@@ -1,0 +1,77 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="UnrealModLoader">
+      <UniqueIdentifier>{2943f03b-3913-4b1d-b86c-36bce15f644e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UnrealModLoader\GameInfo">
+      <UniqueIdentifier>{f2e7939d-44db-4039-ac34-8c81f78c03bf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UnrealModLoader\Memory">
+      <UniqueIdentifier>{0689fbc3-4a71-41a3-b534-3e1d5afcb78f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UnrealModLoader\Utilities">
+      <UniqueIdentifier>{3a334267-87a4-43b3-9398-6d5070b9fc93}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UE4">
+      <UniqueIdentifier>{a62dc67b-5a0e-4ae6-813a-f30f232b4629}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="UnrealEngineModLoader\dllmain.cpp">
+      <Filter>UnrealModLoader</Filter>
+    </ClCompile>
+    <ClCompile Include="UnrealEngineModLoader\Utilities\Globals.cpp">
+      <Filter>UnrealModLoader\Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="UnrealEngineModLoader\Utilities\EngineDefFinder.cpp">
+      <Filter>UnrealModLoader\Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="UnrealEngineModLoader\Memory\mem.cpp">
+      <Filter>UnrealModLoader\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="UnrealEngineModLoader\GameInfo\GameInfo.cpp">
+      <Filter>UnrealModLoader\GameInfo</Filter>
+    </ClCompile>
+    <ClCompile Include="UE4\CoreUObject_functions.cpp">
+      <Filter>UE4</Filter>
+    </ClCompile>
+    <ClCompile Include="UE4\Basic.cpp">
+      <Filter>UE4</Filter>
+    </ClCompile>
+    <ClCompile Include="PakLoader.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="UnrealEngineModLoader\Utilities\Globals.h">
+      <Filter>UnrealModLoader\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="UnrealEngineModLoader\Utilities\Logger.h">
+      <Filter>UnrealModLoader\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="UnrealEngineModLoader\Utilities\MinHook.h">
+      <Filter>UnrealModLoader\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="UnrealEngineModLoader\Utilities\Pattern.h">
+      <Filter>UnrealModLoader\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="UnrealEngineModLoader\Utilities\Dumper.h">
+      <Filter>UnrealModLoader\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="UnrealEngineModLoader\Utilities\EngineDefFinder.h">
+      <Filter>UnrealModLoader\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="UnrealEngineModLoader\Memory\mem.h">
+      <Filter>UnrealModLoader\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="UnrealEngineModLoader\GameInfo\GameInfo.h">
+      <Filter>UnrealModLoader\GameInfo</Filter>
+    </ClInclude>
+    <ClInclude Include="UE4\CoreUObject_classes.hpp">
+      <Filter>UE4</Filter>
+    </ClInclude>
+    <ClInclude Include="UE4\Ue4.hpp">
+      <Filter>UE4</Filter>
+    </ClInclude>
+    <ClInclude Include="PakLoader.h" />
+  </ItemGroup>
+</Project>
