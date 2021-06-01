@@ -6,7 +6,7 @@ This software is provided by the author "as is". In no event shall the author be
 theory of liability, whether in contract, strict liability, or tort (including negligence or otherwise) arising in any way out of the use of this software, even if advised of the possibility of such damage.
 
 # Docs
-TODO
+While the tool doesn't have "official" Documentation yet, here is a very good [Guide](https://github.com/Dmgvol/GR_Guides/blob/main/ModLoaderExample.md) that was made for the game Ghost Runner, the process of making a mod is essentially the same for all other games.
 
 # Special Features
 	* You can enable or disable the console via the ini
