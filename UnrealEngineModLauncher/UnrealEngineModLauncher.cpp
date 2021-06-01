@@ -1,12 +1,15 @@
+#include <Windows.h>
 #include <iostream>
-#include<Windows.h>
 #include <string>
-#include  <filesystem>
+#include <filesystem>
+#include <psapi.h>
 
-uint32_t pid = 0;
+uint32_t FoundGamepid = 0;
+std::vector<std::string> GameProfiles;
+
 void InjectDLL(std::string path)
 {
-    HANDLE hProc = OpenProcess(PROCESS_ALL_ACCESS, 0, pid);
+    HANDLE hProc = OpenProcess(PROCESS_ALL_ACCESS, 0, FoundGamepid);
     if (hProc && hProc != INVALID_HANDLE_VALUE)
     {
         void* loc = VirtualAllocEx(hProc, 0, MAX_PATH, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
@@ -23,55 +26,95 @@ void InjectDLL(std::string path)
     }
 }
 
-std::string string_to_hex(const std::string& input)
-{
-    static const char hex_digits[] = "0123456789ABCDEF";
 
-    std::string output;
-    output.reserve(input.length() * 2);
-    for (unsigned char c : input)
+void GetAllProfiles(std::string path)
+{
+    path = path.substr(0, path.find_last_of("/\\"));
+    path = path + "\\Profiles\\";
+    if (!std::filesystem::exists(path))
     {
-        output.push_back(hex_digits[c >> 4]);
-        output.push_back(hex_digits[c & 15]);
+        std::cout << "PROFILES FOLDER NOT FOUND!" << std::endl;
+        Sleep(5000);
+        exit(0);
     }
-    return output;
+    else
+    {
+        std::cout << "PROFILES FOLDER FOUND!!!!" << std::endl;
+        for (const auto& entry : std::filesystem::directory_iterator(path))
+        {
+            if (entry.path().extension().string() == ".profile")
+            {
+                std::wstring filename = entry.path().filename().wstring();
+                std::string str(filename.begin(), filename.end());
+                str = str.substr(0, str.find_last_of("."));
+                GameProfiles.push_back(str);
+            }
+        }
+    }
 }
 
-HWND WaitingForUnrealWindow()
+BOOL CALLBACK WindowEnumerationCallBack(HWND hwnd, LPARAM lParam) 
+{
+    int length = ::GetWindowTextLength(hwnd);
+    if (!IsWindowVisible(hwnd) || length == 0) 
+    {
+        return TRUE;
+    }
+    DWORD dwProcId = 0;
+    GetWindowThreadProcessId(hwnd, &dwProcId);
+    HANDLE hProc = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, dwProcId);
+    std::wstring EXEName;
+    if (NULL != hProc)
+    {
+        HMODULE hMod;
+        DWORD cbNeeded;
+        TCHAR szEXEName[MAX_PATH];
+        if (EnumProcessModules(hProc, &hMod,
+            sizeof(hMod), &cbNeeded))
+        {
+            GetModuleBaseName(hProc, hMod, szEXEName,
+                sizeof(szEXEName) / sizeof(TCHAR));
+
+            EXEName = (szEXEName);
+        }
+    }
+    CloseHandle(hProc);
+
+    std::string strStd(EXEName.begin(), EXEName.end());
+    strStd = strStd.substr(0, strStd.find_last_of("."));
+    for (int i = 0; i < GameProfiles.size(); i++)
+    {
+        if (strStd == GameProfiles[i])
+        {
+            std::cout << "Found Game: " << GameProfiles[i] << std::endl;
+            FoundGamepid = dwProcId;
+        }
+    }
+    return TRUE;
+}
+
+void WaitingForUnrealWindow(std::string path)
 {
     HWND hWnd = nullptr;
     bool WindowNotFound = true;
     std::cout << "Waiting for Game Window..." << std::endl;
     while (WindowNotFound)
     {
-        LPSTR Test[MAX_PATH] = {0};
-        hWnd = FindWindowA("UnrealWindow", nullptr);
-        if (hWnd != nullptr)
+        EnumWindows(WindowEnumerationCallBack, (LPARAM)nullptr);
+        if (FoundGamepid != 0)
         {
-            std::wstring title(GetWindowTextLength(hWnd) + 1, L'\0');
-            GetWindowTextW(hWnd, &title[0], title.size());
-            std::string str(title.begin(), title.end());
-            auto EpicString = string_to_hex(str);
-            if (EpicString != "457069632047616D6573204C61756E6368657200")
-            {
-                if (EpicString != "00")
-                {
-                    std::cout << "Game Found" << std::endl;
-                    WindowNotFound = false;
-                }
-            }
+            WindowNotFound = false;
+            path = path.substr(0, path.find_last_of("/\\"));
+            path = path + "\\UnrealEngineModLoader.dll";
+            InjectDLL(path);
         }
         Sleep(1000 / 60);
     }
-    return hWnd;
 }
 
 int main(int argc, char* argv[])
 {
-    GetWindowThreadProcessId(WaitingForUnrealWindow(), (DWORD*)(&pid));
-    std::string path = std::string(argv[0]);
-    path = path.substr(0, path.find_last_of("/\\"));
-    path = path + "\\UnrealEngineModLoader.dll";
-    InjectDLL(path);
+    GetAllProfiles(std::string(argv[0]));
+    WaitingForUnrealWindow(std::string(argv[0]));
     return 0;
 }
