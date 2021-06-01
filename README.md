@@ -11,9 +11,9 @@ While the tool doesn't have "official" Documentation yet, here is a very good [G
 # Special Features
 	* You can enable or disable the console via the ini
 	* You can use the Ue4 Say function and add a /Print to the end to print to the modloader console
-	* Press F8 to dump Engine Settings
-	* Press F9 to dump Object Store
-	* Press F10 to dump World Actor Array
+	* Press F8 to dump Object Store
+	* Press F9 to dump Engine Settings
+	* Press F10 to dump World Actors Array
 
 # 3rd Party Software
   * [feather-ini-parser](https://github.com/Turbine1991/cpp-feather-ini-parser)
