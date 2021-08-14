@@ -27,8 +27,6 @@ namespace MinHook
 			Log::Error("Failed to enable hook: %s", displayName.c_str());
 			return;
 		}
-
-		//Log::Info("Added hook: %s [0x%" PRIXPTR "]", displayName.c_str(), pTarget);
 		Log::Info("Added hook: %s", displayName.c_str());
 	}
 }

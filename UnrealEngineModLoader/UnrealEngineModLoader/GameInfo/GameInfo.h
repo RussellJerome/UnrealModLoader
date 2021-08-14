@@ -6,23 +6,23 @@
 
 struct Offsets {
 	struct {
-		uint16_t Index = 0;
-		uint16_t Class = 0;
-		uint16_t Name = 0;
-		uint16_t Outer = 0;
+		uint16_t Index = 0x0;
+		uint16_t Class = 0x0;
+		uint16_t Name = 0x0;
+		uint16_t Outer = 0x0;
 	} UObject;
 	struct {
-		uint16_t Next = 0;
+		uint16_t Next = 0x0;
 	} UField;
 	struct {
-		uint16_t SuperStruct = 0;
-		uint16_t Children = 0;
-		uint16_t PropertiesSize = 0;
-		uint16_t OverallUStructSize = 0;
+		uint16_t SuperStruct = 0x0;
+		uint16_t Children = 0x0;
+		uint16_t PropertiesSize = 0x0;
+		uint16_t OverallUStructSize = 0x0;
 	} UStruct;
 	struct {
-		uint16_t FunctionFlags = 0;
-		uint16_t Func = 0;
+		uint16_t FunctionFlags = 0x0;
+		uint16_t Func = 0x0;
 	} UFunction;
 	struct {
 		uint16_t PersistentLevel = 0x0;

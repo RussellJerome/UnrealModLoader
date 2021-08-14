@@ -202,6 +202,6 @@ namespace PakLoader
 	{
 		Log::Info("Setting Up Loader");
 		CreateThread(0, 0, InitHooks, 0, 0, 0);
-		CreateThread(0, 0, LoopThread, 0, 0, 0);
+		Dumper::BeginKeyThread();
 	}
 };

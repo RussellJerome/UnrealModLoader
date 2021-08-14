@@ -40,6 +40,9 @@
       <Filter>UE4</Filter>
     </ClCompile>
     <ClCompile Include="PakLoader.cpp" />
+    <ClCompile Include="UnrealEngineModLoader\Utilities\Dumper.cpp">
+      <Filter>UnrealModLoader\Utilities</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="UnrealEngineModLoader\Utilities\Globals.h">
