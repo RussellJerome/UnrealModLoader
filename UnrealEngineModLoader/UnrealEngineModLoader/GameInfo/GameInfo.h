@@ -33,8 +33,6 @@ struct Offsets {
 	}ULevel;
 };
 
-extern Offsets defs;
-
 class GameProfile
 {
 public:
@@ -62,6 +60,8 @@ public:
 
 	bool IsEngineDefsMissing;
 	bool IsUWorldMissing;
+
+	Offsets defs;
 
 	static GameProfile SelectedGameProfile;
 	static void CreateGameProfile();

@@ -18,9 +18,9 @@ namespace UE4
 	{
 	public:
 		static FUObjectArray* GObjects;
-		int32_t GetIndex() const { return Read<int32_t>((byte*)this + defs.UObject.Index); };
-		UClass* GetClass() const { return Read<class UClass*>((byte*)this + defs.UObject.Class); };
-		UObject* GetOuter() const { return Read<UObject*>((byte*)this + defs.UObject.Outer); };
+		int32_t GetIndex() const { return Read<int32_t>((byte*)this + GameProfile::SelectedGameProfile.defs.UObject.Index); };
+		UClass* GetClass() const { return Read<class UClass*>((byte*)this + GameProfile::SelectedGameProfile.defs.UObject.Class); };
+		UObject* GetOuter() const { return Read<UObject*>((byte*)this + GameProfile::SelectedGameProfile.defs.UObject.Outer); };
 
 		static inline bool IsChunkedArray()
 		{
@@ -106,7 +106,7 @@ namespace UE4
 	class UField : public UObject
 	{
 	public:
-		UField* GetNext() const { return Read<UField*>((byte*)this + defs.UField.Next); };
+		UField* GetNext() const { return Read<UField*>((byte*)this + GameProfile::SelectedGameProfile.defs.UField.Next); };
 
 		static UClass* StaticClass()
 		{
@@ -119,9 +119,9 @@ namespace UE4
 	class UStruct : public UField
 	{
 	public:
-		UStruct* GetSuperField() const { return Read<UStruct*>((byte*)this + defs.UStruct.SuperStruct); };
-		UField* GetChildren() const { return Read<UField*>((byte*)this + defs.UStruct.Children); };
-		int32_t GetPropertySize() const { return Read<int32_t>((byte*)this + defs.UStruct.PropertiesSize); };
+		UStruct* GetSuperField() const { return Read<UStruct*>((byte*)this + GameProfile::SelectedGameProfile.defs.UStruct.SuperStruct); };
+		UField* GetChildren() const { return Read<UField*>((byte*)this + GameProfile::SelectedGameProfile.defs.UStruct.Children); };
+		int32_t GetPropertySize() const { return Read<int32_t>((byte*)this + GameProfile::SelectedGameProfile.defs.UStruct.PropertiesSize); };
 		
 		static UClass* StaticClass()
 		{
@@ -161,8 +161,8 @@ namespace UE4
 	class UFunction : public UStruct
 	{
 	public:
-		int32_t GetFunctionFlags() const { return Read<int32_t>((byte*)this + defs.UFunction.FunctionFlags); };
-		void* GetFunction() const { return Read<void*>((byte*)this + defs.UFunction.Func); };
+		int32_t GetFunctionFlags() const { return Read<int32_t>((byte*)this + GameProfile::SelectedGameProfile.defs.UFunction.FunctionFlags); };
+		void* GetFunction() const { return Read<void*>((byte*)this + GameProfile::SelectedGameProfile.defs.UFunction.Func); };
 		
 		static UClass* StaticClass()
 		{
@@ -175,7 +175,7 @@ namespace UE4
 	class ULevel : public UObject
 	{
 	public:
-		TArray<class AActor*> GetWorldActors() const { return Read<TArray<class AActor*>>((byte*)this + defs.ULevel.WorldArray); };
+		TArray<class AActor*> GetWorldActors() const { return Read<TArray<class AActor*>>((byte*)this + GameProfile::SelectedGameProfile.defs.ULevel.WorldArray); };
 
 		static UClass* StaticClass()
 		{
@@ -209,8 +209,8 @@ namespace UE4
 	class UWorld : public UObject
 	{
 	public:
-		ULevel* GetPersistentLevel() const { return Read<ULevel*>((byte*)this + defs.UWorld.PersistentLevel); };
-		class AGameModeBase* GetAuthorityGameMode() const { return Read<class AGameModeBase*>((byte*)this + defs.UWorld.AuthorityGameMode); };
+		ULevel* GetPersistentLevel() const { return Read<ULevel*>((byte*)this + GameProfile::SelectedGameProfile.defs.UWorld.PersistentLevel); };
+		class AGameModeBase* GetAuthorityGameMode() const { return Read<class AGameModeBase*>((byte*)this + GameProfile::SelectedGameProfile.defs.UWorld.AuthorityGameMode); };
 
 		inline AActor* SpawnActor(UClass* uclass, const  FTransform* transform, const FActorSpawnParameters* params)
 		{

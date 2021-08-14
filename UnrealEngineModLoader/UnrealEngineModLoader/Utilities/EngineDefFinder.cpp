@@ -5,11 +5,11 @@ namespace ClassDefFinder
 	bool FindUObjectIndexDefs(UE4::UObject* CoreUObject)
 	{
 		Log::Info("Scanning For UObject Index Def.");
-		while (Read<int32_t>((byte*)CoreUObject + defs.UObject.Index) != 1)
+		while (Read<int32_t>((byte*)CoreUObject + GameProfile::SelectedGameProfile.defs.UObject.Index) != 1)
 		{
-			defs.UObject.Index = defs.UObject.Index + 0x4;
+			GameProfile::SelectedGameProfile.defs.UObject.Index = GameProfile::SelectedGameProfile.defs.UObject.Index + 0x4;
 		}
-		Log::Info("UObject Index Def located at: 0x%p", defs.UObject.Index);
+		Log::Info("UObject Index Def located at: 0x%p", GameProfile::SelectedGameProfile.defs.UObject.Index);
 		return true;
 	};
 
@@ -19,7 +19,7 @@ namespace ClassDefFinder
 		Log::Info("Scanning For UObject Name Def.");
 		while (HasNameNotBeenFound)
 		{
-			auto Name = *reinterpret_cast<UE4::FName*>((byte*)CoreUObject + defs.UObject.Name);
+			auto Name = *reinterpret_cast<UE4::FName*>((byte*)CoreUObject + GameProfile::SelectedGameProfile.defs.UObject.Name);
 			if (GameProfile::SelectedGameProfile.UsesFNamePool)
 			{
 				if (UE4::FName::GetFNamePool().IsValidIndex(Name.ComparisonIndex))
@@ -42,10 +42,10 @@ namespace ClassDefFinder
 			}
 			if (HasNameNotBeenFound == true)
 			{
-				defs.UObject.Name = defs.UObject.Name + 0x8;
+				GameProfile::SelectedGameProfile.defs.UObject.Name = GameProfile::SelectedGameProfile.defs.UObject.Name + 0x8;
 			}
 		}
-		Log::Info("UObject Name Def located at: 0x%p", defs.UObject.Name);
+		Log::Info("UObject Name Def located at: 0x%p", GameProfile::SelectedGameProfile.defs.UObject.Name);
 		return true;
 	}
 
@@ -55,7 +55,7 @@ namespace ClassDefFinder
 		Log::Info("Scanning For UObject Class Def.");
 		while (HasClassNotBeenFound)
 		{
-			auto Class = Read<UE4::UClass*>((byte*)CoreUObject + defs.UObject.Class);
+			auto Class = Read<UE4::UClass*>((byte*)CoreUObject + GameProfile::SelectedGameProfile.defs.UObject.Class);
 			auto ClassIndex = Class->GetIndex();
 			UE4::UObject* ClassCheck;
 			if (GameProfile::SelectedGameProfile.IsUsingFChunkedFixedUObjectArray)
@@ -76,10 +76,10 @@ namespace ClassDefFinder
 			}
 			if (HasClassNotBeenFound)
 			{
-				defs.UObject.Class = defs.UObject.Class + 0x8;
+				GameProfile::SelectedGameProfile.defs.UObject.Class = GameProfile::SelectedGameProfile.defs.UObject.Class + 0x8;
 			}
 		}
-		Log::Info("UObject Class Def located at: 0x%p", defs.UObject.Class);
+		Log::Info("UObject Class Def located at: 0x%p", GameProfile::SelectedGameProfile.defs.UObject.Class);
 		return true;
 	}
 
@@ -89,7 +89,7 @@ namespace ClassDefFinder
 		Log::Info("Scanning For UObject Outer Def.");
 		while (HasOuterNotBeenFound)
 		{
-			auto Outer = Read<UE4::UObject*>((byte*)CoreUObject + defs.UObject.Outer);
+			auto Outer = Read<UE4::UObject*>((byte*)CoreUObject + GameProfile::SelectedGameProfile.defs.UObject.Outer);
 			UE4::UObject* ObjectCheck;
 			if (GameProfile::SelectedGameProfile.IsUsingFChunkedFixedUObjectArray)
 			{
@@ -106,10 +106,10 @@ namespace ClassDefFinder
 			}
 			if (HasOuterNotBeenFound)
 			{
-				defs.UObject.Outer = defs.UObject.Outer + 0x8;
+				GameProfile::SelectedGameProfile.defs.UObject.Outer = GameProfile::SelectedGameProfile.defs.UObject.Outer + 0x8;
 			}
 		}
-		Log::Info("UObject Outer Def located at: 0x%p", defs.UObject.Outer);
+		Log::Info("UObject Outer Def located at: 0x%p", GameProfile::SelectedGameProfile.defs.UObject.Outer);
 		return true;
 	}
 
@@ -132,20 +132,20 @@ namespace ClassDefFinder
 		Log::Info("Scanning For UField Next Def.");
 		bool HasNextNotBeenFound = true;
 		auto WasRecentlyRendered = UE4::UObject::FindObject<UE4::UFunction>("Function Engine.Actor.WasRecentlyRendered");
-		defs.UField.Next = defs.UObject.Outer; // Prevents scanning same area over and over.
+		GameProfile::SelectedGameProfile.defs.UField.Next = GameProfile::SelectedGameProfile.defs.UObject.Outer; // Prevents scanning same area over and over.
 		while (HasNextNotBeenFound)
 		{
-			auto NextObject = Read<UE4::UField*>((byte*)WasRecentlyRendered + defs.UField.Next);
+			auto NextObject = Read<UE4::UField*>((byte*)WasRecentlyRendered + GameProfile::SelectedGameProfile.defs.UField.Next);
 			if (NextObject && NextObject->GetIndex() == WasRecentlyRendered->GetIndex() - 1)
 			{
 				HasNextNotBeenFound = false;
 			}
 			if (HasNextNotBeenFound)
 			{
-				defs.UField.Next = defs.UField.Next + 0x8;
+				GameProfile::SelectedGameProfile.defs.UField.Next = GameProfile::SelectedGameProfile.defs.UField.Next + 0x8;
 			}
 		}
-		Log::Info("UField Next Def located at: 0x%p", defs.UField.Next);
+		Log::Info("UField Next Def located at: 0x%p", GameProfile::SelectedGameProfile.defs.UField.Next);
 		return true;
 	}
 
@@ -169,20 +169,20 @@ namespace ClassDefFinder
 		auto StructObject = UE4::UObject::FindObject<UE4::UStruct>("Class CoreUObject.Struct");
 		auto FieldObject = UE4::UObject::FindObject<UE4::UField>("Class CoreUObject.Field");
 		bool HasSuperFieldNotBeenFound = true;
-		defs.UStruct.SuperStruct = defs.UField.Next; // Prevents scanning same area over and over.
+		GameProfile::SelectedGameProfile.defs.UStruct.SuperStruct = GameProfile::SelectedGameProfile.defs.UField.Next; // Prevents scanning same area over and over.
 		while (HasSuperFieldNotBeenFound)
 		{
-			auto SuperFieldObject = Read<UE4::UObject*>((byte*)StructObject + defs.UStruct.SuperStruct);
+			auto SuperFieldObject = Read<UE4::UObject*>((byte*)StructObject + GameProfile::SelectedGameProfile.defs.UStruct.SuperStruct);
 			if (SuperFieldObject == FieldObject)
 			{
 				HasSuperFieldNotBeenFound = false;
 			}
 			if (HasSuperFieldNotBeenFound)
 			{
-				defs.UStruct.SuperStruct = defs.UStruct.SuperStruct + 0x8;
+				GameProfile::SelectedGameProfile.defs.UStruct.SuperStruct = GameProfile::SelectedGameProfile.defs.UStruct.SuperStruct + 0x8;
 			}
 		}
-		Log::Info("UStruct SuperField Def located at: 0x%p", defs.UStruct.SuperStruct);
+		Log::Info("UStruct SuperField Def located at: 0x%p", GameProfile::SelectedGameProfile.defs.UStruct.SuperStruct);
 		return true;
 	}
 
@@ -192,10 +192,10 @@ namespace ClassDefFinder
 		auto VectorObject = UE4::UObject::FindObject<UE4::UObject>("ScriptStruct CoreUObject.Vector");
 		auto VectorFirstChildObject = UE4::UObject::FindObject<UE4::UObject>("FloatProperty CoreUObject.Vector.X");
 		bool HasChildrenNotBeenFound = true;
-		defs.UStruct.Children = defs.UStruct.SuperStruct;
+		GameProfile::SelectedGameProfile.defs.UStruct.Children = GameProfile::SelectedGameProfile.defs.UStruct.SuperStruct;
 		while (HasChildrenNotBeenFound)
 		{
-			auto ChildObject = Read<UE4::UObject*>((byte*)VectorObject + defs.UStruct.Children);
+			auto ChildObject = Read<UE4::UObject*>((byte*)VectorObject + GameProfile::SelectedGameProfile.defs.UStruct.Children);
 			if (VectorFirstChildObject)
 			{
 				if (VectorFirstChildObject == ChildObject)
@@ -204,7 +204,7 @@ namespace ClassDefFinder
 				}
 				if (HasChildrenNotBeenFound)
 				{
-					defs.UStruct.Children = defs.UStruct.Children + 0x8;
+					GameProfile::SelectedGameProfile.defs.UStruct.Children = GameProfile::SelectedGameProfile.defs.UStruct.Children + 0x8;
 				}
 			}
 			else
@@ -217,16 +217,16 @@ namespace ClassDefFinder
 					}
 					else
 					{
-						defs.UStruct.Children = defs.UStruct.Children + 0x8;
+						GameProfile::SelectedGameProfile.defs.UStruct.Children = GameProfile::SelectedGameProfile.defs.UStruct.Children + 0x8;
 					}
 				}
 				else
 				{
-					defs.UStruct.Children = defs.UStruct.Children + 0x8;
+					GameProfile::SelectedGameProfile.defs.UStruct.Children = GameProfile::SelectedGameProfile.defs.UStruct.Children + 0x8;
 				}
 			}
 		}
-		Log::Info("UStruct Children Def located at: 0x%p", defs.UStruct.Children);
+		Log::Info("UStruct Children Def located at: 0x%p", GameProfile::SelectedGameProfile.defs.UStruct.Children);
 		return true;
 	}
 
@@ -234,11 +234,11 @@ namespace ClassDefFinder
 	{
 		Log::Info("Scanning For UStruct PropertySize Def.");
 		auto VectorObject = UE4::UObject::FindObject<UE4::UObject>("ScriptStruct CoreUObject.Vector");
-		while (Read<int32_t>((byte*)VectorObject + defs.UStruct.PropertiesSize) != 12)
+		while (Read<int32_t>((byte*)VectorObject + GameProfile::SelectedGameProfile.defs.UStruct.PropertiesSize) != 12)
 		{
-			defs.UStruct.PropertiesSize = defs.UStruct.PropertiesSize + 0x4;
+			GameProfile::SelectedGameProfile.defs.UStruct.PropertiesSize = GameProfile::SelectedGameProfile.defs.UStruct.PropertiesSize + 0x4;
 		}
-		Log::Info("UStruct PropertySize Def located at: 0x%p", defs.UStruct.PropertiesSize);
+		Log::Info("UStruct PropertySize Def located at: 0x%p", GameProfile::SelectedGameProfile.defs.UStruct.PropertiesSize);
 		return true;
 	}
 
@@ -255,8 +255,8 @@ namespace ClassDefFinder
 	{
 		if (FindUStructSuperFieldDef() && FindUStructChildrenDef() && FindUStructPropertySizeDef())
 		{
-			defs.UStruct.OverallUStructSize = GetOverallUStructSize();
-			Log::Info("UStruct Size: %i", defs.UStruct.OverallUStructSize);
+			GameProfile::SelectedGameProfile.defs.UStruct.OverallUStructSize = GetOverallUStructSize();
+			Log::Info("UStruct Size: %i", GameProfile::SelectedGameProfile.defs.UStruct.OverallUStructSize);
 			Log::Info("UStruct Defined");
 			return true;
 		}
@@ -272,20 +272,20 @@ namespace ClassDefFinder
 		Log::Info("Scanning For UFunction FunctionFlags Def.");
 		bool HasFunctionFlagsNotBeenFound = true;
 		auto WasRecentlyRendered = UE4::UObject::FindObject<UE4::UFunction>("Function Engine.Actor.WasRecentlyRendered");
-		defs.UFunction.FunctionFlags = defs.UStruct.OverallUStructSize; // Prevents scanning same area over and over.
+		GameProfile::SelectedGameProfile.defs.UFunction.FunctionFlags = GameProfile::SelectedGameProfile.defs.UStruct.OverallUStructSize; // Prevents scanning same area over and over.
 		while (HasFunctionFlagsNotBeenFound)
 		{
-			auto FunctionFlags = Read<int>((byte*)WasRecentlyRendered + defs.UFunction.FunctionFlags);
+			auto FunctionFlags = Read<int>((byte*)WasRecentlyRendered + GameProfile::SelectedGameProfile.defs.UFunction.FunctionFlags);
 			if (FunctionFlags == 1409418241)
 			{
 				HasFunctionFlagsNotBeenFound = false;
 			}
 			if (HasFunctionFlagsNotBeenFound)
 			{
-				defs.UFunction.FunctionFlags = defs.UFunction.FunctionFlags + 0x4;
+				GameProfile::SelectedGameProfile.defs.UFunction.FunctionFlags = GameProfile::SelectedGameProfile.defs.UFunction.FunctionFlags + 0x4;
 			}
 		}
-		Log::Info("UFunction FunctionFlags Def located at: 0x%p", defs.UFunction.FunctionFlags);
+		Log::Info("UFunction FunctionFlags Def located at: 0x%p", GameProfile::SelectedGameProfile.defs.UFunction.FunctionFlags);
 		return true;
 	}
 
@@ -294,8 +294,8 @@ namespace ClassDefFinder
 		auto UFunction = UE4::UObject::FindObject<UE4::UFunction>("Class CoreUObject.Function");
 		if (UFunction)
 		{
-			defs.UFunction.Func = UFunction->GetPropertySize() - 0x8;
-			Log::Info("UFunction Func: 0x%p", defs.UFunction.Func);
+			GameProfile::SelectedGameProfile.defs.UFunction.Func = UFunction->GetPropertySize() - 0x8;
+			Log::Info("UFunction Func: 0x%p", GameProfile::SelectedGameProfile.defs.UFunction.Func);
 			return true;
 		}
 		return false;
@@ -318,21 +318,21 @@ namespace ClassDefFinder
 	bool FindPersistentLevelDef()
 	{
 		bool HasPersistentLevelNotBeenFound = true;
-		defs.UWorld.PersistentLevel = defs.UObject.Outer + 0x8;
+		GameProfile::SelectedGameProfile.defs.UWorld.PersistentLevel = GameProfile::SelectedGameProfile.defs.UObject.Outer + 0x8;
 		while (HasPersistentLevelNotBeenFound)
 		{
-			auto PersistentLevel = Read<UE4::ULevel*>((byte*)UE4::UWorld::GetWorld() + defs.UWorld.PersistentLevel);
+			auto PersistentLevel = Read<UE4::ULevel*>((byte*)UE4::UWorld::GetWorld() + GameProfile::SelectedGameProfile.defs.UWorld.PersistentLevel);
 			if (PersistentLevel != nullptr && PersistentLevel->IsA(UE4::ULevel::StaticClass()))
 			{
 				if (PersistentLevel->GetName() == "PersistentLevel" && PersistentLevel->GetClass()->GetName() == "Level")
 				{
-					Log::Info("PersistentLevel: 0x%p", defs.UWorld.PersistentLevel);
+					Log::Info("PersistentLevel: 0x%p", GameProfile::SelectedGameProfile.defs.UWorld.PersistentLevel);
 					HasPersistentLevelNotBeenFound = false;
 				}
 			}
 			if (HasPersistentLevelNotBeenFound)
 			{
-				defs.UWorld.PersistentLevel = defs.UWorld.PersistentLevel + 0x8;
+				GameProfile::SelectedGameProfile.defs.UWorld.PersistentLevel = GameProfile::SelectedGameProfile.defs.UWorld.PersistentLevel + 0x8;
 			}
 		}
 		Log::Info("Persistent Level Found.");
@@ -342,18 +342,18 @@ namespace ClassDefFinder
 	bool FindGameModeDef()
 	{
 		bool HasGameModeNotBeenFound = true;
-		defs.UWorld.AuthorityGameMode = defs.UWorld.PersistentLevel + 0x8;
+		GameProfile::SelectedGameProfile.defs.UWorld.AuthorityGameMode = GameProfile::SelectedGameProfile.defs.UWorld.PersistentLevel + 0x8;
 		while (HasGameModeNotBeenFound)
 		{
-			auto AuthorityGameMode = Read<UE4::AGameModeBase*>((byte*)UE4::UWorld::GetWorld() + defs.UWorld.AuthorityGameMode);
+			auto AuthorityGameMode = Read<UE4::AGameModeBase*>((byte*)UE4::UWorld::GetWorld() + GameProfile::SelectedGameProfile.defs.UWorld.AuthorityGameMode);
 			if (AuthorityGameMode != nullptr && AuthorityGameMode->IsA(UE4::AGameModeBase::StaticClass()))
 			{
-				Log::Info("AuthorityGameMode: 0x%p", defs.UWorld.AuthorityGameMode);
+				Log::Info("AuthorityGameMode: 0x%p", GameProfile::SelectedGameProfile.defs.UWorld.AuthorityGameMode);
 				HasGameModeNotBeenFound = false;
 			}
 			if (HasGameModeNotBeenFound)
 			{
-				defs.UWorld.AuthorityGameMode = defs.UWorld.AuthorityGameMode + 0x8;
+				GameProfile::SelectedGameProfile.defs.UWorld.AuthorityGameMode = GameProfile::SelectedGameProfile.defs.UWorld.AuthorityGameMode + 0x8;
 			}
 		}
 		Log::Info("Authority GameMode Found.");
@@ -362,8 +362,8 @@ namespace ClassDefFinder
 
 	bool FindWorldArrayDef()
 	{
-		defs.ULevel.WorldArray = defs.UObject.Outer + 0x8 + 0x78;
-		Log::Info("World Actor Array: 0x%p", defs.ULevel.WorldArray);
+		GameProfile::SelectedGameProfile.defs.ULevel.WorldArray = GameProfile::SelectedGameProfile.defs.UObject.Outer + 0x8 + 0x78;
+		Log::Info("World Actor Array: 0x%p", GameProfile::SelectedGameProfile.defs.ULevel.WorldArray);
 		Log::Info("World Actors Found.");
 		return true;
 	}

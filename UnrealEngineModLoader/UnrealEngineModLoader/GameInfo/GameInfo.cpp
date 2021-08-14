@@ -8,7 +8,6 @@
 #include "../PakLoader.h"
 #include "../UE4/Ue4.hpp"
 GameProfile GameProfile::SelectedGameProfile;
-Offsets defs;
 
 DWORD StringToDWord(std::string str)
 {
@@ -155,22 +154,22 @@ void SetupProfile(std::string Path)
 
 		if (GameInfo.select("UObjectDef"))
 		{
-			defs.UObject.Index = StringToDWord(GameInfo.get("UObjectDef", "Index", ""));
-			defs.UObject.Class = StringToDWord(GameInfo.get("UObjectDef", "Class", ""));
-			defs.UObject.Name = StringToDWord(GameInfo.get("UObjectDef", "Name", ""));
-			defs.UObject.Outer = StringToDWord(GameInfo.get("UObjectDef", "Outer", ""));
+			GameProfile::SelectedGameProfile.defs.UObject.Index = StringToDWord(GameInfo.get("UObjectDef", "Index", ""));
+			GameProfile::SelectedGameProfile.defs.UObject.Class = StringToDWord(GameInfo.get("UObjectDef", "Class", ""));
+			GameProfile::SelectedGameProfile.defs.UObject.Name = StringToDWord(GameInfo.get("UObjectDef", "Name", ""));
+			GameProfile::SelectedGameProfile.defs.UObject.Outer = StringToDWord(GameInfo.get("UObjectDef", "Outer", ""));
 			
 			GameInfo.select("UFieldDef");
-			defs.UField.Next = StringToDWord(GameInfo.get("UFieldDef", "Next", ""));
+			GameProfile::SelectedGameProfile.defs.UField.Next = StringToDWord(GameInfo.get("UFieldDef", "Next", ""));
 			
 			GameInfo.select("UStructDef");
-			defs.UStruct.SuperStruct = StringToDWord(GameInfo.get("UStructDef", "SuperStruct", ""));
-			defs.UStruct.Children = StringToDWord(GameInfo.get("UStructDef", "Children", ""));
-			defs.UStruct.PropertiesSize = StringToDWord(GameInfo.get("UStructDef", "PropertiesSize", ""));
+			GameProfile::SelectedGameProfile.defs.UStruct.SuperStruct = StringToDWord(GameInfo.get("UStructDef", "SuperStruct", ""));
+			GameProfile::SelectedGameProfile.defs.UStruct.Children = StringToDWord(GameInfo.get("UStructDef", "Children", ""));
+			GameProfile::SelectedGameProfile.defs.UStruct.PropertiesSize = StringToDWord(GameInfo.get("UStructDef", "PropertiesSize", ""));
 			
 			GameInfo.select("UFunctionDef");
-			defs.UFunction.FunctionFlags = StringToDWord(GameInfo.get("UFunctionDef", "FunctionFlags", ""));
-			defs.UFunction.Func = StringToDWord(GameInfo.get("UFunctionDef", "Func", ""));
+			GameProfile::SelectedGameProfile.defs.UFunction.FunctionFlags = StringToDWord(GameInfo.get("UFunctionDef", "FunctionFlags", ""));
+			GameProfile::SelectedGameProfile.defs.UFunction.Func = StringToDWord(GameInfo.get("UFunctionDef", "Func", ""));
 			
 		}
 		else
@@ -180,10 +179,10 @@ void SetupProfile(std::string Path)
 
 		if (GameInfo.select("UWorldDef"))
 		{
-			defs.UWorld.PersistentLevel = StringToDWord(GameInfo.get("UWorldDef", "PersistentLevel", ""));
-			defs.UWorld.AuthorityGameMode = StringToDWord(GameInfo.get("UWorldDef", "AuthorityGameMode", ""));
+			GameProfile::SelectedGameProfile.defs.UWorld.PersistentLevel = StringToDWord(GameInfo.get("UWorldDef", "PersistentLevel", ""));
+			GameProfile::SelectedGameProfile.defs.UWorld.AuthorityGameMode = StringToDWord(GameInfo.get("UWorldDef", "AuthorityGameMode", ""));
 			GameInfo.select("ULevelDef");
-			defs.ULevel.WorldArray = StringToDWord(GameInfo.get("ULevelDef", "WorldArray", ""));
+			GameProfile::SelectedGameProfile.defs.ULevel.WorldArray = StringToDWord(GameInfo.get("ULevelDef", "WorldArray", ""));
 		}
 		else
 		{
