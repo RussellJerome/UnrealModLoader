@@ -43,6 +43,7 @@
     <ClCompile Include="UnrealEngineModLoader\Utilities\Dumper.cpp">
       <Filter>UnrealModLoader\Utilities</Filter>
     </ClCompile>
+    <ClCompile Include="UnrealEngineModLoader\Memory\CoreModLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="UnrealEngineModLoader\Utilities\Globals.h">
@@ -76,5 +77,6 @@
       <Filter>UE4</Filter>
     </ClInclude>
     <ClInclude Include="PakLoader.h" />
+    <ClInclude Include="UnrealEngineModLoader\Memory\CoreModLoader.h" />
   </ItemGroup>
 </Project>

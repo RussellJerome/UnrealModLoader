@@ -24,6 +24,7 @@
     <ClCompile Include="UE4\CoreUObject_functions.cpp" />
     <ClCompile Include="UnrealEngineModLoader\dllmain.cpp" />
     <ClCompile Include="UnrealEngineModLoader\GameInfo\GameInfo.cpp" />
+    <ClCompile Include="UnrealEngineModLoader\Memory\CoreModLoader.cpp" />
     <ClCompile Include="UnrealEngineModLoader\Memory\mem.cpp" />
     <ClCompile Include="UnrealEngineModLoader\Utilities\Dumper.cpp" />
     <ClCompile Include="UnrealEngineModLoader\Utilities\EngineDefFinder.cpp" />
@@ -34,6 +35,7 @@
     <ClInclude Include="UE4\CoreUObject_classes.hpp" />
     <ClInclude Include="UE4\Ue4.hpp" />
     <ClInclude Include="UnrealEngineModLoader\GameInfo\GameInfo.h" />
+    <ClInclude Include="UnrealEngineModLoader\Memory\CoreModLoader.h" />
     <ClInclude Include="UnrealEngineModLoader\Memory\mem.h" />
     <ClInclude Include="UnrealEngineModLoader\Utilities\Dumper.h" />
     <ClInclude Include="UnrealEngineModLoader\Utilities\EngineDefFinder.h" />

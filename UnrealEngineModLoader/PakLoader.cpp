@@ -3,10 +3,11 @@
 #include "GameInfo/GameInfo.h"
 #include "Ue4.hpp"
 #include <filesystem>
+#include <process.h>
 #include "Utilities/Pattern.h"
 #include "Utilities/Globals.h"
 #include "Utilities/Dumper.h"
-
+#include "Memory/CoreModLoader.h"
 bool GameStateClassInitNotRan = true;
 namespace fs = std::filesystem;
 HANDLE                      m_hConsole;
@@ -55,6 +56,7 @@ namespace PakLoader
 			{
 				UE4::InitSDK();
 				Log::Info("Engine Classes Loaded");
+				CoreModLoader::LoadCoreMods();
 				UE4::FTransform transform = UE4::FTransform::FTransform();
 				UE4::FActorSpawnParameters spawnParams = UE4::FActorSpawnParameters::FActorSpawnParameters();
 				if (GameProfile::SelectedGameProfile.StaticLoadObject)
