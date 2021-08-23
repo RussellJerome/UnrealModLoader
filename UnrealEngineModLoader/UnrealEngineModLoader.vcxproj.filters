@@ -44,6 +44,7 @@
       <Filter>UnrealModLoader\Utilities</Filter>
     </ClCompile>
     <ClCompile Include="UnrealEngineModLoader\Memory\CoreModLoader.cpp" />
+    <ClCompile Include="Hooks.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="UnrealEngineModLoader\Utilities\Globals.h">
@@ -78,5 +79,6 @@
     </ClInclude>
     <ClInclude Include="PakLoader.h" />
     <ClInclude Include="UnrealEngineModLoader\Memory\CoreModLoader.h" />
+    <ClInclude Include="Hooks.h" />
   </ItemGroup>
 </Project>

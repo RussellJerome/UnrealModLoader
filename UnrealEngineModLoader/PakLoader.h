@@ -2,5 +2,5 @@
 
 namespace PakLoader
 {
-	void SetupLoader();
+	void ScanLoadedPaks();
 };

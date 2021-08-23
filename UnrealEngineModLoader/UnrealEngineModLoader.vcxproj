@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Hooks.cpp" />
     <ClCompile Include="PakLoader.cpp" />
     <ClCompile Include="UE4\Basic.cpp" />
     <ClCompile Include="UE4\CoreUObject_functions.cpp" />
@@ -31,6 +32,7 @@
     <ClCompile Include="UnrealEngineModLoader\Utilities\Globals.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Hooks.h" />
     <ClInclude Include="PakLoader.h" />
     <ClInclude Include="UE4\CoreUObject_classes.hpp" />
     <ClInclude Include="UE4\Ue4.hpp" />

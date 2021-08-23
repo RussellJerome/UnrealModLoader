@@ -5,7 +5,7 @@
 #include <filesystem>
 #include "INI.h"
 #include "Utilities/Pattern.h"
-#include "../PakLoader.h"
+#include "../Hooks.h"
 #include "../UE4/Ue4.hpp"
 GameProfile GameProfile::SelectedGameProfile;
 
@@ -221,7 +221,7 @@ void SetupProfile(std::string Path)
 			Log::SetupErrorMessage("Function Information Could Not Be Found!");
 		}
 		Log::Info("Setup %s", gamename.c_str());
-		PakLoader::SetupLoader();
+		Hooks::SetupHooks();
 	}
 	else
 	{
