@@ -10,3 +10,7 @@ T Read(void* address)
 	Read(address, &buffer, sizeof(T));
 	return buffer;
 }
+namespace MEM
+{
+	HWND FindWindow(DWORD pid, wchar_t const* className);
+};

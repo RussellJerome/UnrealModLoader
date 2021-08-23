@@ -127,8 +127,19 @@ namespace Dumper
 		return NULL;
 	}
 
+	DWORD __stdcall ObjectThread(LPVOID)
+	{
+		Dumper::DumpObjects();
+		return NULL;
+	}
+
+	void CreateObjectDumpThread()
+	{
+		//CreateThread(0, 0, ObjectThread, 0, 0, 0);
+	}
+
 	void BeginKeyThread()
 	{
-		CreateThread(0, 0, LoopThread, 0, 0, 0);
+		//CreateThread(0, 0, LoopThread, 0, 0, 0);
 	}
 }
