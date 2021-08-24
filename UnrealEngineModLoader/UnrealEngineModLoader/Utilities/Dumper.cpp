@@ -1,10 +1,9 @@
 #include "Dumper.h"
 #include <windows.h>
 #include "../UE4/Ue4.hpp"
-bool f8_pressed;
-bool f9_pressed;
-bool f10_pressed;
-
+#include "Globals.h"
+bool bDumpObjects;
+bool bDumpEngineInfo;
 namespace Dumper
 {
 	bool DumpObjects()
@@ -89,33 +88,37 @@ namespace Dumper
 		fclose(Log);
 		return true;
 	}
-
+	bool f1_pressed;
 	void KeyDetectionLoop()
 	{
 		while (true)
 		{
-			if (GetAsyncKeyState(VK_F8) != 0)
-				f8_pressed = true;
-			else if (f8_pressed)
+			if (GetAsyncKeyState(VK_F1) != 0)
+				f1_pressed = true;
+			else if (f1_pressed)
 			{
-				f8_pressed = false;
+				f1_pressed = false;
+				if (Global::bIsMenuOpen)
+				{
+					Global::bIsMenuOpen = false;
+				}
+				else
+				{
+					Global::bIsMenuOpen = true;
+				}
+			}
+
+			if (bDumpObjects)
+			{
+				bDumpObjects = false;
 				DumpObjects();
 			}
 
-			if (GetAsyncKeyState(VK_F9) != 0)
-				f9_pressed = true;
-			else if (f9_pressed)
-			{
-				f9_pressed = false;
-				DumpEngineInfo();
-			}
 
-			if (GetAsyncKeyState(VK_F10) != 0)
-				f10_pressed = true;
-			else if (f10_pressed)
+			if (bDumpEngineInfo)
 			{
-				f10_pressed = false;
-				DumpWorldActors();
+				bDumpEngineInfo = false;
+				DumpEngineInfo();
 			}
 			Sleep(1000 / 60);
 		}
@@ -127,19 +130,19 @@ namespace Dumper
 		return NULL;
 	}
 
-	DWORD __stdcall ObjectThread(LPVOID)
+
+	void BeginObjectDump()
 	{
-		Dumper::DumpObjects();
-		return NULL;
+		bDumpObjects = true;
 	}
 
-	void CreateObjectDumpThread()
+	void BeginEngineDump()
 	{
-		//CreateThread(0, 0, ObjectThread, 0, 0, 0);
+		bDumpEngineInfo = true;
 	}
 
 	void BeginKeyThread()
 	{
-		//CreateThread(0, 0, LoopThread, 0, 0, 0);
+		CreateThread(0, 0, LoopThread, 0, 0, 0);
 	}
 }

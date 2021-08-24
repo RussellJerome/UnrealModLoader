@@ -2,7 +2,8 @@
 
 // Global defines
 
-std::vector<std::wstring> Global::modnames;
+std::vector<Mod> Global::ModInfo;
 std::string Global::GameName;
-std::vector<UE4::AActor*> Global::ModActors;
 UE4::AActor* Global::ModLoaderActor;
+bool Global::bIsMenuOpen;
+std::string Global::Version = "2.0.0";

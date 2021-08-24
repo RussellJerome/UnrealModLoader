@@ -2,7 +2,7 @@
 
 namespace Dumper
 {
-	bool DumpObjects();
 	void BeginKeyThread();
-	void CreateObjectDumpThread();
+	void BeginObjectDump();
+	void BeginEngineDump();
 }

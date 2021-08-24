@@ -19,7 +19,7 @@ namespace PakLoader
 		{
 			std::filesystem::create_directory(path);
 		}
-		Global::modnames.empty();
+		Global::ModInfo.empty();
 		for (const auto& entry : fs::directory_iterator(path))
 		{
 			if (entry.path().extension().string() == ".pak")
@@ -32,7 +32,10 @@ namespace PakLoader
 					modNameW = modNameW.substr(0, modNameW.length() - 2);
 				std::string str(modNameW.begin(), modNameW.end());
 				Log::Info("PakModLoaded: %s", str);
-				Global::modnames.push_back(modNameW);
+				Mod CurrentMod;
+				CurrentMod.ModName = modNameW;
+				CurrentMod.IsEnabled = true;
+				Global::ModInfo.push_back(CurrentMod);
 			}
 		}
 	}

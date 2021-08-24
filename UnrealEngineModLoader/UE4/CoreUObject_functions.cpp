@@ -95,6 +95,53 @@ namespace UE4
 		//fn->FunctionFlags = flags;
 	}
 
+	bool UObject::DoesObjectContainFunction(std::string Function)
+	{
+		if (IsChunkedArray())
+		{
+			for (int i = 0; i < GObjects->GetAsChunckArray().Num(); ++i)
+			{
+				auto object = GObjects->GetAsChunckArray().GetByIndex(i).Object;
+
+				if (object == nullptr)
+				{
+					continue;
+				}
+
+				if (object->GetName() == Function)
+				{
+					if (object->GetOuter() == this->GetClass())
+					{
+						return true;
+					}
+				}
+			}
+			return false;
+		}
+		else
+		{
+			for (int i = 0; i < GObjects->GetAsTUArray().Num(); ++i)
+			{
+				auto object = GObjects->GetAsTUArray().GetByIndex(i).Object;
+
+				if (object == nullptr)
+				{
+					continue;
+				}
+
+				if (object->GetName() == Function)
+				{
+					if (object->GetOuter() == this->GetClass())
+					{
+						return true;
+					}
+				}
+			}
+			return false;
+		}
+		return false;
+	}
+
 	void UObject::ProcessEvent(class UFunction* function, void* parms)
 	{
 		return reinterpret_cast<void(*)(UObject*, class UFunction*, void*)>(GameProfile::SelectedGameProfile.ProcessEvent)(this, function, parms);
@@ -105,9 +152,9 @@ namespace UE4
 		return reinterpret_cast<UObject * (__fastcall*)(class UClass*, UObject*, const wchar_t*, const wchar_t*, unsigned int, void*, bool)>(GameProfile::SelectedGameProfile.StaticLoadObject)(uclass, InOuter, InName, Filename, LoadFlags, Sandbox, bAllowObjectReconciliation);
 	}
 
-	UObject* UObject::CallFunctionByNameWithArguments(const wchar_t* Str, void* Ar, UE4::UObject* Executor, bool bForceCallWithNonExec)
+	bool UObject::CallFunctionByNameWithArguments(const wchar_t* Str, void* Ar, UE4::UObject* Executor, bool bForceCallWithNonExec)
 	{
-		return reinterpret_cast<UE4::UObject * (*)(UE4::UObject*, const wchar_t*, void*, UE4::UObject*, bool)>(GameProfile::SelectedGameProfile.CallFunctionByNameWithArguments)(this, Str, Ar, Executor, bForceCallWithNonExec);
+		return reinterpret_cast<bool (*)(UE4::UObject*, const wchar_t*, void*, UE4::UObject*, bool)>(GameProfile::SelectedGameProfile.CallFunctionByNameWithArguments)(this, Str, Ar, Executor, bForceCallWithNonExec);
 	}
 
 	//---------------------------------------------------------------------------

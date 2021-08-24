@@ -54,15 +54,16 @@ namespace Hooks
 				}
 				GameStateClassInitNotRan = false;
 			}
-			for (int i = 0; i < Global::ModActors.size(); i++)
+			for (int i = 0; i < Global::ModInfo.size(); i++)
 			{
-				UE4::AActor* CurrentModActor = Global::ModActors[i];
+				UE4::AActor* CurrentModActor = Global::ModInfo[i].CurrentModActor;
 				if (CurrentModActor->IsA(UE4::AActor::StaticClass()))
 				{
 					CurrentModActor->CallFunctionByNameWithArguments(L"ModCleanUp", nullptr, NULL, true);
 				}
+				Global::ModInfo[i].CurrentModActor = nullptr;
 			}
-			Global::ModActors.clear();
+			//Global::ModActors.clear();
 			if (Global::ModLoaderActor->IsA(UE4::AActor::StaticClass()))
 			{
 				Global::ModLoaderActor->CallFunctionByNameWithArguments(L"CleanLoader", nullptr, NULL, true);
@@ -74,38 +75,55 @@ namespace Hooks
 				transform.Rotation = UE4::FQuat(0, 0, 0, 0);
 				transform.Scale3D = UE4::FVector(1, 1, 1);
 				UE4::FActorSpawnParameters spawnParams = UE4::FActorSpawnParameters::FActorSpawnParameters();
-				for (int i = 0; i < Global::modnames.size(); i++)
+				for (int i = 0; i < Global::ModInfo.size(); i++)
 				{
 					std::wstring CurrentMod;
 					//StartSpawningMods
-					CurrentMod = Global::modnames[i];
-					if (GameProfile::SelectedGameProfile.StaticLoadObject)
+					CurrentMod = Global::ModInfo[i].ModName;
+					if (Global::ModInfo[i].IsEnabled)
 					{
-						std::string str(CurrentMod.begin(), CurrentMod.end());
-						const std::wstring Path = L"/Game/Mods/" + CurrentMod + L"/ModActor.ModActor_C";
-						UE4::UClass* ModObject = UE4::UClass::LoadClassFromString(Path.c_str(), false);
-						if (ModObject)
+						if (GameProfile::SelectedGameProfile.StaticLoadObject)
 						{
-							UE4::AActor* ModActor = nullptr;
-							if (!GameProfile::SelectedGameProfile.IsUsingDeferedSpawn)
+							std::string str(CurrentMod.begin(), CurrentMod.end());
+							const std::wstring Path = L"/Game/Mods/" + CurrentMod + L"/ModActor.ModActor_C";
+							UE4::UClass* ModObject = UE4::UClass::LoadClassFromString(Path.c_str(), false);
+							if (ModObject)
 							{
-								ModActor = UE4::UWorld::GetWorld()->SpawnActor(ModObject, &transform, &spawnParams);
+								UE4::AActor* ModActor = nullptr;
+								if (!GameProfile::SelectedGameProfile.IsUsingDeferedSpawn)
+								{
+									ModActor = UE4::UWorld::GetWorld()->SpawnActor(ModObject, &transform, &spawnParams);
+								}
+								else
+								{
+									auto Gameplay = (UE4::UGameplayStatics*)UE4::UGameplayStatics::StaticClass()->CreateDefaultObject();
+									ModActor = Gameplay->BeginDeferredActorSpawnFromClass(ModObject, transform, UE4::ESpawnActorCollisionHandlingMethod::AlwaysSpawn, nullptr);
+								}
+								if (ModActor)
+								{
+									for (size_t i = 0; i < Global::ModInfo.size(); i++)
+									{
+										if (Global::ModInfo[i].ModName == CurrentMod)
+										{
+											Global::ModInfo[i].CurrentModActor = ModActor;
+											if (!Global::ModInfo[i].WasInitialized)
+											{
+												Global::ModInfo[i].ContainsButton = ModActor->DoesObjectContainFunction("ModMenuButtonPressed");
+												//std::cout << str << ": " << Global::ModInfo[i].ContainsButton << std::endl;
+												Global::ModInfo[i].WasInitialized = true;
+											}
+										}
+									}
+									//Global::ModActors.push_back(ModActor);
+									ModActor->CallFunctionByNameWithArguments(L"PreBeginPlay", nullptr, NULL, true);
+
+									Log::Info("Sucessfully Loaded %s", str);
+								}
 							}
 							else
 							{
-								auto Gameplay = (UE4::UGameplayStatics*)UE4::UGameplayStatics::StaticClass()->CreateDefaultObject();
-								ModActor = Gameplay->BeginDeferredActorSpawnFromClass(ModObject, transform, UE4::ESpawnActorCollisionHandlingMethod::AlwaysSpawn, nullptr);
+								Log::Info("Could not locate ModActor for %s", str);
 							}
-							if (ModActor)
-							{
-								Global::ModActors.push_back(ModActor);
-								ModActor->CallFunctionByNameWithArguments(L"PreBeginPlay", nullptr, NULL, true);
-								Log::Info("Sucessfully Loaded %s", str);
-							}
-						}
-						else
-						{
-							Log::Info("Could not locate ModActor for %s", str);
 						}
 					}
 				}
@@ -124,9 +142,9 @@ namespace Hooks
 				{
 					Log::Info("Beginplay Called");
 					Global::ModLoaderActor->CallFunctionByNameWithArguments(L"PostLoaderStart", nullptr, NULL, true);
-					for (int i = 0; i < Global::ModActors.size(); i++)
+					for (int i = 0; i < Global::ModInfo.size(); i++)
 					{
-						UE4::AActor* CurrentModActor = Global::ModActors[i];
+						UE4::AActor* CurrentModActor = Global::ModInfo[i].CurrentModActor;
 						if (CurrentModActor != nullptr)
 						{
 							CurrentModActor->CallFunctionByNameWithArguments(L"PostBeginPlay", nullptr, NULL, true);
@@ -265,6 +283,34 @@ namespace Hooks
 		return NULL;
 	}
 
+	UE4::FString*(*origPrintfImpl)(void*, wchar_t*, int);
+	UE4::FString* hookPrintfImpl(void* a1, wchar_t* a2, int args)
+	{
+		//UE4::FString* Tester = (UE4::FString*)a1;
+		//std::cout << Tester->ToString() << std::endl;
+		//Log::Info("Hook Say Called");
+		//std::wstring string((wchar_t*) a1);
+		//std::string str(string.begin(), string.end());
+		/*
+		auto result = origPrintfImpl(a1, a2, args);
+		if (result->IsValid() && result->Count <= result->Max)
+		{
+			std::cout << result << std::endl;
+			std::cout << result->ToString() << std::endl;
+			/*
+			if (result->c_str() == L"CUNT")
+			{
+				std::cout << result->ToString() << std::endl;
+			}
+			*/
+			//if (result.ToString() == "CUNT")
+			//{
+				//Log::Info("CUNT FOUND");
+			//}
+		//}
+		return origPrintfImpl(a1, a2, args);
+	}
+
 	DWORD __stdcall InitHooks(LPVOID)
 	{
 		MinHook::Init();
@@ -274,6 +320,8 @@ namespace Hooks
 		MinHook::Add(GameProfile::SelectedGameProfile.GameStateInit, &HookedFunctions::hookInitGameState, &HookedFunctions::origInitGameState, "AGameModeBase::InitGameState");
 		MinHook::Add(GameProfile::SelectedGameProfile.BeginPlay, &HookedFunctions::hookBeginPlay, &HookedFunctions::origBeginPlay, "AActor::BeginPlay");
 		MinHook::Add(GameProfile::SelectedGameProfile.Say, &HookedFunctions::hookSay, &HookedFunctions::origSay, "AGameMode::Say");
+
+		//MinHook::Add((DWORD64)Pattern::Find("4C 8B DC 49 89 53 10 4D 89 43 18 4D 89 4B 20 53 55 56 57 41 56 41 57 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 84 24 ? ? ? ? 48 8B DA 48 8D 7C 24 ? 48 8B F1 49 8D 6B 18 41 BE ? ? ? ? E8 ? ? ? ? 48 89 6C 24 ? 45 8D 46 FF 33 ED 48 8D 54 24 ? ") , &hookPrintfImpl, &origPrintfImpl, "FString::PrintfImpl");
 		CreateThread(NULL, 0, InitDX11Hook, NULL, 0, NULL);
 		return NULL;
 	}
