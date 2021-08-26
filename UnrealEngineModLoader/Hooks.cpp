@@ -109,7 +109,14 @@ namespace Hooks
 											if (!Global::ModInfo[i].WasInitialized)
 											{
 												Global::ModInfo[i].ContainsButton = ModActor->DoesObjectContainFunction("ModMenuButtonPressed");
-												//std::cout << str << ": " << Global::ModInfo[i].ContainsButton << std::endl;
+												UE4::FString Author;
+												if (UE4::GetVariable<UE4::FString>(ModActor, "ModAuthor", Author))
+												{
+													if (Author.IsValid())
+													{
+														Global::ModInfo[i].ModAuthor = Author.ToString();
+													}
+												}
 												Global::ModInfo[i].WasInitialized = true;
 											}
 										}
@@ -283,34 +290,6 @@ namespace Hooks
 		return NULL;
 	}
 
-	UE4::FString*(*origPrintfImpl)(void*, wchar_t*, int);
-	UE4::FString* hookPrintfImpl(void* a1, wchar_t* a2, int args)
-	{
-		//UE4::FString* Tester = (UE4::FString*)a1;
-		//std::cout << Tester->ToString() << std::endl;
-		//Log::Info("Hook Say Called");
-		//std::wstring string((wchar_t*) a1);
-		//std::string str(string.begin(), string.end());
-		/*
-		auto result = origPrintfImpl(a1, a2, args);
-		if (result->IsValid() && result->Count <= result->Max)
-		{
-			std::cout << result << std::endl;
-			std::cout << result->ToString() << std::endl;
-			/*
-			if (result->c_str() == L"CUNT")
-			{
-				std::cout << result->ToString() << std::endl;
-			}
-			*/
-			//if (result.ToString() == "CUNT")
-			//{
-				//Log::Info("CUNT FOUND");
-			//}
-		//}
-		return origPrintfImpl(a1, a2, args);
-	}
-
 	DWORD __stdcall InitHooks(LPVOID)
 	{
 		MinHook::Init();
@@ -320,8 +299,6 @@ namespace Hooks
 		MinHook::Add(GameProfile::SelectedGameProfile.GameStateInit, &HookedFunctions::hookInitGameState, &HookedFunctions::origInitGameState, "AGameModeBase::InitGameState");
 		MinHook::Add(GameProfile::SelectedGameProfile.BeginPlay, &HookedFunctions::hookBeginPlay, &HookedFunctions::origBeginPlay, "AActor::BeginPlay");
 		MinHook::Add(GameProfile::SelectedGameProfile.Say, &HookedFunctions::hookSay, &HookedFunctions::origSay, "AGameMode::Say");
-
-		//MinHook::Add((DWORD64)Pattern::Find("4C 8B DC 49 89 53 10 4D 89 43 18 4D 89 4B 20 53 55 56 57 41 56 41 57 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 84 24 ? ? ? ? 48 8B DA 48 8D 7C 24 ? 48 8B F1 49 8D 6B 18 41 BE ? ? ? ? E8 ? ? ? ? 48 89 6C 24 ? 45 8D 46 FF 33 ED 48 8D 54 24 ? ") , &hookPrintfImpl, &origPrintfImpl, "FString::PrintfImpl");
 		CreateThread(NULL, 0, InitDX11Hook, NULL, 0, NULL);
 		return NULL;
 	}

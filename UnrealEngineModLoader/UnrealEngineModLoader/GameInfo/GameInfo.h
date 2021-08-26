@@ -25,6 +25,16 @@ struct Offsets {
 		uint16_t Func = 0x0;
 	} UFunction;
 	struct {
+		//uint16_t Class = 0x8;
+		uint16_t Next = 0x0;
+		uint16_t Name = 0x0;
+	} FField;
+	struct {
+		uint16_t ArrayDim = 0x0;
+		//uint16_t ElementSize = 0x0;
+		uint16_t Offset = 0x0;
+	} Property;
+	struct {
 		uint16_t PersistentLevel = 0x0;
 		uint16_t AuthorityGameMode = 0x0;
 	}UWorld;
@@ -60,6 +70,10 @@ public:
 
 	bool IsEngineDefsMissing;
 	bool IsUWorldMissing;
+
+	bool IsPropertyMissing;
+
+	bool bIsFProperty;
 
 	Offsets defs;
 

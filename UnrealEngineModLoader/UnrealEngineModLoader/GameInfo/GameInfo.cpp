@@ -189,6 +189,25 @@ void SetupProfile(std::string Path)
 			GameProfile::SelectedGameProfile.IsUWorldMissing = true;
 		}
 
+
+		if (GameInfo.select("Property"))
+		{
+			GameProfile::SelectedGameProfile.bIsFProperty = GameInfo.getAs<int>("Property", "IsFProperty", 0);
+			GameProfile::SelectedGameProfile.defs.Property.ArrayDim = StringToDWord(GameInfo.get("Property", "ArrayDim", ""));
+			GameProfile::SelectedGameProfile.defs.Property.Offset = StringToDWord(GameInfo.get("Property", "Offset", ""));
+			if (GameProfile::SelectedGameProfile.bIsFProperty)
+			{
+				GameInfo.select("FField");
+				GameProfile::SelectedGameProfile.defs.FField.Name = StringToDWord(GameInfo.get("FField", "Name", ""));
+				GameProfile::SelectedGameProfile.defs.FField.Next = StringToDWord(GameInfo.get("FField", "Next", ""));
+			}
+		}
+		else
+		{
+			GameProfile::SelectedGameProfile.IsPropertyMissing = true;
+		}
+
+
 		if (GameInfo.select("FunctionInfo"))
 		{
 			if (GameInfo.getAs<int>("FunctionInfo", "IsFunctionPatterns", 0) == 0)

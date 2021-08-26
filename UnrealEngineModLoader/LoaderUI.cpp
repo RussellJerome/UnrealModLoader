@@ -45,6 +45,40 @@ HRESULT LoaderUI::LoaderResizeBuffers(IDXGISwapChain* pSwapChain, UINT BufferCou
 	LoaderUI::GetUI()->pContext->RSSetViewports(1, &vp);
 	return hr;
 }
+static const char* CurrentName;
+void FNameExplorer()
+{
+	ImGui::Begin("FName Finder", NULL, NULL);
+	static int NameIndex;
+
+	ImGui::Text("Name Finder");
+	ImGui::Separator();
+	
+	ImGui::InputInt("NameIndex", &NameIndex);
+	if (ImGui::Button("Find Name"))
+	{
+		Log::Info("Name: %s", UE4::FName::GetFNamePool()[NameIndex]->GetAnsiName().c_str());
+		/*
+		if (UE4::FName::IsUsingNamePool())
+		{
+			if (UE4::FName::GetFNamePool().IsValidIndex(NameIndex))
+			{
+				CurrentName = UE4::FName::GetFNamePool().GetById(NameIndex)->GetAnsiName().c_str();
+			}
+		}
+		else
+		{
+			if (UE4::FName::GetTNameArray().IsValidIndex(NameIndex))
+			{
+				CurrentName = UE4::FName::GetTNameArray()[NameIndex]->GetAnsiName();
+			}
+		}
+		*/
+
+	}
+
+	ImGui::End();
+}
 
 void ShowMods()
 {
@@ -57,6 +91,8 @@ void ShowMods()
 		std::string ModLabel = str + "##" + std::to_string(i);
 		if (ImGui::TreeNode(ModLabel.c_str()))
 		{
+			std::string Author = "Created By: " + Global::ModInfo[i].ModAuthor;
+			ImGui::Text(Author.c_str());
 			std::string ActiveLabel = "Enable##" + std::to_string(i);
 			ImGui::Checkbox(ActiveLabel.c_str(), &Global::ModInfo[i].IsEnabled);
 			if (Global::ModInfo[i].IsEnabled && Global::ModInfo[i].CurrentModActor && Global::ModInfo[i].ContainsButton)
@@ -90,6 +126,10 @@ void ShowTools()
 	{
 		Dumper::BeginEngineDump();
 	}
+	if (ImGui::Button("Dump World Actors"))
+	{
+		Dumper::BeginWorldDump();
+	}
 }
 
 void DrawImGui()
@@ -99,6 +139,8 @@ void DrawImGui()
 	ImGui::Text("Unreal Mod Loader V: %s", Global::Version.c_str());
 	ShowMods();
 	ShowTools();
+
+	//FNameExplorer();
 	//ImGui::ShowDemoWindow();
 	ImGui::End();
 }

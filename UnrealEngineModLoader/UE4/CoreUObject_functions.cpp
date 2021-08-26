@@ -202,6 +202,46 @@ namespace UE4
 	void* UFunction::GetFunction() const { return Read<void*>((byte*)this + GameProfile::SelectedGameProfile.defs.UFunction.Func); };
 
 	//---------------------------------------------------------------------------
+	//UEProperty Functions
+	//---------------------------------------------------------------------------
+
+	int32_t UEProperty::GetArrayDim() const
+	{
+		return Read<int32_t>((byte*)this + GameProfile::SelectedGameProfile.defs.Property.ArrayDim);
+	};
+	/*
+	int32_t UEProperty::GetElementSize() const
+	{
+		return Read<int32_t>((byte*)this + GameProfile::SelectedGameProfile.defs.Property.ElementSize);
+	};
+	*/
+
+	int32_t UEProperty::GetOffset() const
+	{
+		return Read<int32_t>((byte*)this + GameProfile::SelectedGameProfile.defs.Property.Offset);
+	};
+
+	//---------------------------------------------------------------------------
+	//FField Functions
+	//---------------------------------------------------------------------------
+
+	/*FName* FField::GetClass() const
+	{
+		return Read<class FName*>((byte*)this + GameProfile::SelectedGameProfile.defs.FField.Class);
+	};*/
+
+	FField* FField::GetNext() const
+	{
+		return Read<class FField*>((byte*)this + GameProfile::SelectedGameProfile.defs.FField.Next);
+	};
+
+	std::string FField::GetName() const
+	{
+		auto Name = *reinterpret_cast<FName*>((byte*)this + GameProfile::SelectedGameProfile.defs.FField.Name);
+		return Name.GetName();
+	};
+
+	//---------------------------------------------------------------------------
 	//UWorld Functions
 	//---------------------------------------------------------------------------
 

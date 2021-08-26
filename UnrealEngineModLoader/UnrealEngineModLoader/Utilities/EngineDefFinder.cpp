@@ -368,6 +368,142 @@ namespace ClassDefFinder
 		return true;
 	}
 
+	bool FindFField()
+	{
+		auto VectorObject = (UE4::UStruct*)UE4::UObject::FindObject<UE4::UObject>("ScriptStruct CoreUObject.Vector");
+		auto FieldChild = (UE4::FField*)VectorObject->GetChildren();
+		bool NameFound = false;
+		bool NextFound = false;
+		while (!NameFound)
+		{
+			auto Name = *reinterpret_cast<UE4::FName*>((byte*)FieldChild + GameProfile::SelectedGameProfile.defs.FField.Name);
+			if (UE4::FName::GetFNamePool().IsValidIndex(Name.ComparisonIndex))
+			{
+				if (Name.GetName() == "X")
+				{
+					NameFound = true;
+				}
+			}
+			if (NameFound == false)
+			{
+				GameProfile::SelectedGameProfile.defs.FField.Name = GameProfile::SelectedGameProfile.defs.FField.Name + 0x8;
+			}
+		}
+		Log::Info("FField Name Def located at: 0x%p", GameProfile::SelectedGameProfile.defs.FField.Name);
+		while (!NextFound)
+		{
+			auto NextField = Read<UE4::FField*>((byte*)FieldChild + GameProfile::SelectedGameProfile.defs.FField.Next);
+			if (NextField && NextField->GetName() == "Y")
+			{
+				NextFound = true;
+			}
+			if (NextFound == false)
+			{
+				GameProfile::SelectedGameProfile.defs.FField.Next = GameProfile::SelectedGameProfile.defs.FField.Next + 0x8;
+			}
+		}
+		Log::Info("FField Next Def located at: 0x%p", GameProfile::SelectedGameProfile.defs.FField.Next);
+		return true;
+	}
+
+	bool FindUEPropertyDefs()
+	{
+		auto VectorObject = (UE4::UStruct*)UE4::UObject::FindObject<UE4::UObject>("ScriptStruct CoreUObject.Vector");
+		bool ArrayDimFound = false;
+		bool OffsetFound = false;
+		if (GameProfile::SelectedGameProfile.bIsFProperty)
+		{
+			auto FieldChild = (UE4::FField*)VectorObject->GetChildren();
+			while (!ArrayDimFound)
+			{
+				if (Read<int64_t>((byte*)FieldChild + GameProfile::SelectedGameProfile.defs.Property.ArrayDim) == 17179869185) // Array Dim and Element Size are Side By Side
+				{
+					ArrayDimFound = true;
+				}
+
+				if(ArrayDimFound == false)
+				{ 
+					GameProfile::SelectedGameProfile.defs.Property.ArrayDim = GameProfile::SelectedGameProfile.defs.Property.ArrayDim + 0x8;
+				}
+			}
+			Log::Info("FProperty Array Dim Def located at: 0x%p", GameProfile::SelectedGameProfile.defs.Property.ArrayDim);
+
+			auto FieldChildY = FieldChild->GetNext();
+			auto FieldChildZ = FieldChildY->GetNext();
+			GameProfile::SelectedGameProfile.defs.Property.Offset = GameProfile::SelectedGameProfile.defs.Property.ArrayDim + 0x8;
+			while (!OffsetFound)
+			{
+				if (Read<int32_t>((byte*)FieldChildY + GameProfile::SelectedGameProfile.defs.Property.Offset) == 4 && Read<int32_t>((byte*)FieldChildZ + GameProfile::SelectedGameProfile.defs.Property.Offset) == 8)
+				{
+					OffsetFound = true;
+				}
+				if (OffsetFound == false)
+				{
+					GameProfile::SelectedGameProfile.defs.Property.Offset = GameProfile::SelectedGameProfile.defs.Property.Offset + 0x4;
+				}
+			}
+			Log::Info("FProperty Offset Def located at: 0x%p", GameProfile::SelectedGameProfile.defs.Property.Offset);
+			
+		}
+		else
+		{
+			auto FieldChild = (UE4::UField*)VectorObject->GetChildren();
+			while (!ArrayDimFound)
+			{
+				if (Read<int64_t>((byte*)FieldChild + GameProfile::SelectedGameProfile.defs.Property.ArrayDim) == 17179869185) // Array Dim and Element Size are Side By Side
+				{
+					ArrayDimFound = true;
+				}
+
+				if (ArrayDimFound == false)
+				{
+					GameProfile::SelectedGameProfile.defs.Property.ArrayDim = GameProfile::SelectedGameProfile.defs.Property.ArrayDim + 0x8;
+				}
+			}
+			Log::Info("UProperty Array Dim Def located at: 0x%p", GameProfile::SelectedGameProfile.defs.Property.ArrayDim);
+			auto FieldChildY = FieldChild->GetNext();
+			auto FieldChildZ = FieldChildY->GetNext();
+			GameProfile::SelectedGameProfile.defs.Property.Offset = GameProfile::SelectedGameProfile.defs.Property.ArrayDim + 0x8;
+			while (!OffsetFound)
+			{
+				if (Read<int32_t>((byte*)FieldChildY + GameProfile::SelectedGameProfile.defs.Property.Offset) == 4 && Read<int32_t>((byte*)FieldChildZ + GameProfile::SelectedGameProfile.defs.Property.Offset) == 8)
+				{
+					OffsetFound = true;
+				}
+				if (OffsetFound == false)
+				{
+					GameProfile::SelectedGameProfile.defs.Property.Offset = GameProfile::SelectedGameProfile.defs.Property.Offset + 0x4;
+				}
+			}
+			Log::Info("UProperty Offset Def located at: 0x%p", GameProfile::SelectedGameProfile.defs.Property.Offset);
+		}
+	}
+
+	bool FindUEProperty()
+	{
+		Log::Info("Scanning For UEProperty");
+		auto VectorObject = (UE4::UStruct*)UE4::UObject::FindObject<UE4::UObject>("ScriptStruct CoreUObject.Vector");
+		
+		if (!VectorObject->GetChildren()->IsA(UE4::UObject::StaticClass()))
+		{
+			GameProfile::SelectedGameProfile.bIsFProperty = true;
+			Log::Info("UEProperty is a FProperty");
+			if (FindFField())
+			{
+				GameProfile::SelectedGameProfile.defs.Property.ArrayDim = GameProfile::SelectedGameProfile.defs.FField.Name;
+				FindUEPropertyDefs();
+			}
+		}
+		else
+		{
+			GameProfile::SelectedGameProfile.bIsFProperty = false;
+			Log::Info("UEProperty is a UProperty");
+			GameProfile::SelectedGameProfile.defs.Property.ArrayDim = GameProfile::SelectedGameProfile.defs.UField.Next;
+			FindUEPropertyDefs();
+		}
+		return true;
+	}
+
 	bool FindEngineClasses()
 	{
 		Log::Warn("Engine Classes Not Defined. Starting Automatic Class Finder.");
@@ -387,6 +523,10 @@ namespace ClassDefFinder
 				FindPersistentLevelDef();
 				FindGameModeDef();
 				FindWorldArrayDef();
+			}
+			if (GameProfile::SelectedGameProfile.IsPropertyMissing)
+			{
+				FindUEProperty();
 			}
 			return true;
 		}

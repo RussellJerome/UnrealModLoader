@@ -4,6 +4,7 @@
 #include "Globals.h"
 bool bDumpObjects;
 bool bDumpEngineInfo;
+bool bDumpWorldActors;
 namespace Dumper
 {
 	bool DumpObjects()
@@ -75,7 +76,6 @@ namespace Dumper
 					fprintf(Log, "ActorName: %s\n", CurrentActor->GetName().c_str());
 					fprintf(Log, "ClassName: %s\n", CurrentActor->GetClass()->GetName().c_str());
 					fprintf(Log, "Location: %f, %f, %f\n", Transform.Translation.X, Transform.Translation.Y, Transform.Translation.Z);
-					//fprintf(Log, "Rotation: %f, %f, %f, %f\n", Transform.Rotation.X, Transform.Rotation.Y, Transform.Rotation.Z, Transform.Rotation.W);
 					auto Rota = CurrentActor->GetActorRotation();
 					fprintf(Log, "Rotation: %f, %f, %f\n", Rota.Pitch, Rota.Roll, Rota.Yaw);
 					fprintf(Log, "Scale: %f, %f, %f\n", Transform.Scale3D.X, Transform.Scale3D.Y, Transform.Scale3D.Z);
@@ -120,6 +120,11 @@ namespace Dumper
 				bDumpEngineInfo = false;
 				DumpEngineInfo();
 			}
+			if (bDumpWorldActors)
+			{
+				bDumpWorldActors = false;
+				DumpWorldActors();
+			}
 			Sleep(1000 / 60);
 		}
 	}
@@ -139,6 +144,11 @@ namespace Dumper
 	void BeginEngineDump()
 	{
 		bDumpEngineInfo = true;
+	}
+
+	void BeginWorldDump()
+	{
+		bDumpWorldActors = true;
 	}
 
 	void BeginKeyThread()

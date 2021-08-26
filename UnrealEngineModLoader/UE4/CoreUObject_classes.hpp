@@ -13,7 +13,6 @@ namespace UE4
 	//---------------------------------------------------------------------------
 	//Classes
 	//---------------------------------------------------------------------------
-
 	class UObject
 	{
 	public:
@@ -161,6 +160,24 @@ namespace UE4
 		}
 
 	};
+	// UE4.25 AND UP
+	class FField
+	{
+	public:
+		//FName* GetClass() const;
+		FField* GetNext() const;
+		std::string GetName() const;
+	};
+
+	class UEProperty
+	{
+	public:
+		FField* GetParentFProperty() { return (FField*)this; }
+		UField* GetParentUProperty() { return (UField*)this; }
+		int32_t GetArrayDim() const;
+		//int32_t GetElementSize() const;
+		int32_t GetOffset() const;
+	};
 
 	class ULevel : public UObject
 	{
@@ -264,6 +281,50 @@ namespace UE4
 			return ptr;
 		}
 	};
+
+	template<typename T>
+	bool GetVariable(UE4::UObject* Object, std::string Name, T& Variable)
+	{
+		UE4::UClass* ObjectClass = Object->GetClass();
+		if (GameProfile::SelectedGameProfile.bIsFProperty)
+		{
+			auto Children = (UE4::FField*)ObjectClass->GetChildren();
+			bool VarFound = false;
+			while (!VarFound)
+			{
+				if (!Children)
+					break;
+				if (Children->GetName() == Name)
+				{
+					VarFound = true;
+					auto varProperty = (UE4::UEProperty*)Children;
+					Variable= Read<T>((byte*)Object + varProperty->GetOffset());
+					return true;
+				}
+				Children = Children->GetNext();
+			}
+			
+		}
+		else
+		{
+			auto Children = (UE4::UField*)ObjectClass->GetChildren();
+			bool VarFound = false;
+			while (!VarFound)
+			{
+				if (!Children)
+					break;
+				if (Children->GetName() == Name)
+				{
+					VarFound = true;
+					auto varProperty = (UE4::UEProperty*)Children;
+					Variable = Read<T>((byte*)Object + varProperty->GetOffset());
+					return true;
+				}
+				Children = Children->GetNext();
+			}
+		}
+		return false;
+	}
 }
 
 #ifdef _MSC_VER
