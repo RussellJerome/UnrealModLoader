@@ -8,12 +8,49 @@
 #include "UnrealEngineModLoader/Memory/CoreModLoader.h"
 #include "UE4/Ue4.hpp"
 #include "LoaderUI.h"
-
+bool bIsProcessInternalsHooked = false;
+bool GameStateClassInitNotRan = true;
 namespace Hooks
 {
 	namespace HookedFunctions
 	{
-		bool GameStateClassInitNotRan = true;
+		struct PrintStringParams
+		{
+			UE4::FString Message;
+		};
+
+		struct CallFuncByNameParams
+		{
+			UE4::FString Str;
+			int64_t bForceCallWithNonExec;
+			UE4::UObject* Object;
+			UE4::FString OutputString;
+		};
+
+		PVOID(*origProcessFunction)(UE4::UObject*, UE4::FFrame*, void* const);
+		PVOID hookProcessFunction(UE4::UObject* obj, UE4::FFrame* Frame, void* const Result)
+		{
+			if (!GameStateClassInitNotRan)
+			{
+				/*if (Frame->Node->GetName() == "CallFunctionByNameWithArguments_Wrap")
+				{
+					std::cout << "I love testy" << std::endl;
+					Frame->GetParams<CallFuncByNameParams>()->OutputString = Testy;
+					std::cout << "I love testy2" << std::endl;
+				}*/
+				if (Frame->Node->GetName() == "PrintToModLoader")
+				{
+					auto msg = Frame->GetParams<PrintStringParams>()->Message;
+					if (msg.IsValid())
+					{
+						Log::Print("%s", msg.ToString().c_str());
+					}
+				}
+			}
+			return origProcessFunction(obj, Frame, Result);
+
+		}
+
 		PVOID(*origInitGameState)(void*);
 		PVOID hookInitGameState(void* Ret)
 		{
@@ -101,6 +138,28 @@ namespace Hooks
 								}
 								if (ModActor)
 								{
+									if (!bIsProcessInternalsHooked)
+									{
+										if (GameProfile::SelectedGameProfile.UsesFNamePool)
+										{
+											DWORD64 ProcessAddy = (DWORD64)Pattern::Find("41 F6 C7 02 74 10 4C 8B C7 48 8B D5 48 8B CB E8 ? ? ? ? EB 79");
+											auto ProcessAddyOffset = *reinterpret_cast<uint32_t*>(ProcessAddy + 16);
+											GameProfile::SelectedGameProfile.ProcessInternals = (ProcessAddy + 20 + ProcessAddyOffset);
+										}
+										else
+										{
+											if (ModActor->DoesObjectContainFunction("PostBeginPlay"))
+											{
+												GameProfile::SelectedGameProfile.ProcessInternals = (DWORD64)ModActor->GetFunction("PostBeginPlay")->GetFunction();
+											}
+										}
+										bIsProcessInternalsHooked = true;
+										if (GameProfile::SelectedGameProfile.ProcessInternals)
+											MinHook::Add(GameProfile::SelectedGameProfile.ProcessInternals, &HookedFunctions::hookProcessFunction, &HookedFunctions::origProcessFunction, "ProcessBlueprintFunctions");
+										else
+											Log::Warn("ProcessBlueprintFunctions could not be located! Mod Loader Functionality Will be Limited!");
+									}
+
 									for (size_t i = 0; i < Global::ModInfo.size(); i++)
 									{
 										if (Global::ModInfo[i].ModName == CurrentMod)
@@ -160,23 +219,6 @@ namespace Hooks
 				}
 			}
 			return origBeginPlay(Actor);
-		}
-
-		PVOID(*origSay)(void*, UE4::FString*);
-		PVOID hookSay(void* GM, UE4::FString* Message)
-		{
-			Log::Info("Hook Say Called");
-			std::wstring WStrMsg = Message->c_str();
-			if (WStrMsg.substr(WStrMsg.length() - 6, 6) == L"/Print") // check if message ends with /Print
-			{
-				HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-				WStrMsg = WStrMsg.substr(0, WStrMsg.length() - 6); // remove /Print extension
-				std::string str(WStrMsg.begin(), WStrMsg.end());
-				SetConsoleTextAttribute(hConsole, 13);
-				std::cout << "Print: " << str << std::endl;
-				SetConsoleTextAttribute(hConsole, 7);
-			}
-			return origSay(GM, Message);
 		}
 	};
 
@@ -298,7 +340,7 @@ namespace Hooks
 		Log::Info("ScanLoadedPaks Setup");
 		MinHook::Add(GameProfile::SelectedGameProfile.GameStateInit, &HookedFunctions::hookInitGameState, &HookedFunctions::origInitGameState, "AGameModeBase::InitGameState");
 		MinHook::Add(GameProfile::SelectedGameProfile.BeginPlay, &HookedFunctions::hookBeginPlay, &HookedFunctions::origBeginPlay, "AActor::BeginPlay");
-		MinHook::Add(GameProfile::SelectedGameProfile.Say, &HookedFunctions::hookSay, &HookedFunctions::origSay, "AGameMode::Say");
+		//MinHook::Add((DWORD64)Pattern::Find("48 89 5C 24 ? 48 89 6C 24 ? 48 89 74 24 ? 48 89 7C 24 ? 41 56 48 83 EC 20 8B 41 08 4D 8B F1 C1 E8 04 49 8B F0 48 8B EA 48 8B F9 A8 01 74 04 33 DB EB 04 "), &HookedFunctions::hookCallFunction, &HookedFunctions::origCallFunction, "UObject::CallFunction");
 		CreateThread(NULL, 0, InitDX11Hook, NULL, 0, NULL);
 		return NULL;
 	}

@@ -86,6 +86,8 @@ namespace UE4
 
 		bool DoesObjectContainFunction(std::string Function);
 
+		class UFunction* GetFunction(std::string Function);
+
 		void ProcessEvent(class UFunction* function, void* parms);
 
 		static UObject* StaticLoadObject(class UClass* uclass, UObject* InOuter, const wchar_t* InName, const wchar_t* Filename, unsigned int LoadFlags, void* Sandbox, bool bAllowObjectReconciliation);
@@ -325,6 +327,20 @@ namespace UE4
 		}
 		return false;
 	}
+
+	class FFrame
+	{
+	public:
+		char pad_0x0000[0x10]; //0x0000
+		UFunction* Node; //0x0010 
+		UObject* Object; //0x0018 
+		uint8_t* Code; //0x0020 
+		uint8_t* Locals; //0x0028
+
+		template<typename T>
+		T* GetParams() { return (T*)Locals; }
+
+	};
 }
 
 #ifdef _MSC_VER

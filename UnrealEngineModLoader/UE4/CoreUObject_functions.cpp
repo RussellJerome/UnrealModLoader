@@ -142,6 +142,53 @@ namespace UE4
 		return false;
 	}
 
+	class UFunction* UObject::GetFunction(std::string Function)
+	{
+		if (IsChunkedArray())
+		{
+			for (int i = 0; i < GObjects->GetAsChunckArray().Num(); ++i)
+			{
+				auto object = GObjects->GetAsChunckArray().GetByIndex(i).Object;
+
+				if (object == nullptr)
+				{
+					continue;
+				}
+
+				if (object->GetName() == Function)
+				{
+					if (object->GetOuter() == this->GetClass())
+					{
+						return (UFunction*)object;
+					}
+				}
+			}
+			return nullptr;
+		}
+		else
+		{
+			for (int i = 0; i < GObjects->GetAsTUArray().Num(); ++i)
+			{
+				auto object = GObjects->GetAsTUArray().GetByIndex(i).Object;
+
+				if (object == nullptr)
+				{
+					continue;
+				}
+
+				if (object->GetName() == Function)
+				{
+					if (object->GetOuter() == this->GetClass())
+					{
+						return (UFunction*)object;
+					}
+				}
+			}
+			return nullptr;
+		}
+		return nullptr;
+	}
+
 	void UObject::ProcessEvent(class UFunction* function, void* parms)
 	{
 		return reinterpret_cast<void(*)(UObject*, class UFunction*, void*)>(GameProfile::SelectedGameProfile.ProcessEvent)(this, function, parms);

@@ -63,10 +63,11 @@ public:
 	DWORD64 CreateDefualtObject;
 	DWORD64 GameStateInit;
 	DWORD64 BeginPlay;
-	DWORD64 Say;
 	DWORD64 StaticLoadObject;
 	DWORD64 SpawnActorFTrans;
 	DWORD64 CallFunctionByNameWithArguments;
+
+	DWORD64 ProcessInternals;
 
 	bool IsEngineDefsMissing;
 	bool IsUWorldMissing;
