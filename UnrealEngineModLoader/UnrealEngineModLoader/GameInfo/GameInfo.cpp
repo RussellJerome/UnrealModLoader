@@ -235,7 +235,110 @@ void SetupProfile(std::string Path)
 		}
 		else
 		{
-			Log::SetupErrorMessage("Function Information Could Not Be Found!");
+			GameProfile::SelectedGameProfile.GameStateInit = (DWORD64)Pattern::Find("40 53 48 83 EC 20 48 8B 41 10 48 8B D9 48 8B 91");
+			std::cout << "GameProfile::SelectedGameProfile.GameStateInit: " << (void*)GameProfile::SelectedGameProfile.GameStateInit << std::endl;
+			if (!GameProfile::SelectedGameProfile.GameStateInit)
+			{
+				Log::Error("GameStateInit NOT FOUND!");
+			}
+
+			auto BeginPlay = Pattern::Find("48 8B D9 E8 ?? ?? ?? ?? F6 83 ?? ?? ?? ?? ?? 74 12 48 8B 03");
+			BeginPlay += 0x3;
+			if (BeginPlay != nullptr)
+			{
+				GameProfile::SelectedGameProfile.BeginPlay = (DWORD64)MEM::GetAddressPTR(BeginPlay, 0x1, 0x5);
+				std::cout << "GameProfile::SelectedGameProfile.BeginPlay: " << (void*)GameProfile::SelectedGameProfile.BeginPlay << std::endl;
+			}
+			else
+			{
+				Log::Error("AActor::BeginPlay NOT FOUND!");
+			}
+
+			auto StaticLoadObject = Pattern::Find("89 64 24 ? 48 8B C8 E8 ? ? ? ? 41 BE ? ? ? ? EB 05 E8"); // Sig 1
+			if (StaticLoadObject != nullptr)
+			{
+				StaticLoadObject += 0x7;
+				GameProfile::SelectedGameProfile.StaticLoadObject = (DWORD64)MEM::GetAddressPTR(StaticLoadObject, 0x1, 0x5);
+				std::cout << "GameProfile::SelectedGameProfile.StaticLoadObject: " << (void*)GameProfile::SelectedGameProfile.StaticLoadObject << std::endl;
+			}
+			else
+			{
+				StaticLoadObject = Pattern::Find("C7 44 24 ? ? ? ? ? E8 ? ? ? ? 48 8B 8D ? ? ? ? 48 85 C9 74 05 E8 ? ? ? ? 45 33 C9 ? 89 74 24");
+				if (StaticLoadObject != nullptr)
+				{
+					StaticLoadObject += 0x8;
+					GameProfile::SelectedGameProfile.StaticLoadObject = (DWORD64)MEM::GetAddressPTR(StaticLoadObject, 0x1, 0x5);
+					std::cout << "GameProfile::SelectedGameProfile.StaticLoadObject: " << (void*)GameProfile::SelectedGameProfile.StaticLoadObject << std::endl;
+				}
+				else
+				{
+					std::cout << "Sig2 Failed" << std::endl;
+					if (StaticLoadObject = Pattern::Find("48 8B C8 89 5C 24 20 E8 ? ? ? ? 48"))
+					{
+						StaticLoadObject += 0x7;
+						GameProfile::SelectedGameProfile.StaticLoadObject = (DWORD64)MEM::GetAddressPTR(StaticLoadObject, 0x1, 0x5);
+						std::cout << "GameProfile::SelectedGameProfile.StaticLoadObject: " << (void*)GameProfile::SelectedGameProfile.StaticLoadObject << std::endl;
+					}
+					else
+					{
+						Log::Error("StaticLoadObject NOT FOUND!");
+					}
+				}
+			}
+
+			auto SpawnActorFTrans = Pattern::Find("4C 8B C6 48 8B C8 48 8B D3 E8 ? ? ? ? 48 8B 5C 24 ? 48 8B 74 24");
+			SpawnActorFTrans += 0x9;
+			if (SpawnActorFTrans != nullptr)
+			{
+				GameProfile::SelectedGameProfile.SpawnActorFTrans = (DWORD64)MEM::GetAddressPTR(SpawnActorFTrans, 0x1, 0x5);
+				std::cout << "GameProfile::SelectedGameProfile.SpawnActorFTrans: " << (void*)GameProfile::SelectedGameProfile.SpawnActorFTrans << std::endl;
+			}
+			else
+			{
+				Log::Error("SpawnActorFTrans NOT FOUND!");
+			}
+
+			auto CallFunctionByNameWithArguments = Pattern::Find("8B ? E8 ? ? ? ? ? 0A E8 FF C3 EB 9E ? 8B");
+			CallFunctionByNameWithArguments += 0x2;
+			if (CallFunctionByNameWithArguments != nullptr)
+			{
+				GameProfile::SelectedGameProfile.CallFunctionByNameWithArguments = (DWORD64)MEM::GetAddressPTR(CallFunctionByNameWithArguments, 0x1, 0x5);
+				std::cout << "GameProfile::SelectedGameProfile.CallFunctionByNameWithArguments: " << (void*)GameProfile::SelectedGameProfile.CallFunctionByNameWithArguments << std::endl;
+			}
+			else
+			{
+				Log::Error("CallFunctionByNameWithArguments NOT FOUND!");
+			}
+
+			auto ProcessEvent = Pattern::Find("75 0E ? ? ? 48 ? ? 48 ? ? E8 ? ? ? ? 48 8B ? 24 ? 48 8B ? 24 38 48 8B ? 24 40");
+			ProcessEvent += 0x11;
+			if (ProcessEvent != nullptr)
+			{
+				GameProfile::SelectedGameProfile.ProcessEvent = (DWORD64)MEM::GetAddressPTR(ProcessEvent, 0x1, 0x5);
+				std::cout << "GameProfile::SelectedGameProfile.ProcessEvent: " << (void*)GameProfile::SelectedGameProfile.ProcessEvent << std::endl;
+			}
+			else
+			{
+				Log::Error("ProcessEvent NOT FOUND!");
+			}
+
+			GameProfile::SelectedGameProfile.CreateDefualtObject = (DWORD64)Pattern::Find("4C 8B DC 57 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 84 24 ? ? ? ? 48 83 B9 ? ? ? ? ? 48 8B F9 ");
+			if (!GameProfile::SelectedGameProfile.CreateDefualtObject)
+			{
+				//FallBack 1
+				GameProfile::SelectedGameProfile.CreateDefualtObject = (DWORD64)Pattern::Find("48 39 5F 20 75 22 8B 47 08 C1 E8 0A A8 01 74 0F");
+				if (!GameProfile::SelectedGameProfile.CreateDefualtObject)
+				{
+					//Final FallBack
+					GameProfile::SelectedGameProfile.CreateDefualtObject = (DWORD64)Pattern::Find("4C 8B DC ?? ?? ?? ?? ?? ? ? ? ? ?? ?? ?? ? ? ? ? ?? ?? ?? ? ? ? ? ?? ?? ?? 48 ?? ?? ? ? ? ? ?? ?? ?? ? ? ? ? ? ?? ?? ?? ?? ?? ? ? ? ? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ? ? ? ? ?? 8B ?? ? ? ? ? ?? ?? ?? ?? ?? ?? 8B ?? ?? ?? ?? ?? ?? ? ? ? ? ?? ?? ?? ? ? ? ? ?? ?? ?? ?? ?? ?? ? ? ? ? ?? ?? ?? ?? ?? ? ? ? ? ?? ?? ? ? ? ? ?? ?? ?? 48");
+					if (!GameProfile::SelectedGameProfile.CreateDefualtObject)
+					{
+						Log::Error("CreateDefualtObject NOT FOUND!");
+					}
+				}
+			}
+			std::cout << "GameProfile::SelectedGameProfile.CreateDefualtObject: " << (void*)GameProfile::SelectedGameProfile.CreateDefualtObject << std::endl;
+			//Log::SetupErrorMessage("Function Information Could Not Be Found!");
 		}
 		Log::Info("Setup %s", gamename.c_str());
 		Hooks::SetupHooks();

@@ -93,6 +93,13 @@ void ShowMods()
 		{
 			std::string Author = "Created By: " + Global::ModInfo[i].ModAuthor;
 			ImGui::Text(Author.c_str());
+			ImGui::Separator();
+			std::string Description = "Description: " + Global::ModInfo[i].ModDescription;
+			ImGui::Text(Description.c_str());
+			ImGui::Separator();
+			std::string Version = "Version: " + Global::ModInfo[i].ModVersion;
+			ImGui::Text(Version.c_str());
+			ImGui::Separator();
 			std::string ActiveLabel = "Enable##" + std::to_string(i);
 			ImGui::Checkbox(ActiveLabel.c_str(), &Global::ModInfo[i].IsEnabled);
 			if (Global::ModInfo[i].IsEnabled && Global::ModInfo[i].CurrentModActor && Global::ModInfo[i].ContainsButton)

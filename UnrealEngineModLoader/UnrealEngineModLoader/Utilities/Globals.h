@@ -8,6 +8,8 @@ struct Mod
 {
 	std::wstring ModName;
 	std::string ModAuthor = "Unknown Author";
+	std::string ModDescription = "No Description";
+	std::string ModVersion = "Unknown Version";
 	UE4::AActor* CurrentModActor;
 	bool IsEnabled;
 	bool ContainsButton;

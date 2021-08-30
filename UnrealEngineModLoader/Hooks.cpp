@@ -24,7 +24,6 @@ namespace Hooks
 			UE4::FString Str;
 			int64_t bForceCallWithNonExec;
 			UE4::UObject* Object;
-			UE4::FString OutputString;
 		};
 
 		PVOID(*origProcessFunction)(UE4::UObject*, UE4::FFrame*, void* const);
@@ -32,12 +31,11 @@ namespace Hooks
 		{
 			if (!GameStateClassInitNotRan)
 			{
-				/*if (Frame->Node->GetName() == "CallFunctionByNameWithArguments_Wrap")
+				if (Frame->Node->GetName() == "CallFunctionByNameWithArguments_Wrap")
 				{
-					std::cout << "I love testy" << std::endl;
-					Frame->GetParams<CallFuncByNameParams>()->OutputString = Testy;
-					std::cout << "I love testy2" << std::endl;
-				}*/
+					//auto parm = Frame->GetParams<CallFuncByNameParams>();
+					//obj->CallFunctionByNameWithArguments(parm->Str.c_str(), nullptr, nullptr, parm->bForceCallWithNonExec);
+				}
 				if (Frame->Node->GetName() == "PrintToModLoader")
 				{
 					auto msg = Frame->GetParams<PrintStringParams>()->Message;
@@ -169,6 +167,8 @@ namespace Hooks
 											{
 												Global::ModInfo[i].ContainsButton = ModActor->DoesObjectContainFunction("ModMenuButtonPressed");
 												UE4::FString Author;
+												UE4::FString Description;
+												UE4::FString Version;
 												if (UE4::GetVariable<UE4::FString>(ModActor, "ModAuthor", Author))
 												{
 													if (Author.IsValid())
@@ -176,13 +176,25 @@ namespace Hooks
 														Global::ModInfo[i].ModAuthor = Author.ToString();
 													}
 												}
+												if (UE4::GetVariable<UE4::FString>(ModActor, "ModDescription", Description))
+												{
+													if (Description.IsValid())
+													{
+														Global::ModInfo[i].ModDescription = Description.ToString();
+													}
+												}
+												if (UE4::GetVariable<UE4::FString>(ModActor, "ModVersion", Version))
+												{
+													if (Version.IsValid())
+													{
+														Global::ModInfo[i].ModVersion = Version.ToString();
+													}
+												}
 												Global::ModInfo[i].WasInitialized = true;
 											}
 										}
 									}
-									//Global::ModActors.push_back(ModActor);
 									ModActor->CallFunctionByNameWithArguments(L"PreBeginPlay", nullptr, NULL, true);
-
 									Log::Info("Sucessfully Loaded %s", str);
 								}
 							}
@@ -340,7 +352,6 @@ namespace Hooks
 		Log::Info("ScanLoadedPaks Setup");
 		MinHook::Add(GameProfile::SelectedGameProfile.GameStateInit, &HookedFunctions::hookInitGameState, &HookedFunctions::origInitGameState, "AGameModeBase::InitGameState");
 		MinHook::Add(GameProfile::SelectedGameProfile.BeginPlay, &HookedFunctions::hookBeginPlay, &HookedFunctions::origBeginPlay, "AActor::BeginPlay");
-		//MinHook::Add((DWORD64)Pattern::Find("48 89 5C 24 ? 48 89 6C 24 ? 48 89 74 24 ? 48 89 7C 24 ? 41 56 48 83 EC 20 8B 41 08 4D 8B F1 C1 E8 04 49 8B F0 48 8B EA 48 8B F9 A8 01 74 04 33 DB EB 04 "), &HookedFunctions::hookCallFunction, &HookedFunctions::origCallFunction, "UObject::CallFunction");
 		CreateThread(NULL, 0, InitDX11Hook, NULL, 0, NULL);
 		return NULL;
 	}
