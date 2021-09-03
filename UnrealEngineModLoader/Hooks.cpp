@@ -19,23 +19,11 @@ namespace Hooks
 			UE4::FString Message;
 		};
 
-		struct CallFuncByNameParams
-		{
-			UE4::FString Str;
-			int64_t bForceCallWithNonExec;
-			UE4::UObject* Object;
-		};
-
 		PVOID(*origProcessFunction)(UE4::UObject*, UE4::FFrame*, void* const);
 		PVOID hookProcessFunction(UE4::UObject* obj, UE4::FFrame* Frame, void* const Result)
 		{
 			if (!GameStateClassInitNotRan)
 			{
-				if (Frame->Node->GetName() == "CallFunctionByNameWithArguments_Wrap")
-				{
-					//auto parm = Frame->GetParams<CallFuncByNameParams>();
-					//obj->CallFunctionByNameWithArguments(parm->Str.c_str(), nullptr, nullptr, parm->bForceCallWithNonExec);
-				}
 				if (Frame->Node->GetName() == "PrintToModLoader")
 				{
 					auto msg = Frame->GetParams<PrintStringParams>()->Message;
@@ -44,6 +32,7 @@ namespace Hooks
 						Log::Print("%s", msg.ToString().c_str());
 					}
 				}
+				Global::eventSystem.dispatchEvent("ProcessFunction", obj, Frame);
 			}
 			return origProcessFunction(obj, Frame, Result);
 
@@ -89,14 +78,14 @@ namespace Hooks
 				}
 				GameStateClassInitNotRan = false;
 			}
-			for (int i = 0; i < Global::ModInfo.size(); i++)
+			for (int i = 0; i < Global::ModInfoList.size(); i++)
 			{
-				UE4::AActor* CurrentModActor = Global::ModInfo[i].CurrentModActor;
+				UE4::AActor* CurrentModActor = Global::ModInfoList[i].CurrentModActor;
 				if (CurrentModActor->IsA(UE4::AActor::StaticClass()))
 				{
 					CurrentModActor->CallFunctionByNameWithArguments(L"ModCleanUp", nullptr, NULL, true);
 				}
-				Global::ModInfo[i].CurrentModActor = nullptr;
+				Global::ModInfoList[i].CurrentModActor = nullptr;
 			}
 			//Global::ModActors.clear();
 			if (Global::ModLoaderActor->IsA(UE4::AActor::StaticClass()))
@@ -110,12 +99,12 @@ namespace Hooks
 				transform.Rotation = UE4::FQuat(0, 0, 0, 0);
 				transform.Scale3D = UE4::FVector(1, 1, 1);
 				UE4::FActorSpawnParameters spawnParams = UE4::FActorSpawnParameters::FActorSpawnParameters();
-				for (int i = 0; i < Global::ModInfo.size(); i++)
+				for (int i = 0; i < Global::ModInfoList.size(); i++)
 				{
 					std::wstring CurrentMod;
 					//StartSpawningMods
-					CurrentMod = Global::ModInfo[i].ModName;
-					if (Global::ModInfo[i].IsEnabled)
+					CurrentMod = Global::ModInfoList[i].ModName;
+					if (Global::ModInfoList[i].IsEnabled)
 					{
 						if (GameProfile::SelectedGameProfile.StaticLoadObject)
 						{
@@ -131,8 +120,7 @@ namespace Hooks
 								}
 								else
 								{
-									auto Gameplay = (UE4::UGameplayStatics*)UE4::UGameplayStatics::StaticClass()->CreateDefaultObject();
-									ModActor = Gameplay->BeginDeferredActorSpawnFromClass(ModObject, transform, UE4::ESpawnActorCollisionHandlingMethod::AlwaysSpawn, nullptr);
+									ModActor = UE4::UGameplayStatics::BeginDeferredActorSpawnFromClass(ModObject, transform, UE4::ESpawnActorCollisionHandlingMethod::AlwaysSpawn, nullptr);
 								}
 								if (ModActor)
 								{
@@ -158,14 +146,14 @@ namespace Hooks
 											Log::Warn("ProcessBlueprintFunctions could not be located! Mod Loader Functionality Will be Limited!");
 									}
 
-									for (size_t i = 0; i < Global::ModInfo.size(); i++)
+									for (size_t i = 0; i < Global::ModInfoList.size(); i++)
 									{
-										if (Global::ModInfo[i].ModName == CurrentMod)
+										if (Global::ModInfoList[i].ModName == CurrentMod)
 										{
-											Global::ModInfo[i].CurrentModActor = ModActor;
-											if (!Global::ModInfo[i].WasInitialized)
+											Global::ModInfoList[i].CurrentModActor = ModActor;
+											if (!Global::ModInfoList[i].WasInitialized)
 											{
-												Global::ModInfo[i].ContainsButton = ModActor->DoesObjectContainFunction("ModMenuButtonPressed");
+												Global::ModInfoList[i].ContainsButton = ModActor->DoesObjectContainFunction("ModMenuButtonPressed");
 												UE4::FString Author;
 												UE4::FString Description;
 												UE4::FString Version;
@@ -173,24 +161,24 @@ namespace Hooks
 												{
 													if (Author.IsValid())
 													{
-														Global::ModInfo[i].ModAuthor = Author.ToString();
+														Global::ModInfoList[i].ModAuthor = Author.ToString();
 													}
 												}
 												if (UE4::GetVariable<UE4::FString>(ModActor, "ModDescription", Description))
 												{
 													if (Description.IsValid())
 													{
-														Global::ModInfo[i].ModDescription = Description.ToString();
+														Global::ModInfoList[i].ModDescription = Description.ToString();
 													}
 												}
 												if (UE4::GetVariable<UE4::FString>(ModActor, "ModVersion", Version))
 												{
 													if (Version.IsValid())
 													{
-														Global::ModInfo[i].ModVersion = Version.ToString();
+														Global::ModInfoList[i].ModVersion = Version.ToString();
 													}
 												}
-												Global::ModInfo[i].WasInitialized = true;
+												Global::ModInfoList[i].WasInitialized = true;
 											}
 										}
 									}
@@ -206,6 +194,7 @@ namespace Hooks
 					}
 				}
 				Log::Info("Finished Spawning PakMods");
+				Global::eventSystem.dispatchEvent("InitGameState");
 			}
 			Log::Info("Returning to GameState --------------------------------------------------------");
 			return origInitGameState(Ret);
@@ -220,15 +209,17 @@ namespace Hooks
 				{
 					Log::Info("Beginplay Called");
 					Global::ModLoaderActor->CallFunctionByNameWithArguments(L"PostLoaderStart", nullptr, NULL, true);
-					for (int i = 0; i < Global::ModInfo.size(); i++)
+					for (int i = 0; i < Global::ModInfoList.size(); i++)
 					{
-						UE4::AActor* CurrentModActor = Global::ModInfo[i].CurrentModActor;
+						UE4::AActor* CurrentModActor = Global::ModInfoList[i].CurrentModActor;
 						if (CurrentModActor != nullptr)
 						{
 							CurrentModActor->CallFunctionByNameWithArguments(L"PostBeginPlay", nullptr, NULL, true);
+							Global::eventSystem.dispatchEvent("PostBeginPlay", Global::ModInfoList[i].ModName, CurrentModActor);
 						}
 					}
 				}
+				Global::eventSystem.dispatchEvent("BeginPlay", Actor);
 			}
 			return origBeginPlay(Actor);
 		}
@@ -316,14 +307,6 @@ namespace Hooks
 
 		LoaderUI::GetUI()->pSwapChainVtable = (DWORD_PTR*)pSwapChain;
 		LoaderUI::GetUI()->pSwapChainVtable = (DWORD_PTR*)LoaderUI::GetUI()->pSwapChainVtable[0];
-		/*
-		Log::Info("BaseAddr:               0x%" PRIXPTR, (DWORD_PTR)GetModuleHandle(NULL));
-		Log::Info("SwapChain:              0x%" PRIXPTR, pSwapChain);
-		Log::Info("SwapChainVtable:        0x%" PRIXPTR, LoaderUI::GetUI()->pSwapChainVtable);
-		Log::Info("Device:                 0x%" PRIXPTR, LoaderUI::GetUI()->pDevice);
-		Log::Info("DeviceContext:          0x%" PRIXPTR, LoaderUI::GetUI()->pContext);
-		Log::Info("D3D11Present:           0x%" PRIXPTR, LoaderUI::GetUI()->pSwapChainVtable[8]);
-		*/
 		LoaderUI::GetUI()->phookD3D11Present = (LoaderUI::D3D11PresentHook)LoaderUI::GetUI()->pSwapChainVtable[8];
 		MinHook::Add((DWORD64)LoaderUI::GetUI()->phookD3D11Present, &hookD3D11Present, &D3D11Present, "DX11");
 		MinHook::Add((DWORD64)LoaderUI::GetUI()->pSwapChainVtable[13], &hookResizeBuffers, &LoaderUI::GetUI()->ResizeBuffers, "DX11");

@@ -85,30 +85,30 @@ void ShowMods()
 	if (!ImGui::CollapsingHeader("Logic Mods"))
 		return;
 
-	for (size_t i = 0; i < Global::ModInfo.size(); i++)
+	for (size_t i = 0; i < Global::ModInfoList.size(); i++)
 	{
-		std::string str(Global::ModInfo[i].ModName.begin(), Global::ModInfo[i].ModName.end());
+		std::string str(Global::ModInfoList[i].ModName.begin(), Global::ModInfoList[i].ModName.end());
 		std::string ModLabel = str + "##" + std::to_string(i);
 		if (ImGui::TreeNode(ModLabel.c_str()))
 		{
-			std::string Author = "Created By: " + Global::ModInfo[i].ModAuthor;
+			std::string Author = "Created By: " + Global::ModInfoList[i].ModAuthor;
 			ImGui::Text(Author.c_str());
 			ImGui::Separator();
-			std::string Description = "Description: " + Global::ModInfo[i].ModDescription;
+			std::string Description = "Description: " + Global::ModInfoList[i].ModDescription;
 			ImGui::Text(Description.c_str());
 			ImGui::Separator();
-			std::string Version = "Version: " + Global::ModInfo[i].ModVersion;
+			std::string Version = "Version: " + Global::ModInfoList[i].ModVersion;
 			ImGui::Text(Version.c_str());
 			ImGui::Separator();
 			std::string ActiveLabel = "Enable##" + std::to_string(i);
-			ImGui::Checkbox(ActiveLabel.c_str(), &Global::ModInfo[i].IsEnabled);
-			if (Global::ModInfo[i].IsEnabled && Global::ModInfo[i].CurrentModActor && Global::ModInfo[i].ContainsButton)
+			ImGui::Checkbox(ActiveLabel.c_str(), &Global::ModInfoList[i].IsEnabled);
+			if (Global::ModInfoList[i].IsEnabled && Global::ModInfoList[i].CurrentModActor && Global::ModInfoList[i].ContainsButton)
 			{
 				std::string ButtonLabel = str + " Button" + "##" + std::to_string(i);
 				if (ImGui::Button(ButtonLabel.c_str()))
 				{
 					//std::cout << Global::ModInfo[i].CurrentModActor->GetName() << std::endl;
-					Global::ModInfo[i].CurrentModActor->CallFunctionByNameWithArguments(L"ModMenuButtonPressed", nullptr, NULL, true);
+					Global::ModInfoList[i].CurrentModActor->CallFunctionByNameWithArguments(L"ModMenuButtonPressed", nullptr, NULL, true);
 				}
 			}
 			ImGui::TreePop();
@@ -147,8 +147,6 @@ void DrawImGui()
 	ShowMods();
 	ShowTools();
 
-	//FNameExplorer();
-	//ImGui::ShowDemoWindow();
 	ImGui::End();
 }
 
@@ -282,8 +280,8 @@ void LoaderUI::LoaderD3D11Present(IDXGISwapChain* pSwapChain, UINT SyncInterval,
 		style->TabBorderSize = 1.0f;
 		style->TabRounding = 0.0f;
 		style->WindowRounding = 4.0f;
-
 		DrawImGui();
+		Global::eventSystem.dispatchEvent("DrawImGui");
 	}
 
 	ImGui::Render();

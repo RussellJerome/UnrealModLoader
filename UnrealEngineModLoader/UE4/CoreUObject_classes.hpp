@@ -71,6 +71,62 @@ namespace UE4
 			}
 		}
 
+		template<typename T>
+		static std::vector<T*> GetAllObjectsOfType(UClass* Class, bool filterDefualts)
+		{
+			if (IsChunkedArray())
+			{
+				std::vector<T*> ret;
+				//auto v = T::StaticClass();
+				for (int i = 0; i < GObjects->GetAsChunckArray().Num(); ++i)
+				{
+					auto object = GObjects->GetAsChunckArray().GetByIndex(i).Object;
+
+					if (object == nullptr)
+					{
+						continue;
+					}
+
+					if (object->IsA(Class))
+					{
+						if (filterDefualts)
+						{
+							if (object->GetName().find("Default__") != std::string::npos) {
+								continue;
+							}
+						}
+						ret.push_back(static_cast<T*>(object));
+					}
+				}
+				return ret;
+			}
+			else
+			{
+				std::vector<T*> ret;
+				for (int i = 0; i < GObjects->GetAsTUArray().Num(); ++i)
+				{
+					auto object = GObjects->GetAsTUArray().GetByIndex(i).Object;
+
+					if (object == nullptr)
+					{
+						continue;
+					}
+
+					if (object->IsA(Class))
+					{
+						if (filterDefualts)
+						{
+							if (object->GetName().find("Default__") != std::string::npos) {
+								continue;
+							}
+						}
+						ret.push_back(static_cast<T*>(object));
+					}
+				}
+				return ret;
+			}
+		}
+
 		static UClass* FindClass(const std::string& name)
 		{
 			return FindObject<UClass>(name);
@@ -249,6 +305,42 @@ namespace UE4
 		}
 	};
 
+	class AGameMode : public AActor
+	{
+	public:
+
+	};
+
+	class AGameState : public AActor
+	{
+	public:
+		static UClass* StaticClass()
+		{
+			static auto ptr = UObject::FindClass("Class Engine.GameState");
+			return ptr;
+		}
+	};
+
+	class UGameInstance : public UObject
+	{
+	public:
+		static UClass* StaticClass()
+		{
+			static auto ptr = UObject::FindClass("Class Engine.GameInstance");
+			return ptr;
+		}
+	};
+
+	class APawn : public AActor
+	{
+	public:
+		static UClass* StaticClass()
+		{
+			static auto ptr = UObject::FindClass("Class Engine.Pawn");
+			return ptr;
+		}
+	};
+
 	class ACustomClass : public UObject
 	{
 	public:
@@ -273,10 +365,15 @@ namespace UE4
 	{
 	public:
 
-		class AActor* BeginDeferredActorSpawnFromClass(class UClass* ActorClass, const struct FTransform& SpawnTransform, ESpawnActorCollisionHandlingMethod CollisionHandlingOverride, class AActor* Owner);
+		static class AActor* BeginDeferredActorSpawnFromClass(class UClass* ActorClass, const struct FTransform& SpawnTransform, ESpawnActorCollisionHandlingMethod CollisionHandlingOverride, class AActor* Owner);
 
-		class FString GetCurrentLevelName(bool bRemovePrefixString);
+		static class FString GetCurrentLevelName(bool bRemovePrefixString);
 
+		static class AGameState* GetGameState();
+		static class AGameMode* GetGameMode();
+		static class UGameInstance* GetGameInstance();
+		static class APawn* GetPlayerPawn(int PlayerIndex);
+		static class APlayerController* GetPlayerController(int PlayerIndex);
 		static UClass* StaticClass()
 		{
 			static auto ptr = UObject::FindClass("Class Engine.GameplayStatics");
@@ -284,8 +381,9 @@ namespace UE4
 		}
 	};
 
+	static UE4::UEProperty* _dummy_foobar = nullptr;
 	template<typename T>
-	bool GetVariable(UE4::UObject* Object, std::string Name, T& Variable)
+	bool GetVariable(UE4::UObject* Object, std::string Name, T& Variable, UE4::UEProperty*& Property = _dummy_foobar)
 	{
 		UE4::UClass* ObjectClass = Object->GetClass();
 		if (GameProfile::SelectedGameProfile.bIsFProperty)
@@ -300,6 +398,7 @@ namespace UE4
 				{
 					VarFound = true;
 					auto varProperty = (UE4::UEProperty*)Children;
+					Property = varProperty;
 					Variable= Read<T>((byte*)Object + varProperty->GetOffset());
 					return true;
 				}
@@ -319,6 +418,7 @@ namespace UE4
 				{
 					VarFound = true;
 					auto varProperty = (UE4::UEProperty*)Children;
+					Property = varProperty;
 					Variable = Read<T>((byte*)Object + varProperty->GetOffset());
 					return true;
 				}
@@ -327,6 +427,55 @@ namespace UE4
 		}
 		return false;
 	}
+
+	template<typename T>
+	bool SetVariable(UE4::UObject* Object, std::string Name, T Value)
+	{
+		UE4::UClass* ObjectClass = Object->GetClass();
+		if (GameProfile::SelectedGameProfile.bIsFProperty)
+		{
+			auto Children = (UE4::FField*)ObjectClass->GetChildren();
+			bool VarFound = false;
+			while (!VarFound)
+			{
+				if (!Children)
+					break;
+				if (Children->GetName() == Name)
+				{
+					VarFound = true;
+					auto varProperty = (UE4::UEProperty*)Children;
+					Write<T>((byte*)Object + varProperty->GetOffset(), Value);
+					return true;
+				}
+				Children = Children->GetNext();
+			}
+
+		}
+		else
+		{
+			auto Children = (UE4::UField*)ObjectClass->GetChildren();
+			bool VarFound = false;
+			while (!VarFound)
+			{
+				if (!Children)
+					break;
+				if (Children->GetName() == Name)
+				{
+					VarFound = true;
+					auto varProperty = (UE4::UEProperty*)Children;
+					Write<T>((byte*)Object + varProperty->GetOffset(), Value);
+					return true;
+				}
+				Children = Children->GetNext();
+			}
+		}
+		return false;
+	}
+
+	//void CallFunction(class UObject* Object, class UFunction* Function, void* parms)
+	//{
+	//	Object->ProcessEvent(Function, &parms);
+	//}
 
 	class FFrame
 	{

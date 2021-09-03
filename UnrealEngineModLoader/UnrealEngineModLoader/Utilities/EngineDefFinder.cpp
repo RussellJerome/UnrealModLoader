@@ -477,6 +477,7 @@ namespace ClassDefFinder
 			}
 			Log::Info("UProperty Offset Def located at: 0x%p", GameProfile::SelectedGameProfile.defs.Property.Offset);
 		}
+		return true;
 	}
 
 	bool FindUEProperty()

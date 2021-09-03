@@ -65,8 +65,7 @@ namespace Dumper
 		fopen_s(&Log, "WorldActorDump.txt", "w+");
 		if (UE4::UWorld::GetWorld()->GetPersistentLevel())
 		{
-			auto GameplayStatics = (UE4::UGameplayStatics*)UE4::UGameplayStatics::StaticClass()->CreateDefaultObject();
-			fprintf(Log, "#Level: %s\n\n", GameplayStatics->GetCurrentLevelName(false).ToString().c_str());
+			fprintf(Log, "#Level: %s\n\n", UE4::UGameplayStatics::GetCurrentLevelName(false).ToString().c_str());
 			for (int i = 0; i < UE4::UWorld::GetWorld()->GetPersistentLevel()->GetWorldActors().Num(); i++)
 			{
 				auto CurrentActor = UE4::UWorld::GetWorld()->GetPersistentLevel()->GetWorldActors()[i];

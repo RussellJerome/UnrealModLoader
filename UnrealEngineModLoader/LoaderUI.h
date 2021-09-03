@@ -1,4 +1,5 @@
 #pragma once
+#include "Lib.h"
 #include <Windows.h>
 #include <inttypes.h>
 #include <string>
@@ -13,7 +14,7 @@
 #include "ImGui/imgui_impl_win32.h"
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-class LoaderUI
+class LOADER_API LoaderUI
 {
 public:
 	typedef HRESULT(__stdcall* D3D11PresentHook) (IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags);

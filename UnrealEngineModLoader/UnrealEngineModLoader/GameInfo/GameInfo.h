@@ -1,4 +1,5 @@
 #pragma once
+#include "../Lib.h"
 #include <string>
 #include <vector>
 #include <Windows.h>
@@ -43,9 +44,10 @@ struct Offsets {
 	}ULevel;
 };
 
-class GameProfile
+class LOADER_API GameProfile
 {
 public:
+	std::string ProfileName;
 	std::string LoaderPath;
 	int UsesFNamePool;
 	std::string BeginPlayOverwrite = "Class Engine.PlayerController";

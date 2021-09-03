@@ -45,7 +45,6 @@ namespace CoreModLoader
 				std::wstring path = entry.path();
 				std::string str(path.begin(), path.end());
 				InjectDLL(str);
-				Log::Info("CoreModLoaded: %s", str);
 			}
 		}
 	}

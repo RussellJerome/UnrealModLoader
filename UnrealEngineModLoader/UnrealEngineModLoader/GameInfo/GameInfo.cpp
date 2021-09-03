@@ -55,6 +55,7 @@ void SetupProfile(std::string Path)
 	}
 	if (std::filesystem::exists(Profile))
 	{
+		GameProfile::SelectedGameProfile.ProfileName = gamename;
 		Log::Info("Profile Detected: %s", gamename.c_str());
 		std::ifstream file("Profile");
 
@@ -311,7 +312,7 @@ void SetupProfile(std::string Path)
 			}
 
 			auto ProcessEvent = Pattern::Find("75 0E ? ? ? 48 ? ? 48 ? ? E8 ? ? ? ? 48 8B ? 24 ? 48 8B ? 24 38 48 8B ? 24 40");
-			ProcessEvent += 0x11;
+			ProcessEvent += 0xB;
 			if (ProcessEvent != nullptr)
 			{
 				GameProfile::SelectedGameProfile.ProcessEvent = (DWORD64)MEM::GetAddressPTR(ProcessEvent, 0x1, 0x5);
@@ -326,7 +327,7 @@ void SetupProfile(std::string Path)
 			if (!GameProfile::SelectedGameProfile.CreateDefualtObject)
 			{
 				//FallBack 1
-				GameProfile::SelectedGameProfile.CreateDefualtObject = (DWORD64)Pattern::Find("48 39 5F 20 75 22 8B 47 08 C1 E8 0A A8 01 74 0F");
+				GameProfile::SelectedGameProfile.CreateDefualtObject = (DWORD64)Pattern::Find("4C 8B DC 55 53 49 8D AB ? ? ? ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 48 83 B9 ? ? ? ? ? 48 8B D9 0F 85");
 				if (!GameProfile::SelectedGameProfile.CreateDefualtObject)
 				{
 					//Final FallBack

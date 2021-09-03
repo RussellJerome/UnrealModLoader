@@ -1,10 +1,11 @@
 #pragma once
 #include <windows.h>
+#include "../Lib.h"
 #include <string>
 #define APP_NAME "UnrealModLoader"
 #define LOG_STREAM stdout
 
-class Log
+class LOADER_API Log
 {
 private:
 	enum MsgType

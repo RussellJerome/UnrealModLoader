@@ -8,6 +8,12 @@ bool Read(void* address, void* buffer, unsigned long long size)
 	return ReadProcessMemory(hProcess, address, buffer, size, nullptr);
 }
 
+bool Write(void* address, void* buffer, unsigned long long size)
+{
+	auto hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, _getpid());
+	return WriteProcessMemory(hProcess, address, buffer, size, nullptr);
+}
+
 namespace MEM
 {
 	HWND FindWindow(DWORD pid, wchar_t const* className)
