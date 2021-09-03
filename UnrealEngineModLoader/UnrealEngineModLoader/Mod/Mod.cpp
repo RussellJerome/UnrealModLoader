@@ -38,6 +38,10 @@ void Mod::InitGameState()
 {
 }
 
+void Mod::OnModMenuButtonPressed()
+{
+}
+
 void Mod::BeginPlay(UE4::AActor* Actor)
 {
 }

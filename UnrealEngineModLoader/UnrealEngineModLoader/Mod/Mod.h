@@ -10,13 +10,16 @@
 class LOADER_API Mod
 {
 public:
+	// Mod Default Variables
 	std::string ModName;
 	std::string ModVersion;
 	std::string ModDescription;
 	std::string ModAuthors;
 	std::string ModLoaderVersion;
+	bool UseMenuButton;
+	//ModInternals
 	bool IsFinishedCreating;
-
+	
 	//Used Internally to setup Hook Event System
 	void SetupHooks();
 
@@ -37,6 +40,8 @@ public:
 
 	//PostBeginPlay of EVERY Blueprint ModActor
 	virtual void PostBeginPlay(std::wstring ModActorName, UE4::AActor* Actor);
+
+	virtual void OnModMenuButtonPressed();
 
 	//Called When Mod Construct Finishes
 	void CompleteModCreation();

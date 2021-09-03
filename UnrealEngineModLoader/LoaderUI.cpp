@@ -45,42 +45,8 @@ HRESULT LoaderUI::LoaderResizeBuffers(IDXGISwapChain* pSwapChain, UINT BufferCou
 	LoaderUI::GetUI()->pContext->RSSetViewports(1, &vp);
 	return hr;
 }
-static const char* CurrentName;
-void FNameExplorer()
-{
-	ImGui::Begin("FName Finder", NULL, NULL);
-	static int NameIndex;
 
-	ImGui::Text("Name Finder");
-	ImGui::Separator();
-	
-	ImGui::InputInt("NameIndex", &NameIndex);
-	if (ImGui::Button("Find Name"))
-	{
-		Log::Info("Name: %s", UE4::FName::GetFNamePool()[NameIndex]->GetAnsiName().c_str());
-		/*
-		if (UE4::FName::IsUsingNamePool())
-		{
-			if (UE4::FName::GetFNamePool().IsValidIndex(NameIndex))
-			{
-				CurrentName = UE4::FName::GetFNamePool().GetById(NameIndex)->GetAnsiName().c_str();
-			}
-		}
-		else
-		{
-			if (UE4::FName::GetTNameArray().IsValidIndex(NameIndex))
-			{
-				CurrentName = UE4::FName::GetTNameArray()[NameIndex]->GetAnsiName();
-			}
-		}
-		*/
-
-	}
-
-	ImGui::End();
-}
-
-void ShowMods()
+void ShowLogicMods()
 {
 	if (!ImGui::CollapsingHeader("Logic Mods"))
 		return;
@@ -107,7 +73,6 @@ void ShowMods()
 				std::string ButtonLabel = str + " Button" + "##" + std::to_string(i);
 				if (ImGui::Button(ButtonLabel.c_str()))
 				{
-					//std::cout << Global::ModInfo[i].CurrentModActor->GetName() << std::endl;
 					Global::ModInfoList[i].CurrentModActor->CallFunctionByNameWithArguments(L"ModMenuButtonPressed", nullptr, NULL, true);
 				}
 			}
@@ -116,6 +81,41 @@ void ShowMods()
 	}
 }
 
+void ShowCoreMods()
+{
+	if (!ImGui::CollapsingHeader("Core Mods"))
+		return;
+
+	for (size_t i = 0; i < Global::CoreMods.size(); i++)
+	{
+		std::string str(Global::CoreMods[i]->ModName.begin(), Global::CoreMods[i]->ModName.end());
+		std::string ModLabel = str + "##cm" + std::to_string(i);
+		if (ImGui::TreeNode(ModLabel.c_str()))
+		{
+
+			std::string Author = "Created By: " + Global::CoreMods[i]->ModAuthors;
+			ImGui::Text(Author.c_str());
+			ImGui::Separator();
+			std::string Description = "Description: " + Global::CoreMods[i]->ModDescription;
+			ImGui::Text(Description.c_str());
+			ImGui::Separator();
+			std::string Version = "Version: " + Global::CoreMods[i]->ModVersion;
+			ImGui::Text(Version.c_str());
+			ImGui::Separator();
+
+			if (Global::CoreMods[i]->UseMenuButton && Global::CoreMods[i]->IsFinishedCreating)
+			{
+				std::string ButtonLabel = str + " Button" + "##cm" + std::to_string(i);
+				if (ImGui::Button(ButtonLabel.c_str()))
+				{
+					Global::CoreMods[i]->OnModMenuButtonPressed();
+				}
+			}
+
+			ImGui::TreePop();
+		}
+	}
+}
 
 
 void ShowTools()
@@ -144,7 +144,8 @@ void DrawImGui()
 	ImGui::Begin("Unreal Mod Loader", NULL, NULL);
 	ImGui::Spacing();
 	ImGui::Text("Unreal Mod Loader V: %s", Global::Version.c_str());
-	ShowMods();
+	ShowLogicMods();
+	ShowCoreMods();
 	ShowTools();
 
 	ImGui::End();

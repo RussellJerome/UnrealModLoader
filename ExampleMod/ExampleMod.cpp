@@ -5,6 +5,7 @@ void ExampleMod::InitializeMod()
 {
 	UE4::InitSDK();
 	SetupHooks();
+	//UseMenuButton = true; // Allows Mod Loader To Show Button
 }
 
 void ExampleMod::ProcessFunction(UE4::UObject* obj, UE4::FFrame* Frame)
@@ -33,7 +34,11 @@ void ExampleMod::PostBeginPlay(std::wstring ModActorName, UE4::AActor* Actor)
 		ModActor = Actor;
 	}
 }
-UE4::APawn* OgPawn;
+
+void ExampleMod::OnModMenuButtonPressed()
+{
+}
+
 void ExampleMod::DrawImGui()
 {
 }

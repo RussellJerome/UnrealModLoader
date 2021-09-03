@@ -34,6 +34,8 @@ public:
 	//PostBeginPlay of EVERY Blueprint ModActor
 	virtual void PostBeginPlay(std::wstring ModActorName, UE4::AActor* Actor) override;
 
+	virtual void OnModMenuButtonPressed() override;
+
 	//Call ImGui Here (CALLED EVERY FRAME ON DX HOOK)
 	virtual void DrawImGui() override;
 
