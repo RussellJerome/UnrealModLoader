@@ -240,8 +240,6 @@ namespace UE4
 	class ULevel : public UObject
 	{
 	public:
-		TArray<class AActor*> GetWorldActors() const;
-
 		static UClass* StaticClass()
 		{
 			static auto ptr = UObject::FindClass("Class Engine.Level");
@@ -252,9 +250,6 @@ namespace UE4
 	class UWorld : public UObject
 	{
 	public:
-		ULevel* GetPersistentLevel() const;
-		//class AGameModeBase* GetAuthorityGameMode() const { return Read<class AGameModeBase*>((byte*)this + GameProfile::SelectedGameProfile.defs.UWorld.AuthorityGameMode); };
-
 		AActor* SpawnActor(UClass* uclass, const  FTransform* transform, const FActorSpawnParameters* params);
 
 		static UWorld** GWorld;
@@ -277,6 +272,10 @@ namespace UE4
 		FTransform GetTransform();
 
 		FRotator GetActorRotation();
+
+		FVector GetActorLocation();
+
+		FVector GetActorScale3D();
 
 		static UClass* StaticClass()
 		{

@@ -88,6 +88,6 @@ public:
 
 	static void SetupMessage(std::string Info, std::string Message)
 	{
-		MessageBoxA(NULL, (Message).c_str(), Info.c_str(), MB_OK);
+		MessageBoxA(NULL, (Message).c_str(), Info.c_str(), MB_OK | MB_SYSTEMMODAL);
 	}
 };

@@ -178,19 +178,6 @@ void SetupProfile(std::string Path)
 			GameProfile::SelectedGameProfile.IsEngineDefsMissing = true;
 		}
 
-		if (GameInfo.select("UWorldDef"))
-		{
-			GameProfile::SelectedGameProfile.defs.UWorld.PersistentLevel = StringToDWord(GameInfo.get("UWorldDef", "PersistentLevel", ""));
-			GameProfile::SelectedGameProfile.defs.UWorld.AuthorityGameMode = StringToDWord(GameInfo.get("UWorldDef", "AuthorityGameMode", ""));
-			GameInfo.select("ULevelDef");
-			GameProfile::SelectedGameProfile.defs.ULevel.WorldArray = StringToDWord(GameInfo.get("ULevelDef", "WorldArray", ""));
-		}
-		else
-		{
-			GameProfile::SelectedGameProfile.IsUWorldMissing = true;
-		}
-
-
 		if (GameInfo.select("Property"))
 		{
 			GameProfile::SelectedGameProfile.bIsFProperty = GameInfo.getAs<int>("Property", "IsFProperty", 0);

@@ -62,31 +62,30 @@ namespace Dumper
 	bool DumpWorldActors()
 	{
 		FILE* Log = NULL;
-		fopen_s(&Log, "WorldActorDump.txt", "w+");
-		if (UE4::UWorld::GetWorld()->GetPersistentLevel())
+		std::string FileName = UE4::UGameplayStatics::GetCurrentLevelName(false).ToString() + "_Dump.txt";
+		fopen_s(&Log, FileName.c_str(), "w+");
+		auto actors = UE4::UObject::GetAllObjectsOfType<UE4::AActor>(UE4::AActor::StaticClass(), true);
+		for (size_t i = 0; i < actors.size(); i++)
 		{
-			fprintf(Log, "#Level: %s\n\n", UE4::UGameplayStatics::GetCurrentLevelName(false).ToString().c_str());
-			for (int i = 0; i < UE4::UWorld::GetWorld()->GetPersistentLevel()->GetWorldActors().Num(); i++)
+			auto actor = actors[i];
+			if (actor->GetOuter()->GetClass() == UE4::ULevel::StaticClass())
 			{
-				auto CurrentActor = UE4::UWorld::GetWorld()->GetPersistentLevel()->GetWorldActors()[i];
-				if (CurrentActor != nullptr)
-				{
-					auto Transform = CurrentActor->GetTransform();
-					fprintf(Log, "ActorName: %s\n", CurrentActor->GetName().c_str());
-					fprintf(Log, "ClassName: %s\n", CurrentActor->GetClass()->GetName().c_str());
-					fprintf(Log, "Location: %f, %f, %f\n", Transform.Translation.X, Transform.Translation.Y, Transform.Translation.Z);
-					auto Rota = CurrentActor->GetActorRotation();
-					fprintf(Log, "Rotation: %f, %f, %f\n", Rota.Pitch, Rota.Roll, Rota.Yaw);
-					fprintf(Log, "Scale: %f, %f, %f\n", Transform.Scale3D.X, Transform.Scale3D.Y, Transform.Scale3D.Z);
-					fprintf(Log, "\n");
-
-				}
+				auto Location = actor->GetActorLocation();
+				auto Rotation = actor->GetActorRotation();
+				auto Scale = actor->GetActorScale3D();
+				fprintf(Log, "ActorName: %s\n", actor->GetName().c_str());
+				fprintf(Log, "ClassName: %s\n", actor->GetClass()->GetName().c_str());
+				fprintf(Log, "Location: %f, %f, %f\n", Location.X, Location.Y, Location.Z);
+				fprintf(Log, "Rotation: %f, %f, %f\n", Rotation.Pitch, Rotation.Roll, Rotation.Yaw);
+				fprintf(Log, "Scale: %f, %f, %f\n", Scale.X, Scale.Y, Scale.Z);
+				fprintf(Log, "\n");
 			}
 		}
 		Log::SetupMessage("Done!", "World Actors Dump Complete!");
 		fclose(Log);
 		return true;
 	}
+
 	bool f1_pressed;
 	void KeyDetectionLoop()
 	{

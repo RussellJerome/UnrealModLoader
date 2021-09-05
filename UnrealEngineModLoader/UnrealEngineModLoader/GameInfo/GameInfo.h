@@ -35,13 +35,6 @@ struct Offsets {
 		//uint16_t ElementSize = 0x0;
 		uint16_t Offset = 0x0;
 	} Property;
-	struct {
-		uint16_t PersistentLevel = 0x0;
-		uint16_t AuthorityGameMode = 0x0;
-	}UWorld;
-	struct {
-		uint16_t WorldArray = 0x0;
-	}ULevel;
 };
 
 class LOADER_API GameProfile
@@ -72,7 +65,6 @@ public:
 	DWORD64 ProcessInternals;
 
 	bool IsEngineDefsMissing;
-	bool IsUWorldMissing;
 
 	bool IsPropertyMissing;
 

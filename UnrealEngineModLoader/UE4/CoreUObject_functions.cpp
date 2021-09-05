@@ -292,24 +292,10 @@ namespace UE4
 	//UWorld Functions
 	//---------------------------------------------------------------------------
 
-	ULevel* UWorld::GetPersistentLevel() const
-	{ 
-		return Read<ULevel*>((byte*)this + GameProfile::SelectedGameProfile.defs.UWorld.PersistentLevel); 
-	};
-
 	AActor* UWorld::SpawnActor(UClass* uclass, const  FTransform* transform, const FActorSpawnParameters* params)
 	{
 		return reinterpret_cast<AActor * (*)(UWorld*, UClass*, const FTransform*, const FActorSpawnParameters*)>(GameProfile::SelectedGameProfile.SpawnActorFTrans)(this, uclass, transform, params);
 	}
-
-	//---------------------------------------------------------------------------
-	//ULevel Functions
-	//---------------------------------------------------------------------------
-
-	TArray<class AActor*> ULevel::GetWorldActors() const
-	{ 
-		return Read<TArray<class AActor*>>((byte*)this + GameProfile::SelectedGameProfile.defs.ULevel.WorldArray); 
-	};
 
 	//---------------------------------------------------------------------------
 	//Actor Functions
@@ -332,6 +318,28 @@ namespace UE4
 		struct
 		{
 			FRotator ReturnValue;
+		}params;
+		UObject::ProcessEvent(fn, &params);
+		return params.ReturnValue;
+	}
+
+	FVector AActor::GetActorLocation()
+	{
+		static auto fn = UObject::FindObject<UFunction>("Function Engine.Actor.K2_GetActorLocation");
+		struct
+		{
+			FVector ReturnValue;
+		}params;
+		UObject::ProcessEvent(fn, &params);
+		return params.ReturnValue;
+	}
+
+	FVector AActor::GetActorScale3D()
+	{
+		static auto fn = UObject::FindObject<UFunction>("Function Engine.Actor.GetActorScale3D");
+		struct
+		{
+			FVector ReturnValue;
 		}params;
 		UObject::ProcessEvent(fn, &params);
 		return params.ReturnValue;

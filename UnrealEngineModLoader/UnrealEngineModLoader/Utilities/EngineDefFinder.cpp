@@ -315,59 +315,6 @@ namespace ClassDefFinder
 		return false;
 	}
 
-	bool FindPersistentLevelDef()
-	{
-		bool HasPersistentLevelNotBeenFound = true;
-		GameProfile::SelectedGameProfile.defs.UWorld.PersistentLevel = GameProfile::SelectedGameProfile.defs.UObject.Outer + 0x8;
-		while (HasPersistentLevelNotBeenFound)
-		{
-			auto PersistentLevel = Read<UE4::ULevel*>((byte*)UE4::UWorld::GetWorld() + GameProfile::SelectedGameProfile.defs.UWorld.PersistentLevel);
-			if (PersistentLevel != nullptr && PersistentLevel->IsA(UE4::ULevel::StaticClass()))
-			{
-				if (PersistentLevel->GetName() == "PersistentLevel" && PersistentLevel->GetClass()->GetName() == "Level")
-				{
-					Log::Info("PersistentLevel: 0x%p", GameProfile::SelectedGameProfile.defs.UWorld.PersistentLevel);
-					HasPersistentLevelNotBeenFound = false;
-				}
-			}
-			if (HasPersistentLevelNotBeenFound)
-			{
-				GameProfile::SelectedGameProfile.defs.UWorld.PersistentLevel = GameProfile::SelectedGameProfile.defs.UWorld.PersistentLevel + 0x8;
-			}
-		}
-		Log::Info("Persistent Level Found.");
-		return true;
-	}
-
-	bool FindGameModeDef()
-	{
-		bool HasGameModeNotBeenFound = true;
-		GameProfile::SelectedGameProfile.defs.UWorld.AuthorityGameMode = GameProfile::SelectedGameProfile.defs.UWorld.PersistentLevel + 0x8;
-		while (HasGameModeNotBeenFound)
-		{
-			auto AuthorityGameMode = Read<UE4::AGameModeBase*>((byte*)UE4::UWorld::GetWorld() + GameProfile::SelectedGameProfile.defs.UWorld.AuthorityGameMode);
-			if (AuthorityGameMode != nullptr && AuthorityGameMode->IsA(UE4::AGameModeBase::StaticClass()))
-			{
-				Log::Info("AuthorityGameMode: 0x%p", GameProfile::SelectedGameProfile.defs.UWorld.AuthorityGameMode);
-				HasGameModeNotBeenFound = false;
-			}
-			if (HasGameModeNotBeenFound)
-			{
-				GameProfile::SelectedGameProfile.defs.UWorld.AuthorityGameMode = GameProfile::SelectedGameProfile.defs.UWorld.AuthorityGameMode + 0x8;
-			}
-		}
-		Log::Info("Authority GameMode Found.");
-		return true;
-	}
-
-	bool FindWorldArrayDef()
-	{
-		GameProfile::SelectedGameProfile.defs.ULevel.WorldArray = GameProfile::SelectedGameProfile.defs.UObject.Outer + 0x8 + 0x78;
-		Log::Info("World Actor Array: 0x%p", GameProfile::SelectedGameProfile.defs.ULevel.WorldArray);
-		Log::Info("World Actors Found.");
-		return true;
-	}
-
 	bool FindFField()
 	{
 		auto VectorObject = (UE4::UStruct*)UE4::UObject::FindObject<UE4::UObject>("ScriptStruct CoreUObject.Vector");
@@ -519,12 +466,6 @@ namespace ClassDefFinder
 		}
 		if (FindUObjectDefs(CoreUobjectObject) && FindUFieldDefs() && FindUStructDefs() && FindUFunctionDefs())
 		{
-			if (GameProfile::SelectedGameProfile.IsUWorldMissing)
-			{
-				FindPersistentLevelDef();
-				FindGameModeDef();
-				FindWorldArrayDef();
-			}
 			if (GameProfile::SelectedGameProfile.IsPropertyMissing)
 			{
 				FindUEProperty();
