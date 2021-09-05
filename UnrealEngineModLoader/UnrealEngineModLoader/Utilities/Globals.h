@@ -21,7 +21,6 @@ struct ModInfo
 class LOADER_API Global {
 public:
 	static std::vector<ModInfo> ModInfoList;
-	static UE4::AActor* ModLoaderActor;
 	static std::string GameName;
 	static bool bIsMenuOpen;
 	static std::string Version;

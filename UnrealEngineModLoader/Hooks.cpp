@@ -52,25 +52,6 @@ namespace Hooks
 				if (GameProfile::SelectedGameProfile.StaticLoadObject)
 				{
 					Log::Info("StaticLoadObject Found");
-					UE4::UClass* ModActorObject = UE4::UClass::LoadClassFromString(L"/Game/ModLoaderContent/ModLoaderActor.ModLoaderActor_C", false);
-					if (ModActorObject)
-					{
-						Log::Info("Sucessfully Loaded ModLoader Pak");
-						if (!GameProfile::SelectedGameProfile.IsUsingDeferedSpawn)
-						{
-							Global::ModLoaderActor = UE4::UWorld::GetWorld()->SpawnActor(ModActorObject, &transform, &spawnParams);
-						}
-						else
-						{
-							auto Gameplay = (UE4::UGameplayStatics*)UE4::UGameplayStatics::StaticClass()->CreateDefaultObject();
-							Global::ModLoaderActor = Gameplay->BeginDeferredActorSpawnFromClass(ModActorObject, transform, UE4::ESpawnActorCollisionHandlingMethod::AlwaysSpawn, nullptr);
-						}
-
-					}
-					else
-					{
-						Log::Warn("ModLoader Pak Not Found");
-					}
 				}
 				else
 				{
@@ -86,11 +67,6 @@ namespace Hooks
 					CurrentModActor->CallFunctionByNameWithArguments(L"ModCleanUp", nullptr, NULL, true);
 				}
 				Global::ModInfoList[i].CurrentModActor = nullptr;
-			}
-			//Global::ModActors.clear();
-			if (Global::ModLoaderActor->IsA(UE4::AActor::StaticClass()))
-			{
-				Global::ModLoaderActor->CallFunctionByNameWithArguments(L"CleanLoader", nullptr, NULL, true);
 			}
 			if (GameProfile::SelectedGameProfile.StaticLoadObject)
 			{
@@ -208,7 +184,6 @@ namespace Hooks
 				if (Actor->IsA(UE4::ACustomClass::StaticClass(GameProfile::SelectedGameProfile.BeginPlayOverwrite)))
 				{
 					Log::Info("Beginplay Called");
-					Global::ModLoaderActor->CallFunctionByNameWithArguments(L"PostLoaderStart", nullptr, NULL, true);
 					for (int i = 0; i < Global::ModInfoList.size(); i++)
 					{
 						UE4::AActor* CurrentModActor = Global::ModInfoList[i].CurrentModActor;
