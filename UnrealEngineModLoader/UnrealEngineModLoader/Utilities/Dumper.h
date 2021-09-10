@@ -1,9 +1,12 @@
 #pragma once
 
-namespace Dumper
+class Dumper
 {
-	void BeginKeyThread();
-	void BeginObjectDump();
-	void BeginEngineDump();
-	void BeginWorldDump();
-}
+public:
+	bool DumpObjectArray();
+	bool DumpEngineInfo();
+	bool DumpWorldActors();
+	static Dumper* GetDumper();
+private:
+	static Dumper* DumpRef;
+};

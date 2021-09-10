@@ -127,6 +127,53 @@ namespace UE4
 			}
 		}
 
+		template<typename T>
+		static T* GetDefaultObjectFromArray(UClass* Class)
+		{
+			if (IsChunkedArray())
+			{
+				for (int i = 0; i < GObjects->GetAsChunckArray().Num(); ++i)
+				{
+					auto object = GObjects->GetAsChunckArray().GetByIndex(i).Object;
+
+					if (object == nullptr)
+					{
+						continue;
+					}
+
+					if (object->IsA(Class))
+					{
+						if (object->GetName().find("Default__") != std::string::npos) 
+						{
+							return static_cast<T*>(object);
+						}
+					}
+				}
+				return nullptr;
+			}
+			else
+			{
+				for (int i = 0; i < GObjects->GetAsTUArray().Num(); ++i)
+				{
+					auto object = GObjects->GetAsTUArray().GetByIndex(i).Object;
+
+					if (object == nullptr)
+					{
+						continue;
+					}
+
+					if (object->IsA(Class))
+					{
+						if (object->GetName().find("Default__") != std::string::npos) 
+						{
+							return static_cast<T*>(object);
+						}
+					}
+				}
+				return nullptr;
+			}
+		}
+
 		static UClass* FindClass(const std::string& name)
 		{
 			return FindObject<UClass>(name);
@@ -187,6 +234,10 @@ namespace UE4
 		template<typename T>
 		inline T* CreateDefaultObject()
 		{
+			if (GameProfile::SelectedGameProfile.bIsDefaultObjectArrayed = true)
+			{
+				return UE4::UObject::GetDefaultObjectFromArray<T>(this);
+			}
 			return static_cast<T*>(CreateDefaultObject());
 		}
 
@@ -268,7 +319,7 @@ namespace UE4
 	class AActor : public UObject
 	{
 	public:
-
+		// WARNING TENDS TO CRASH AND I HAVE NO FUCKING CLUE WHY
 		FTransform GetTransform();
 
 		FRotator GetActorRotation();
@@ -470,11 +521,6 @@ namespace UE4
 		}
 		return false;
 	}
-
-	//void CallFunction(class UObject* Object, class UFunction* Function, void* parms)
-	//{
-	//	Object->ProcessEvent(Function, &parms);
-	//}
 
 	class FFrame
 	{

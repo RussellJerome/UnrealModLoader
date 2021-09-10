@@ -2,155 +2,100 @@
 #include <windows.h>
 #include "../UE4/Ue4.hpp"
 #include "Globals.h"
-bool bDumpObjects;
-bool bDumpEngineInfo;
-bool bDumpWorldActors;
-namespace Dumper
+
+Dumper* Dumper::DumpRef;
+
+Dumper* Dumper::GetDumper()
 {
-	bool DumpObjects()
+	if (!DumpRef)
 	{
-		FILE* Log = NULL;
-		fopen_s(&Log, "ObjectDump.txt", "w+");
-		if (UE4::UObject::GObjects != nullptr)
+		DumpRef = new Dumper();
+	}
+	return DumpRef;
+}
+
+
+bool Dumper::DumpObjectArray()
+{
+	FILE* Log = NULL;
+	fopen_s(&Log, "ObjectDump.txt", "w+");
+	if (UE4::UObject::GObjects != nullptr)
+	{
+		if (GameProfile::SelectedGameProfile.IsUsingFChunkedFixedUObjectArray)
 		{
-			if (GameProfile::SelectedGameProfile.IsUsingFChunkedFixedUObjectArray)
+			for (int i = 0; i < UE4::UObject::GObjects->GetAsChunckArray().Num(); i++)
 			{
-				for (int i = 0; i < UE4::UObject::GObjects->GetAsChunckArray().Num(); i++)
-				{
-					auto obj = UE4::UObject::GObjects->GetAsChunckArray().GetByIndex(i).Object;
-					if (obj != nullptr)
-						fprintf(Log, "[%06i] %-100s 0x%p\n", obj->GetIndex(), obj->GetFullName().c_str(), obj);
-				}
-				Log::SetupMessage("Done!", "Object Dump Complete!");
+				auto obj = UE4::UObject::GObjects->GetAsChunckArray().GetByIndex(i).Object;
+				if (obj != nullptr)
+					fprintf(Log, "[%06i] %-100s 0x%p\n", obj->GetIndex(), obj->GetFullName().c_str(), obj);
 			}
-			else
-			{
-				for (int i = 0; i < UE4::UObject::GObjects->GetAsTUArray().Num(); i++)
-				{
-					auto obj = UE4::UObject::GObjects->GetAsTUArray().GetByIndex(i).Object;
-					if (obj != nullptr)
-						fprintf(Log, "[%06i] %-100s 0x%p\n", obj->GetIndex(), obj->GetFullName().c_str(), obj);
-				}
-				Log::SetupMessage("Done!", "Object Dump Complete!");
-			}
-			Log::Info("Object Dump Complete!");
-			fclose(Log);
-			return true;
+			Log::SetupMessage("Done!", "Object Dump Complete!");
 		}
 		else
 		{
-			return false;
-		}
-	}
-
-	bool DumpEngineInfo()
-	{
-		FILE* Log = NULL;
-		fopen_s(&Log, "EngineInfo.txt", "w+");
-		fprintf(Log, "#Engine Info Dump\n");
-		fprintf(Log, "[GInfo]\nIsGInfoPatterns=0\nGName=0x%p\nGObject=0x%p\nGWorld=0x%p\n", GameProfile::SelectedGameProfile.GName - (DWORD64)GetModuleHandleW(0), GameProfile::SelectedGameProfile.GObject - (DWORD64)GetModuleHandleW(0), GameProfile::SelectedGameProfile.GWorld - (DWORD64)GetModuleHandleW(0));
-		fprintf(Log, "\n[UObjectDef]\nIndex=0x%p\nClass=0x%p\nName=0x%p\nOuter=0x%p\n", GameProfile::SelectedGameProfile.defs.UObject.Index, GameProfile::SelectedGameProfile.defs.UObject.Class, GameProfile::SelectedGameProfile.defs.UObject.Name, GameProfile::SelectedGameProfile.defs.UObject.Outer);
-		fprintf(Log, "\n[UFieldDef]\nNext=0x%p\n", GameProfile::SelectedGameProfile.defs.UField.Next);
-		fprintf(Log, "\n[UStructDef]\nSuperStruct=0x%p\nChildren=0x%p\nPropertiesSize=0x%p\n", GameProfile::SelectedGameProfile.defs.UStruct.SuperStruct, GameProfile::SelectedGameProfile.defs.UStruct.Children, GameProfile::SelectedGameProfile.defs.UStruct.PropertiesSize);
-		fprintf(Log, "\n[UFunctionDef]\nFunctionFlags=0x%p\nFunc=0x%p\n", GameProfile::SelectedGameProfile.defs.UFunction.FunctionFlags, GameProfile::SelectedGameProfile.defs.UFunction.Func);
-		fclose(Log);
-		Log::SetupMessage("Done!", "Engine Info Dump Complete!");
-		Log::Info("Engine Info Dump Complete!");
-		return true;
-	}
-
-	bool DumpWorldActors()
-	{
-		FILE* Log = NULL;
-		std::string FileName = UE4::UGameplayStatics::GetCurrentLevelName(false).ToString() + "_Dump.txt";
-		fopen_s(&Log, FileName.c_str(), "w+");
-		auto actors = UE4::UObject::GetAllObjectsOfType<UE4::AActor>(UE4::AActor::StaticClass(), true);
-		for (size_t i = 0; i < actors.size(); i++)
-		{
-			auto actor = actors[i];
-			if (actor->GetOuter()->GetClass() == UE4::ULevel::StaticClass())
+			for (int i = 0; i < UE4::UObject::GObjects->GetAsTUArray().Num(); i++)
 			{
-				auto Location = actor->GetActorLocation();
-				auto Rotation = actor->GetActorRotation();
-				auto Scale = actor->GetActorScale3D();
-				fprintf(Log, "ActorName: %s\n", actor->GetName().c_str());
-				fprintf(Log, "ClassName: %s\n", actor->GetClass()->GetName().c_str());
-				fprintf(Log, "Location: %f, %f, %f\n", Location.X, Location.Y, Location.Z);
-				fprintf(Log, "Rotation: %f, %f, %f\n", Rotation.Pitch, Rotation.Roll, Rotation.Yaw);
-				fprintf(Log, "Scale: %f, %f, %f\n", Scale.X, Scale.Y, Scale.Z);
-				fprintf(Log, "\n");
+				auto obj = UE4::UObject::GObjects->GetAsTUArray().GetByIndex(i).Object;
+				if (obj != nullptr)
+					fprintf(Log, "[%06i] %-100s 0x%p\n", obj->GetIndex(), obj->GetFullName().c_str(), obj);
 			}
+			Log::SetupMessage("Done!", "Object Dump Complete!");
 		}
-		Log::SetupMessage("Done!", "World Actors Dump Complete!");
+		Log::Info("Object Dump Complete!");
 		fclose(Log);
 		return true;
 	}
-
-	bool f1_pressed;
-	void KeyDetectionLoop()
+	else
 	{
-		while (true)
+		return false;
+	}
+}
+
+
+bool Dumper::DumpEngineInfo()
+{
+	FILE* Log = NULL;
+	fopen_s(&Log, "EngineInfo.txt", "w+");
+	fprintf(Log, "#Engine Info Dump\n");
+	fprintf(Log, "[GInfo]\nIsGInfoPatterns=0\nGName=0x%p\nGObject=0x%p\nGWorld=0x%p\n", GameProfile::SelectedGameProfile.GName - (DWORD64)GetModuleHandleW(0), GameProfile::SelectedGameProfile.GObject - (DWORD64)GetModuleHandleW(0), GameProfile::SelectedGameProfile.GWorld - (DWORD64)GetModuleHandleW(0));
+	fprintf(Log, "\n[UObjectDef]\nIndex=0x%p\nClass=0x%p\nName=0x%p\nOuter=0x%p\n", GameProfile::SelectedGameProfile.defs.UObject.Index, GameProfile::SelectedGameProfile.defs.UObject.Class, GameProfile::SelectedGameProfile.defs.UObject.Name, GameProfile::SelectedGameProfile.defs.UObject.Outer);
+	fprintf(Log, "\n[UFieldDef]\nNext=0x%p\n", GameProfile::SelectedGameProfile.defs.UField.Next);
+	fprintf(Log, "\n[UStructDef]\nSuperStruct=0x%p\nChildren=0x%p\nPropertiesSize=0x%p\n", GameProfile::SelectedGameProfile.defs.UStruct.SuperStruct, GameProfile::SelectedGameProfile.defs.UStruct.Children, GameProfile::SelectedGameProfile.defs.UStruct.PropertiesSize);
+	fprintf(Log, "\n[UFunctionDef]\nFunctionFlags=0x%p\nFunc=0x%p\n", GameProfile::SelectedGameProfile.defs.UFunction.FunctionFlags, GameProfile::SelectedGameProfile.defs.UFunction.Func);
+	fclose(Log);
+	Log::SetupMessage("Done!", "Engine Info Dump Complete!");
+	Log::Info("Engine Info Dump Complete!");
+	return true;
+}
+
+bool Dumper::DumpWorldActors()
+{
+	FILE* Log = NULL;
+	std::string FileName = UE4::UGameplayStatics::GetCurrentLevelName(false).ToString() + "_Dump.txt";
+
+	//auto GameplayStatics = (UE4::UGameplayStatics*)UE4::UGameplayStatics::StaticClass()->CreateDefaultObject();
+
+	auto GameplayStatics = UE4::UObject::GetDefaultObjectFromArray<UE4::UGameplayStatics>(UE4::UGameplayStatics::StaticClass());
+	std::cout << GameplayStatics->GetFullName() << std::endl;
+	fopen_s(&Log, FileName.c_str(), "w+");
+	auto actors = UE4::UObject::GetAllObjectsOfType<UE4::AActor>(UE4::AActor::StaticClass(), true);
+	for (size_t i = 0; i < actors.size(); i++)
+	{
+		auto actor = actors[i];
+		if (actor->GetOuter()->GetClass() == UE4::ULevel::StaticClass())
 		{
-			if (GetAsyncKeyState(VK_F1) != 0)
-				f1_pressed = true;
-			else if (f1_pressed)
-			{
-				f1_pressed = false;
-				if (Global::bIsMenuOpen)
-				{
-					Global::bIsMenuOpen = false;
-				}
-				else
-				{
-					Global::bIsMenuOpen = true;
-				}
-			}
-
-			if (bDumpObjects)
-			{
-				bDumpObjects = false;
-				DumpObjects();
-			}
-
-
-			if (bDumpEngineInfo)
-			{
-				bDumpEngineInfo = false;
-				DumpEngineInfo();
-			}
-			if (bDumpWorldActors)
-			{
-				bDumpWorldActors = false;
-				DumpWorldActors();
-			}
-			Sleep(1000 / 60);
+			auto Location = actor->GetActorLocation();
+			auto Rotation = actor->GetActorRotation();
+			auto Scale = actor->GetActorScale3D();
+			fprintf(Log, "ActorName: %s\n", actor->GetName().c_str());
+			fprintf(Log, "ClassName: %s\n", actor->GetClass()->GetName().c_str());
+			fprintf(Log, "Location: %f, %f, %f\n", Location.X, Location.Y, Location.Z);
+			fprintf(Log, "Rotation: %f, %f, %f\n", Rotation.Pitch, Rotation.Roll, Rotation.Yaw);
+			fprintf(Log, "Scale: %f, %f, %f\n", Scale.X, Scale.Y, Scale.Z);
+			fprintf(Log, "\n");
 		}
 	}
-
-	DWORD __stdcall LoopThread(LPVOID)
-	{
-		Dumper::KeyDetectionLoop();
-		return NULL;
-	}
-
-
-	void BeginObjectDump()
-	{
-		bDumpObjects = true;
-	}
-
-	void BeginEngineDump()
-	{
-		bDumpEngineInfo = true;
-	}
-
-	void BeginWorldDump()
-	{
-		bDumpWorldActors = true;
-	}
-
-	void BeginKeyThread()
-	{
-		CreateThread(0, 0, LoopThread, 0, 0, 0);
-	}
+	Log::SetupMessage("Done!", "World Actors Dump Complete!");
+	fclose(Log);
+	return true;
 }

@@ -206,7 +206,7 @@ namespace UE4
 
 	//---------------------------------------------------------------------------
 	//UField Functions
-	//-
+	//---------------------------------------------------------------------------
 
 	UField* UField::GetNext() const 
 	{ 
@@ -271,11 +271,6 @@ namespace UE4
 	//---------------------------------------------------------------------------
 	//FField Functions
 	//---------------------------------------------------------------------------
-
-	/*FName* FField::GetClass() const
-	{
-		return Read<class FName*>((byte*)this + GameProfile::SelectedGameProfile.defs.FField.Class);
-	};*/
 
 	FField* FField::GetNext() const
 	{
@@ -374,7 +369,8 @@ namespace UE4
 	class FString UGameplayStatics::GetCurrentLevelName(bool bRemovePrefixString)
 	{
 		static auto fn = UObject::FindObject<UFunction>("Function Engine.GameplayStatics.GetCurrentLevelName");
-		auto GameplayStatics = (UE4::UGameplayStatics*)UE4::UGameplayStatics::StaticClass()->CreateDefaultObject();
+		//auto GameplayStatics = (UE4::UGameplayStatics*)UE4::UGameplayStatics::StaticClass()->CreateDefaultObject();
+		auto GameplayStatics = UE4::UObject::GetDefaultObjectFromArray<UE4::UGameplayStatics>(UE4::UGameplayStatics::StaticClass());
 		struct
 		{
 			class UObject* WorldContextObject;

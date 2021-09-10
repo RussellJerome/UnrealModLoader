@@ -39,6 +39,8 @@ public:
 
 	static LRESULT CALLBACK hookWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
+	void CreateUILogicThread();
+
 	static LoaderUI* GetUI();
 
 	bool initRendering = true;

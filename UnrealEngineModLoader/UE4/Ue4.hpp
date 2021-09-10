@@ -28,7 +28,8 @@ namespace UE4
 		DWORD64   GWorldObjects = NULL;
 		GWorldObjects = (DWORD64)(GameProfile::SelectedGameProfile.GWorld);
 		UWorld::GWorld = (UWorld**)GWorldObjects;
-		#ifdef UNREALENGINEMODLOADER_EXPORTS
+
+		#ifdef UNREALENGINEMODLOADER_EXPORTS //Stops dumb errors from the ExampleMod shit
 		if (GameProfile::SelectedGameProfile.IsEngineDefsMissing)
 		{
 			if (ClassDefFinder::FindEngineClasses())
@@ -38,5 +39,6 @@ namespace UE4
 			}
 		}
 		#endif
+
 	}
 }

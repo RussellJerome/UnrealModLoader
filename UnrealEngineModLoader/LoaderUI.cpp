@@ -15,6 +15,72 @@ LoaderUI* LoaderUI::GetUI()
 	return UI;
 }
 
+namespace TickVars
+{
+	bool f1_pressed;
+	bool bDumpObjects;
+	bool bDumpEngineInfo;
+	bool bDumpWorldActors;
+};
+
+namespace UITools
+{
+	void ObjectDump()
+	{
+		TickVars::bDumpObjects = true;
+	}
+
+	void EngineDump()
+	{
+		TickVars::bDumpEngineInfo = true;
+	}
+
+	void WorldDump()
+	{
+		TickVars::bDumpWorldActors = true;
+	}
+};
+
+void UILogicTick()
+{
+	while (true)
+	{
+		if (GetAsyncKeyState(VK_F1) != 0)
+			TickVars::f1_pressed = true;
+		else if (TickVars::f1_pressed)
+		{
+			TickVars::f1_pressed = false;
+			if (Global::bIsMenuOpen)
+			{
+				Global::bIsMenuOpen = false;
+			}
+			else
+			{
+				Global::bIsMenuOpen = true;
+			}
+		}
+
+		if (TickVars::bDumpObjects)
+		{
+			TickVars::bDumpObjects = false;
+			Dumper::GetDumper()->DumpObjectArray();
+		}
+
+		if (TickVars::bDumpEngineInfo)
+		{
+			TickVars::bDumpEngineInfo = false;
+			Dumper::GetDumper()->DumpEngineInfo();
+		}
+
+		if (TickVars::bDumpWorldActors)
+		{
+			TickVars::bDumpWorldActors = false;
+			Dumper::GetDumper()->DumpWorldActors();
+		}
+		Sleep(1000 / 60);
+	}
+}
+
 HRESULT LoaderUI::LoaderResizeBuffers(IDXGISwapChain* pSwapChain, UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT NewFormat, UINT SwapChainFlags)
 {
 	if (LoaderUI::GetUI()->pRenderTargetView) {
@@ -127,15 +193,15 @@ void ShowTools()
 	ImGui::Spacing();
 	if (ImGui::Button("Dump Objects"))
 	{
-		Dumper::BeginObjectDump();
+		UITools::ObjectDump();
 	}
 	if (ImGui::Button("Dump Engine Info"))
 	{
-		Dumper::BeginEngineDump();
+		UITools::EngineDump();
 	}
 	if (ImGui::Button("Dump World Actors"))
 	{
-		Dumper::BeginWorldDump();
+		UITools::WorldDump();
 	}
 }
 
@@ -212,8 +278,8 @@ void LoaderUI::LoaderD3D11Present(IDXGISwapChain* pSwapChain, UINT SyncInterval,
 	ImGui_ImplDX11_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
-
 	ImGui::GetIO().MouseDrawCursor = Global::bIsMenuOpen;
+	ImGui::GetIO().WantCaptureMouse = Global::bIsMenuOpen;
 	if (Global::bIsMenuOpen)
 	{
 		/*
@@ -287,4 +353,17 @@ void LoaderUI::LoaderD3D11Present(IDXGISwapChain* pSwapChain, UINT SyncInterval,
 
 	ImGui::Render();
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+}
+
+DWORD __stdcall LogicThread(LPVOID)
+{
+	UILogicTick();
+	return NULL;
+}
+
+
+void LoaderUI::CreateUILogicThread()
+{
+	Log::Info("CreateUILogicThread Called");
+	CreateThread(0, 0, LogicThread, 0, 0, 0);
 }

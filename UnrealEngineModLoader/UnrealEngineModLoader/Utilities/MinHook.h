@@ -2,7 +2,11 @@
 #include <string>
 #include "Logger.h"
 #include "include/MinHook.h"
+#include "Globals.h"
+#ifdef UNREALENGINEMODLOADER_EXPORTS //Stops dumb errors from the ExampleMod shit
 #pragma comment(lib,"../../Minhook/lib/libMinHook-x64-v141-mtd.lib")
+#endif
+
 namespace MinHook
 {
 	static void Init()

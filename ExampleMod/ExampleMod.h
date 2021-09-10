@@ -40,5 +40,6 @@ public:
 	virtual void DrawImGui() override;
 
 private:
+	// If you have a BP Mod Actor, This is a straight refrence to it
 	UE4::AActor* ModActor;
 };

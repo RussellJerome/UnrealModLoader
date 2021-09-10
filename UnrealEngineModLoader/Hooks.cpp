@@ -158,6 +158,9 @@ namespace Hooks
 											}
 										}
 									}
+									/*UE4::UFunction* PreBegin;
+									UE4::GetVariable<UE4::UFunction*>(ModActor, "PreBeginPlay", PreBegin);
+									ModActor->ProcessEvent(PreBegin, nullptr);*/
 									ModActor->CallFunctionByNameWithArguments(L"PreBeginPlay", nullptr, NULL, true);
 									Log::Info("Sucessfully Loaded %s", str);
 								}
@@ -283,8 +286,9 @@ namespace Hooks
 		LoaderUI::GetUI()->pSwapChainVtable = (DWORD_PTR*)pSwapChain;
 		LoaderUI::GetUI()->pSwapChainVtable = (DWORD_PTR*)LoaderUI::GetUI()->pSwapChainVtable[0];
 		LoaderUI::GetUI()->phookD3D11Present = (LoaderUI::D3D11PresentHook)LoaderUI::GetUI()->pSwapChainVtable[8];
-		MinHook::Add((DWORD64)LoaderUI::GetUI()->phookD3D11Present, &hookD3D11Present, &D3D11Present, "DX11");
-		MinHook::Add((DWORD64)LoaderUI::GetUI()->pSwapChainVtable[13], &hookResizeBuffers, &LoaderUI::GetUI()->ResizeBuffers, "DX11");
+		MinHook::Add((DWORD64)LoaderUI::GetUI()->phookD3D11Present, &hookD3D11Present, &D3D11Present, "DX11-Present");
+		MinHook::Add((DWORD64)LoaderUI::GetUI()->pSwapChainVtable[13], &hookResizeBuffers, &LoaderUI::GetUI()->ResizeBuffers, "DX11-ResizeBuffers");
+		LoaderUI::GetUI()->CreateUILogicThread();
 
 		DWORD dPresentwOld;
 		DWORD dResizeOld;
@@ -318,6 +322,5 @@ namespace Hooks
 	{
 		Log::Info("Setting Up Loader");
 		CreateThread(0, 0, InitHooks, 0, 0, 0);
-		Dumper::BeginKeyThread();
 	}
 };

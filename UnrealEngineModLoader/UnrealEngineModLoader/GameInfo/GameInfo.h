@@ -70,6 +70,8 @@ public:
 
 	bool bIsFProperty;
 
+	bool bIsDefaultObjectArrayed;
+
 	Offsets defs;
 
 	static GameProfile SelectedGameProfile;
