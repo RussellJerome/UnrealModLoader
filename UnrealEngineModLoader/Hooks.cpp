@@ -288,7 +288,6 @@ namespace Hooks
 		LoaderUI::GetUI()->phookD3D11Present = (LoaderUI::D3D11PresentHook)LoaderUI::GetUI()->pSwapChainVtable[8];
 		MinHook::Add((DWORD64)LoaderUI::GetUI()->phookD3D11Present, &hookD3D11Present, &D3D11Present, "DX11-Present");
 		MinHook::Add((DWORD64)LoaderUI::GetUI()->pSwapChainVtable[13], &hookResizeBuffers, &LoaderUI::GetUI()->ResizeBuffers, "DX11-ResizeBuffers");
-		LoaderUI::GetUI()->CreateUILogicThread();
 
 		DWORD dPresentwOld;
 		DWORD dResizeOld;

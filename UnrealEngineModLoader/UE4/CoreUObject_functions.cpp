@@ -280,7 +280,11 @@ namespace UE4
 	std::string FField::GetName() const
 	{
 		auto Name = *reinterpret_cast<FName*>((byte*)this + GameProfile::SelectedGameProfile.defs.FField.Name);
-		return Name.GetName();
+		if (UE4::FName::GetFNamePool().IsValidIndex(Name.ComparisonIndex))
+		{
+			return Name.GetName();
+		}
+		return "nullptr";
 	};
 
 	//---------------------------------------------------------------------------

@@ -220,9 +220,7 @@ void DrawImGui()
 LRESULT CALLBACK LoaderUI::hookWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	CallWindowProc(ImGui_ImplWin32_WndProcHandler, hWnd, uMsg, wParam, lParam);
-
-	ImGuiIO& io = ImGui::GetIO();
-	if (io.WantCaptureMouse || io.WantCaptureKeyboard) {
+	if (Global::bIsMenuOpen) {
 		return true;
 	}
 	return CallWindowProc(LoaderUI::GetUI()->hGameWindowProc, hWnd, uMsg, wParam, lParam);
@@ -267,6 +265,7 @@ void LoaderUI::LoaderD3D11Present(IDXGISwapChain* pSwapChain, UINT SyncInterval,
 		ImGui_ImplDX11_CreateDeviceObjects();
 		ImGui_ImplDX11_Init(LoaderUI::GetUI()->pDevice, LoaderUI::GetUI()->pContext);
 
+		LoaderUI::GetUI()->CreateUILogicThread();
 		LoaderUI::GetUI()->initRendering = false;
 	}
 
@@ -279,7 +278,7 @@ void LoaderUI::LoaderD3D11Present(IDXGISwapChain* pSwapChain, UINT SyncInterval,
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
 	ImGui::GetIO().MouseDrawCursor = Global::bIsMenuOpen;
-	ImGui::GetIO().WantCaptureMouse = Global::bIsMenuOpen;
+	//ImGui::GetIO().WantCaptureMouse = Global::bIsMenuOpen;
 	if (Global::bIsMenuOpen)
 	{
 		/*

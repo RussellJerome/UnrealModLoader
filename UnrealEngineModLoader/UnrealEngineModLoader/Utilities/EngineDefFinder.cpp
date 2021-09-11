@@ -131,12 +131,12 @@ namespace ClassDefFinder
 	{
 		Log::Info("Scanning For UField Next Def.");
 		bool HasNextNotBeenFound = true;
-		auto WasRecentlyRendered = UE4::UObject::FindObject<UE4::UFunction>("Function Engine.Actor.WasRecentlyRendered");
+		auto UserConstructionScript = UE4::UObject::FindObject<UE4::UFunction>("Function Engine.Actor.UserConstructionScript");
 		GameProfile::SelectedGameProfile.defs.UField.Next = GameProfile::SelectedGameProfile.defs.UObject.Outer; // Prevents scanning same area over and over.
 		while (HasNextNotBeenFound)
 		{
-			auto NextObject = Read<UE4::UField*>((byte*)WasRecentlyRendered + GameProfile::SelectedGameProfile.defs.UField.Next);
-			if (NextObject && NextObject->GetIndex() == WasRecentlyRendered->GetIndex() - 1)
+			auto NextObject = Read<UE4::UField*>((byte*)UserConstructionScript + GameProfile::SelectedGameProfile.defs.UField.Next);
+			if (NextObject && NextObject->GetOuter() == UserConstructionScript->GetOuter())
 			{
 				HasNextNotBeenFound = false;
 			}
@@ -148,6 +148,28 @@ namespace ClassDefFinder
 		Log::Info("UField Next Def located at: 0x%p", GameProfile::SelectedGameProfile.defs.UField.Next);
 		return true;
 	}
+
+	//bool FindUFieldNextDef()
+	//{
+	//	Log::Info("Scanning For UField Next Def.");
+	//	bool HasNextNotBeenFound = true;
+	//	auto WasRecentlyRendered = UE4::UObject::FindObject<UE4::UFunction>("Function Engine.Actor.WasRecentlyRendered");
+	//	GameProfile::SelectedGameProfile.defs.UField.Next = GameProfile::SelectedGameProfile.defs.UObject.Outer; // Prevents scanning same area over and over.
+	//	while (HasNextNotBeenFound)
+	//	{
+	//		auto NextObject = Read<UE4::UField*>((byte*)WasRecentlyRendered + GameProfile::SelectedGameProfile.defs.UField.Next);
+	//		if (NextObject && NextObject->GetIndex() == WasRecentlyRendered->GetIndex() - 1)
+	//		{
+	//			HasNextNotBeenFound = false;
+	//		}
+	//		if (HasNextNotBeenFound)
+	//		{
+	//			GameProfile::SelectedGameProfile.defs.UField.Next = GameProfile::SelectedGameProfile.defs.UField.Next + 0x8;
+	//		}
+	//	}
+	//	Log::Info("UField Next Def located at: 0x%p", GameProfile::SelectedGameProfile.defs.UField.Next);
+	//	return true;
+	//}
 
 	bool FindUFieldDefs()
 	{
@@ -339,7 +361,16 @@ namespace ClassDefFinder
 		Log::Info("FField Name Def located at: 0x%p", GameProfile::SelectedGameProfile.defs.FField.Name);
 		while (!NextFound)
 		{
-			auto NextField = Read<UE4::FField*>((byte*)FieldChild + GameProfile::SelectedGameProfile.defs.FField.Next);
+			// 9 times out of 10, its right behind the Name, so we do that check to save possible issues
+			auto NextField = Read<UE4::FField*>((byte*)FieldChild + GameProfile::SelectedGameProfile.defs.FField.Name - 0x8);
+			if (NextField && NextField->GetName() == "Y")
+			{
+				NextFound = true;
+				GameProfile::SelectedGameProfile.defs.FField.Next = GameProfile::SelectedGameProfile.defs.FField.Name - 0x8;
+				break;
+			}
+
+			NextField = Read<UE4::FField*>((byte*)FieldChild + GameProfile::SelectedGameProfile.defs.FField.Next);
 			if (NextField && NextField->GetName() == "Y")
 			{
 				NextFound = true;
