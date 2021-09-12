@@ -21,6 +21,8 @@ namespace TickVars
 	bool bDumpObjects;
 	bool bDumpEngineInfo;
 	bool bDumpWorldActors;
+	bool bExecuteConsoleCommand;
+	std::wstring CurrentCommand;
 };
 
 namespace UITools
@@ -38,6 +40,12 @@ namespace UITools
 	void WorldDump()
 	{
 		TickVars::bDumpWorldActors = true;
+	}
+
+	void ExecuteCommand(std::wstring command)
+	{
+		TickVars::CurrentCommand = command;
+		TickVars::bExecuteConsoleCommand = true;
 	}
 };
 
@@ -76,6 +84,14 @@ void UILogicTick()
 		{
 			TickVars::bDumpWorldActors = false;
 			Dumper::GetDumper()->DumpWorldActors();
+		}
+
+		if (TickVars::bExecuteConsoleCommand)
+		{
+			TickVars::bExecuteConsoleCommand = false;
+			UE4::UGameplayStatics::ExecuteConsoleCommand(TickVars::CurrentCommand.c_str(), nullptr);
+			TickVars::CurrentCommand = L"";
+
 		}
 		Sleep(1000 / 60);
 	}
@@ -203,6 +219,18 @@ void ShowTools()
 	{
 		UITools::WorldDump();
 	}
+
+	static char Command[128];
+	ImGui::Spacing();
+	ImGui::Separator();
+	ImGui::Text("Execute Console Command");
+	ImGui::InputText("", Command, IM_ARRAYSIZE(Command));
+	if (ImGui::Button("Execute"))
+	{
+		std::string strCommand(Command);
+		std::wstring wstrCommand = std::wstring(strCommand.begin(), strCommand.end());
+		UITools::ExecuteCommand(wstrCommand);
+	}
 }
 
 void DrawImGui()
@@ -220,7 +248,9 @@ void DrawImGui()
 LRESULT CALLBACK LoaderUI::hookWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	CallWindowProc(ImGui_ImplWin32_WndProcHandler, hWnd, uMsg, wParam, lParam);
-	if (Global::bIsMenuOpen) {
+
+	ImGuiIO& io = ImGui::GetIO();
+	if (io.WantCaptureMouse || io.WantCaptureKeyboard) {
 		return true;
 	}
 	return CallWindowProc(LoaderUI::GetUI()->hGameWindowProc, hWnd, uMsg, wParam, lParam);
@@ -278,7 +308,6 @@ void LoaderUI::LoaderD3D11Present(IDXGISwapChain* pSwapChain, UINT SyncInterval,
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
 	ImGui::GetIO().MouseDrawCursor = Global::bIsMenuOpen;
-	//ImGui::GetIO().WantCaptureMouse = Global::bIsMenuOpen;
 	if (Global::bIsMenuOpen)
 	{
 		/*

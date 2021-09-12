@@ -463,6 +463,23 @@ namespace UE4
 	}
 
 
+	void UGameplayStatics::ExecuteConsoleCommand(const class FString& Command, class APlayerController* SpecificPlayer)
+	{
+		static auto fn = UObject::FindObject<UFunction>("Function Engine.KismetSystemLibrary.ExecuteConsoleCommand");
+		auto GameplayStatics = (UE4::UGameplayStatics*)UE4::UGameplayStatics::StaticClass()->CreateDefaultObject();
+		struct
+		{
+			class UObject* WorldContextObject;
+			class FString Command;
+			class APlayerController* SpecificPlayer;
+		}params;
+		params.WorldContextObject = UWorld::GetWorld();
+		params.Command = Command;
+		params.SpecificPlayer = SpecificPlayer;
+		GameplayStatics->ProcessEvent(fn, &params);
+	}
+
+
 }
 
 #ifdef _MSC_VER
