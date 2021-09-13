@@ -4,6 +4,7 @@ UsesFNamePool=0
 IsUsingFChunkedFixedUObjectArray=0
 IsUsingDeferedSpawn=1
 BeginPlayOverwrite=
+IsDefaultObjectArrayed=1
 
 [GInfo]
 IsGInfoPatterns=0

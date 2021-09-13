@@ -234,7 +234,7 @@ namespace UE4
 		template<typename T>
 		inline T* CreateDefaultObject()
 		{
-			if (GameProfile::SelectedGameProfile.bIsDefaultObjectArrayed = true)
+			if (GameProfile::SelectedGameProfile.bIsDefaultObjectArrayed == true)
 			{
 				return UE4::UObject::GetDefaultObjectFromArray<T>(this);
 			}
@@ -249,7 +249,15 @@ namespace UE4
 
 		inline UObject* CreateDefaultObject()
 		{
-			return reinterpret_cast<UObject*(*)(UClass*)>(this, GameProfile::SelectedGameProfile.CreateDefualtObject)(this);
+
+			if (GameProfile::SelectedGameProfile.bIsDefaultObjectArrayed == true)
+			{
+				return UE4::UObject::GetDefaultObjectFromArray<UObject>(this);
+			}
+			else
+			{
+				return reinterpret_cast<UObject * (*)(UClass*)>(this, GameProfile::SelectedGameProfile.CreateDefualtObject)(this);
+			}
 		}
 
 		static UClass* LoadClassFromString(const wchar_t* InName, bool bAllowObjectReconciliation);
