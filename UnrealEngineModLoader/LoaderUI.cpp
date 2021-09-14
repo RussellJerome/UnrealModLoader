@@ -292,7 +292,7 @@ void LoaderUI::LoaderD3D11Present(IDXGISwapChain* pSwapChain, UINT SyncInterval,
 		LoaderUI::GetUI()->hGameWindowProc = (WNDPROC)SetWindowLongPtr(hGameWindow, GWLP_WNDPROC, (LONG_PTR)LoaderUI::hookWndProc);
 		ImGui_ImplWin32_Init(hGameWindow);
 
-		ImGui_ImplDX11_CreateDeviceObjects();
+		//ImGui_ImplDX11_CreateDeviceObjects();
 		ImGui_ImplDX11_Init(LoaderUI::GetUI()->pDevice, LoaderUI::GetUI()->pContext);
 
 		LoaderUI::GetUI()->CreateUILogicThread();
