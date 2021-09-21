@@ -155,7 +155,11 @@ void ShowLogicMods()
 				std::string ButtonLabel = str + " Button" + "##" + std::to_string(i);
 				if (ImGui::Button(ButtonLabel.c_str()))
 				{
-					Global::ModInfoList[i].CurrentModActor->CallFunctionByNameWithArguments(L"ModMenuButtonPressed", nullptr, NULL, true);
+					struct
+					{
+
+					}ModMenuButtonPressedParams;
+					Global::ModInfoList[i].CurrentModActor->ProcessEvent(Global::ModInfoList[i].CurrentModActor->GetFunction("ModMenuButtonPressed"), &ModMenuButtonPressedParams);
 				}
 			}
 			ImGui::TreePop();

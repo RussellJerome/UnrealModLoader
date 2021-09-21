@@ -64,7 +64,12 @@ namespace Hooks
 				UE4::AActor* CurrentModActor = Global::ModInfoList[i].CurrentModActor;
 				if (CurrentModActor->IsA(UE4::AActor::StaticClass()))
 				{
-					CurrentModActor->CallFunctionByNameWithArguments(L"ModCleanUp", nullptr, NULL, true);
+					struct
+					{
+
+					}CleanParams;
+					
+					CurrentModActor->ProcessEvent(CurrentModActor->GetFunction("ModCleanUp"), &CleanParams);
 				}
 				Global::ModInfoList[i].CurrentModActor = nullptr;
 			}
@@ -161,7 +166,13 @@ namespace Hooks
 									/*UE4::UFunction* PreBegin;
 									UE4::GetVariable<UE4::UFunction*>(ModActor, "PreBeginPlay", PreBegin);
 									ModActor->ProcessEvent(PreBegin, nullptr);*/
-									ModActor->CallFunctionByNameWithArguments(L"PreBeginPlay", nullptr, NULL, true);
+
+									struct
+									{
+
+									}PreBeginPlayParams;
+
+									ModActor->ProcessEvent(ModActor->GetFunction("PreBeginPlay"), &PreBeginPlayParams);
 									Log::Info("Sucessfully Loaded %s", str);
 								}
 							}
@@ -192,7 +203,12 @@ namespace Hooks
 						UE4::AActor* CurrentModActor = Global::ModInfoList[i].CurrentModActor;
 						if (CurrentModActor != nullptr)
 						{
-							CurrentModActor->CallFunctionByNameWithArguments(L"PostBeginPlay", nullptr, NULL, true);
+							struct
+							{
+
+							}PostBeginPlayParams;
+
+							CurrentModActor->ProcessEvent(CurrentModActor->GetFunction("PostBeginPlay"), &PostBeginPlayParams);
 							Global::eventSystem.dispatchEvent("PostBeginPlay", Global::ModInfoList[i].ModName, CurrentModActor);
 						}
 					}
