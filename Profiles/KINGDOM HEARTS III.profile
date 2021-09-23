@@ -25,6 +25,5 @@ BeginPlay=0X44054F0
 Say=0x1111111
 StaticLoadObject=0x3421330
 SpawnActorFTrans=0x1111111
-CallFunctionByNameWithArguments=0x340B150
-CreateDefualtObject=0x597730
+CreateDefaultObject=0x597730
 ProcessEvent=0x340C160

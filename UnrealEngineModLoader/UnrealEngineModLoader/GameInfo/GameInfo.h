@@ -26,13 +26,11 @@ struct Offsets {
 		uint16_t Func = 0x0;
 	} UFunction;
 	struct {
-		//uint16_t Class = 0x8;
 		uint16_t Next = 0x0;
 		uint16_t Name = 0x0;
 	} FField;
 	struct {
 		uint16_t ArrayDim = 0x0;
-		//uint16_t ElementSize = 0x0;
 		uint16_t Offset = 0x0;
 	} Property;
 };
@@ -55,7 +53,7 @@ public:
 
 	bool IsFunctionPatterns;
 	DWORD64 ProcessEvent;
-	DWORD64 CreateDefualtObject;
+	DWORD64 CreateDefaultObject;
 	DWORD64 GameStateInit;
 	DWORD64 BeginPlay;
 	DWORD64 StaticLoadObject;

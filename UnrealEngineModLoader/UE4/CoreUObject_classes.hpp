@@ -254,7 +254,7 @@ namespace UE4
 			}
 			else
 			{
-				return reinterpret_cast<UObject * (*)(UClass*)>(this, GameProfile::SelectedGameProfile.CreateDefualtObject)(this);
+				return reinterpret_cast<UObject * (*)(UClass*)>(this, GameProfile::SelectedGameProfile.CreateDefaultObject)(this);
 			}
 		}
 
