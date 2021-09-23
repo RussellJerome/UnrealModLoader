@@ -246,8 +246,6 @@ void SetupProfile(std::string Path)
 			if (StaticLoadObject != nullptr)
 			{
 				StaticLoadObject += 0x7;
-				GameProfile::SelectedGameProfile.StaticLoadObject = (DWORD64)MEM::GetAddressPTR(StaticLoadObject, 0x1, 0x5);
-				std::cout << "GameProfile::SelectedGameProfile.StaticLoadObject: " << (void*)GameProfile::SelectedGameProfile.StaticLoadObject << std::endl;
 			}
 			else
 			{
@@ -255,8 +253,6 @@ void SetupProfile(std::string Path)
 				if (StaticLoadObject != nullptr)
 				{
 					StaticLoadObject += 0x8;
-					GameProfile::SelectedGameProfile.StaticLoadObject = (DWORD64)MEM::GetAddressPTR(StaticLoadObject, 0x1, 0x5);
-					std::cout << "GameProfile::SelectedGameProfile.StaticLoadObject: " << (void*)GameProfile::SelectedGameProfile.StaticLoadObject << std::endl;
 				}
 				else
 				{
@@ -264,16 +260,12 @@ void SetupProfile(std::string Path)
 					if (StaticLoadObject != nullptr)
 					{
 						StaticLoadObject += 0x7;
-						GameProfile::SelectedGameProfile.StaticLoadObject = (DWORD64)MEM::GetAddressPTR(StaticLoadObject, 0x1, 0x5);
-						std::cout << "GameProfile::SelectedGameProfile.StaticLoadObject: " << (void*)GameProfile::SelectedGameProfile.StaticLoadObject << std::endl;
 					}
 					else
 					{
 						if (StaticLoadObject = Pattern::Find("48 8B C8 89 5C 24 20 E8 ? ? ? ? 48"))
 						{
 							StaticLoadObject += 0x7;
-							GameProfile::SelectedGameProfile.StaticLoadObject = (DWORD64)MEM::GetAddressPTR(StaticLoadObject, 0x1, 0x5);
-							std::cout << "GameProfile::SelectedGameProfile.StaticLoadObject: " << (void*)GameProfile::SelectedGameProfile.StaticLoadObject << std::endl;
 						}
 						else
 						{
@@ -282,13 +274,13 @@ void SetupProfile(std::string Path)
 					}
 				}
 			}
-			//Second 4C 8B CE 4C 8D 44 24 ? 48 8B D7 48 8B CB E8 ? ? ? ? 48 8B 4C 24 ? 48 33 CC 
+			GameProfile::SelectedGameProfile.StaticLoadObject = (DWORD64)MEM::GetAddressPTR(StaticLoadObject, 0x1, 0x5);
+			std::cout << "GameProfile::SelectedGameProfile.StaticLoadObject: " << (void*)GameProfile::SelectedGameProfile.StaticLoadObject << std::endl;
+
 			auto SpawnActorFTrans = Pattern::Find("4C 8B C6 48 8B C8 48 8B D3 E8 ? ? ? ? 48 8B 5C 24 ? 48 8B 74 24");
 			if (SpawnActorFTrans != nullptr)
 			{
 				SpawnActorFTrans += 0x9;
-				GameProfile::SelectedGameProfile.SpawnActorFTrans = (DWORD64)MEM::GetAddressPTR(SpawnActorFTrans, 0x1, 0x5);
-				std::cout << "GameProfile::SelectedGameProfile.SpawnActorFTrans: " << (void*)GameProfile::SelectedGameProfile.SpawnActorFTrans << std::endl;
 			}
 			else
 			{
@@ -296,14 +288,15 @@ void SetupProfile(std::string Path)
 				if (SpawnActorFTrans != nullptr)
 				{
 					SpawnActorFTrans += 0xE;
-					GameProfile::SelectedGameProfile.SpawnActorFTrans = (DWORD64)MEM::GetAddressPTR(SpawnActorFTrans, 0x1, 0x5);
-					std::cout << "GameProfile::SelectedGameProfile.SpawnActorFTrans: " << (void*)GameProfile::SelectedGameProfile.SpawnActorFTrans << std::endl;
 				}
 				else
 				{
 					Log::Error("SpawnActorFTrans NOT FOUND!");
 				}
 			}
+
+			GameProfile::SelectedGameProfile.SpawnActorFTrans = (DWORD64)MEM::GetAddressPTR(SpawnActorFTrans, 0x1, 0x5);
+			std::cout << "GameProfile::SelectedGameProfile.SpawnActorFTrans: " << (void*)GameProfile::SelectedGameProfile.SpawnActorFTrans << std::endl;
 
 			auto ProcessEvent = Pattern::Find("75 0E ? ? ? 48 ? ? 48 ? ? E8 ? ? ? ? 48 8B ? 24 ? 48 8B ? 24 38 48 8B ? 24 40");
 			ProcessEvent += 0xB;
