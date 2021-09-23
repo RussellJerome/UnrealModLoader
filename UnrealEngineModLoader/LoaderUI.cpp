@@ -159,7 +159,10 @@ void ShowLogicMods()
 					{
 
 					}ModMenuButtonPressedParams;
-					Global::ModInfoList[i].CurrentModActor->ProcessEvent(Global::ModInfoList[i].CurrentModActor->GetFunction("ModMenuButtonPressed"), &ModMenuButtonPressedParams);
+					if (Global::ModInfoList[i].CurrentModActor->DoesObjectContainFunction("ModMenuButtonPressed"))
+					{
+						Global::ModInfoList[i].CurrentModActor->ProcessEvent(Global::ModInfoList[i].CurrentModActor->GetFunction("ModMenuButtonPressed"), &ModMenuButtonPressedParams);
+					}
 				}
 			}
 			ImGui::TreePop();

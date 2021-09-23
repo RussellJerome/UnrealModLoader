@@ -53,6 +53,8 @@ private:
 
 		SetConsoleTextAttribute(hConsole, 7);
 		fprintf(LOG_STREAM, "] %s\n", output.c_str());
+		LogArray.push_back(output);
+		Log::DumpLog();
 	}
 
 public:
@@ -90,4 +92,19 @@ public:
 	{
 		MessageBoxA(NULL, (Message).c_str(), Info.c_str(), MB_OK | MB_SYSTEMMODAL);
 	}
+
+	static bool DumpLog()
+	{
+		FILE* Log = NULL;
+		fopen_s(&Log, "UML-Log.txt", "w+");
+		for (size_t i = 0; i < LogArray.size(); i++)
+		{
+			auto currentstring = LogArray[i];
+			fprintf(Log, "%s\n", currentstring.c_str());
+		}
+		fclose(Log);
+	}
+
+private:
+	static std::vector<std::string> LogArray;
 };

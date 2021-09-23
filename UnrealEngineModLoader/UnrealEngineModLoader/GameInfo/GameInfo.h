@@ -60,7 +60,6 @@ public:
 	DWORD64 BeginPlay;
 	DWORD64 StaticLoadObject;
 	DWORD64 SpawnActorFTrans;
-	DWORD64 CallFunctionByNameWithArguments;
 
 	DWORD64 ProcessInternals;
 

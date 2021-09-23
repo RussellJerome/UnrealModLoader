@@ -39,6 +39,7 @@
     <ClCompile Include="UnrealEngineModLoader\Utilities\Dumper.cpp" />
     <ClCompile Include="UnrealEngineModLoader\Utilities\EngineDefFinder.cpp" />
     <ClCompile Include="UnrealEngineModLoader\Utilities\Globals.cpp" />
+    <ClCompile Include="UnrealEngineModLoader\Utilities\Logger.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EventSystem.h" />

@@ -171,8 +171,11 @@ namespace Hooks
 									{
 
 									}PreBeginPlayParams;
-
-									ModActor->ProcessEvent(ModActor->GetFunction("PreBeginPlay"), &PreBeginPlayParams);
+									if (ModActor->DoesObjectContainFunction("PreBeginPlay"))
+									{
+										ModActor->ProcessEvent(ModActor->GetFunction("PreBeginPlay"), &PreBeginPlayParams);
+									}
+									
 									Log::Info("Sucessfully Loaded %s", str);
 								}
 							}
@@ -208,7 +211,10 @@ namespace Hooks
 
 							}PostBeginPlayParams;
 
-							CurrentModActor->ProcessEvent(CurrentModActor->GetFunction("PostBeginPlay"), &PostBeginPlayParams);
+							if (CurrentModActor->DoesObjectContainFunction("PostBeginPlay"))
+							{
+								CurrentModActor->ProcessEvent(CurrentModActor->GetFunction("PostBeginPlay"), &PostBeginPlayParams);
+							}
 							Global::eventSystem.dispatchEvent("PostBeginPlay", Global::ModInfoList[i].ModName, CurrentModActor);
 						}
 					}
