@@ -1,5 +1,5 @@
 # Unreal Engine Mod Loader Development Branch
-A tool used to load Blueprint mods for Unreal Engine 4 games
+A tool used to load Blueprint and basic SDK based C++ Mods for Unreal Engine 4 games
 
 # WARNING
 This branch of the Unreal Mod Loader is currently under development and is NOT stable. Use this version at your own risk.
@@ -9,15 +9,13 @@ This software is provided by the author "as is". In no event shall the author be
 theory of liability, whether in contract, strict liability, or tort (including negligence or otherwise) arising in any way out of the use of this software, even if advised of the possibility of such damage.
 
 # Docs
-While the tool doesn't have "official" Documentation yet, here is a very good [Guide](https://github.com/Dmgvol/GR_Guides/blob/main/ModLoaderExample.md) that was made for the game Ghost Runner, the process of making a mod is essentially the same for all other games.
+All documentation and guides can be found [here](https://github.com/RussellJerome/UnrealModLoader-Guides).
 
-# Special Features
-	* You can enable or disable the console via the ini
-	* You can use the Ue4 Say function and add a /Print to the end to print to the modloader console
-	* Press F8 to dump Object Store
-	* Press F9 to dump Engine Settings
-	* Press F10 to dump World Actors Array
+# Extra Info
+	* You can enable or disable the mod loader output console via the ini (NOTE: This is not related to the UE4 Console.)
+	* You can press f1 to open the Mod Loader gui panel.
 
 # 3rd Party Software
   * [feather-ini-parser](https://github.com/Turbine1991/cpp-feather-ini-parser)
   * [Minhook](https://github.com/TsudaKageyu/minhook)
+  * [ImGui](https://github.com/ocornut/imgui)
