@@ -62,15 +62,22 @@ namespace Hooks
 			for (int i = 0; i < Global::ModInfoList.size(); i++)
 			{
 				UE4::AActor* CurrentModActor = Global::ModInfoList[i].CurrentModActor;
-				if (CurrentModActor->IsA(UE4::AActor::StaticClass()))
+				if (CurrentModActor)
 				{
-					struct
+					if (CurrentModActor->IsA(UE4::AActor::StaticClass()))
 					{
+						if (CurrentModActor->GetFunction("ModCleanUp"))
+						{
+							struct
+							{
 
-					}CleanParams;
-					
-					CurrentModActor->ProcessEvent(CurrentModActor->GetFunction("ModCleanUp"), &CleanParams);
+							}CleanParams;
+
+							CurrentModActor->ProcessEvent(CurrentModActor->GetFunction("ModCleanUp"), &CleanParams);
+						}
+					}
 				}
+				
 				Global::ModInfoList[i].CurrentModActor = nullptr;
 			}
 			if (GameProfile::SelectedGameProfile.StaticLoadObject)
