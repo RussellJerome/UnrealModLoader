@@ -11,7 +11,6 @@ BeginPlayOverwrite=
 IsFunctionPatterns=0
 GameStateInit=0x200F7E0
 BeginPlay=0x1D9B630
-Say=0x201AA00
 StaticLoadObject=0xD33200
 SpawnActorFTrans=0x20CFEC0
 ProcessEvent=0xD2AA90

@@ -22,7 +22,6 @@ WorldArray=0xB8
 IsFunctionPatterns=0
 GameStateInit=0X4678920
 BeginPlay=0X44054F0
-Say=0x1111111
 StaticLoadObject=0x3421330
 SpawnActorFTrans=0x1111111
 CreateDefaultObject=0x597730
