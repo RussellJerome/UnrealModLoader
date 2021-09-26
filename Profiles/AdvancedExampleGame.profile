@@ -13,6 +13,9 @@
 #Overwrites the BeginPlay hook which calls PostBeginPlay and PostLoaderStart. To use PlayerController default leave empty.
 #BeginPlayOverwrite=
 
+#UE4.22 changes the namepool weird, only set this to 1 if the game uses 4.22
+#IsUsing4_22=0
+
 #GName, GWorld, and GObject patterns with op code (EXAMPLE BELOW, FILL OUT PATTERNS YOURSELF IF NEEDED)
 #[GInfo]
 

@@ -9,3 +9,6 @@ IsUsingFChunkedFixedUObjectArray=1
 
 #Fallback if Spawn Actor can't be found or refuses to work. You should almost NEVER use.
 IsUsingDeferedSpawn=0
+
+#UE4.22 changes the namepool weird, only set this to 1 if the game uses 4.22
+#IsUsing4_22=0
