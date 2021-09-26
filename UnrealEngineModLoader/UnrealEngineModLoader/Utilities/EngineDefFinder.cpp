@@ -2,12 +2,22 @@
 #include "Utilities/Logger.h"
 namespace ClassDefFinder
 {
-	bool FindUObjectIndexDefs(UE4::UObject* CoreUObject)
+	bool FindUObjectIndexDefs(UE4::UObject* CoreUObject, UE4::UObject* UEObject)
 	{
 		Log::Info("Scanning For UObject Index Def.");
-		while (Read<int32_t>((byte*)CoreUObject + GameProfile::SelectedGameProfile.defs.UObject.Index) != 1)
+		bool HasIndexNotBeenFound = true;
+
+		//Read<int32_t>((byte*)CoreUObject + GameProfile::SelectedGameProfile.defs.UObject.Index) != 1
+		while (HasIndexNotBeenFound)
 		{
 			GameProfile::SelectedGameProfile.defs.UObject.Index = GameProfile::SelectedGameProfile.defs.UObject.Index + 0x4;
+			if (Read<int32_t>((byte*)CoreUObject + GameProfile::SelectedGameProfile.defs.UObject.Index) == 1)
+			{
+				if (Read<int32_t>((byte*)UEObject + GameProfile::SelectedGameProfile.defs.UObject.Index) == 2)
+				{
+					HasIndexNotBeenFound = false;
+				}
+			}
 		}
 		Log::Info("UObject Index Def located at: 0x%p", GameProfile::SelectedGameProfile.defs.UObject.Index);
 		return true;
@@ -113,9 +123,9 @@ namespace ClassDefFinder
 		return true;
 	}
 
-	bool FindUObjectDefs(UE4::UObject* CoreUObject)
+	bool FindUObjectDefs(UE4::UObject* CoreUObject, UE4::UObject* UEObject)
 	{
-		if (FindUObjectIndexDefs(CoreUObject) && FindUObjectNameDefs(CoreUObject) && FindUObjectClassDefs(CoreUObject) && FindUObjectOuterDefs(CoreUObject))
+		if (FindUObjectIndexDefs(CoreUObject, UEObject) && FindUObjectNameDefs(CoreUObject) && FindUObjectClassDefs(CoreUObject) && FindUObjectOuterDefs(CoreUObject))
 		{
 			Log::Info("UObject Defined");
 			return true;
@@ -487,15 +497,18 @@ namespace ClassDefFinder
 	{
 		Log::Warn("Engine Classes Not Defined. Starting Automatic Class Finder.");
 		UE4::UObject* CoreUobjectObject;
+		UE4::UObject* UEObject;
 		if (GameProfile::SelectedGameProfile.IsUsingFChunkedFixedUObjectArray)
 		{
 			CoreUobjectObject = UE4::UObject::GObjects->GetAsChunckArray().GetByIndex(1).Object;
+			UEObject = UE4::UObject::GObjects->GetAsChunckArray().GetByIndex(2).Object;
 		}
 		else
 		{
 			CoreUobjectObject = UE4::UObject::GObjects->GetAsTUArray().GetByIndex(1).Object;
+			UEObject = UE4::UObject::GObjects->GetAsTUArray().GetByIndex(2).Object;
 		}
-		if (FindUObjectDefs(CoreUobjectObject) && FindUFieldDefs() && FindUStructDefs() && FindUFunctionDefs())
+		if (FindUObjectDefs(CoreUobjectObject, UEObject) && FindUFieldDefs() && FindUStructDefs() && FindUFunctionDefs())
 		{
 			if (GameProfile::SelectedGameProfile.IsPropertyMissing)
 			{
