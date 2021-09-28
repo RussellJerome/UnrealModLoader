@@ -300,12 +300,12 @@ void SetupProfile(std::string Path)
 			GameProfile::SelectedGameProfile.SpawnActorFTrans = (DWORD64)MEM::GetAddressPTR(SpawnActorFTrans, 0x1, 0x5);
 			std::cout << "GameProfile::SelectedGameProfile.SpawnActorFTrans: " << (void*)GameProfile::SelectedGameProfile.SpawnActorFTrans << std::endl;
 
-			auto CallFunctionByNameWithArguments = Pattern::Find("8B ? E8 ? ? ? ? ? 0A E8 FF C3 EB 9E ? 8B");
+			auto CallFunctionByNameWithArguments = Pattern::Find("8B ? E8 ? ? ? ? ? 0A E8 FF ? EB 9E ? 8B");
+			Log::Info("TestBetMan: 0x%p", CallFunctionByNameWithArguments);
 			if (CallFunctionByNameWithArguments != nullptr)
 			{
 				CallFunctionByNameWithArguments += 0x2;
 				GameProfile::SelectedGameProfile.CallFunctionByNameWithArguments = (DWORD64)MEM::GetAddressPTR(CallFunctionByNameWithArguments, 0x1, 0x5);
-				std::cout << "GameProfile::SelectedGameProfile.CallFunctionByNameWithArguments: " << (void*)GameProfile::SelectedGameProfile.CallFunctionByNameWithArguments << std::endl;
 			}
 			else
 			{
@@ -314,13 +314,13 @@ void SetupProfile(std::string Path)
 				{
 					CallFunctionByNameWithArguments += 0x3;
 					GameProfile::SelectedGameProfile.CallFunctionByNameWithArguments = (DWORD64)MEM::GetAddressPTR(CallFunctionByNameWithArguments, 0x1, 0x5);
-					std::cout << "GameProfile::SelectedGameProfile.CallFunctionByNameWithArguments: " << (void*)GameProfile::SelectedGameProfile.CallFunctionByNameWithArguments << std::endl;
 				}
 				else
 				{
 					Log::Error("CallFunctionByNameWithArguments NOT FOUND!");
 				}
 			}
+			std::cout << "GameProfile::SelectedGameProfile.CallFunctionByNameWithArguments: " << (void*)GameProfile::SelectedGameProfile.CallFunctionByNameWithArguments << std::endl;
 
 			auto ProcessEvent = Pattern::Find("75 0E ? ? ? 48 ? ? 48 ? ? E8 ? ? ? ? 48 8B ? 24 ? 48 8B ? 24 38 48 8B ? 24 40");
 			ProcessEvent += 0xB;

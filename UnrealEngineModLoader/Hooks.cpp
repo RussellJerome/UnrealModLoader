@@ -71,6 +71,7 @@ namespace Hooks
 				}
 				
 				Global::ModInfoList[i].CurrentModActor = nullptr;
+				Global::ModInfoList[i].ModButtons.clear();
 			}
 			if (GameProfile::SelectedGameProfile.StaticLoadObject)
 			{
@@ -137,7 +138,6 @@ namespace Hooks
 												UE4::FString Author;
 												UE4::FString Description;
 												UE4::FString Version;
-												UE4::TArray<UE4::FString> ModButtons;
 												if (UE4::GetVariable<UE4::FString>(ModActor, "ModAuthor", Author))
 												{
 													if (Author.IsValid())
@@ -157,17 +157,6 @@ namespace Hooks
 													if (Version.IsValid())
 													{
 														Global::ModInfoList[i].ModVersion = Version.ToString();
-													}
-												}
-												if (UE4::GetVariable<UE4::TArray<UE4::FString>>(ModActor, "ModButtons", ModButtons))
-												{
-													for (size_t bi = 0; bi < ModButtons.Num(); bi++)
-													{
-														auto CurrentButton = ModButtons[bi];
-														if (CurrentButton.IsValid())
-														{
-															Global::ModInfoList[i].ModButtons.push_back(CurrentButton.ToString());
-														}
 													}
 												}
 												Global::ModInfoList[i].WasInitialized = true;
@@ -206,6 +195,18 @@ namespace Hooks
 						UE4::AActor* CurrentModActor = Global::ModInfoList[i].CurrentModActor;
 						if (CurrentModActor != nullptr)
 						{
+							UE4::TArray<UE4::FString> ModButtons;
+							if (UE4::GetVariable<UE4::TArray<UE4::FString>>(CurrentModActor, "ModButtons", ModButtons))
+							{
+								for (size_t bi = 0; bi < ModButtons.Num(); bi++)
+								{
+									auto CurrentButton = ModButtons[bi];
+									if (CurrentButton.IsValid())
+									{
+										Global::ModInfoList[i].ModButtons.push_back(CurrentButton.ToString());
+									}
+								}
+							}
 							CurrentModActor->CallFunctionByNameWithArguments(L"PostBeginPlay", nullptr, NULL, true);
 							Global::eventSystem.dispatchEvent("PostBeginPlay", Global::ModInfoList[i].ModName, CurrentModActor);
 						}

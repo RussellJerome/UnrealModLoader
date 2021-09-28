@@ -147,21 +147,26 @@ void ShowLogicMods()
 			std::string Version = "Version: " + Global::ModInfoList[i].ModVersion;
 			ImGui::Text(Version.c_str());
 			ImGui::Separator();
+			if (ImGui::TreeNode("Mod Buttons"))
+			{
+				if (Global::ModInfoList[i].IsEnabled && Global::ModInfoList[i].CurrentModActor && Global::ModInfoList[i].ContainsButton)
+				{
+					for (size_t bi = 0; bi < Global::ModInfoList[i].ModButtons.size(); bi++)
+					{
+						auto currentmodbutton = Global::ModInfoList[i].ModButtons[bi];
+						std::string ButtonLabel = currentmodbutton + "##" + std::to_string(i + bi);
+						if (ImGui::Button(ButtonLabel.c_str()))
+						{
+							std::wstring FuncNameAndArgs = L"ModMenuButtonPressed " + std::to_wstring(bi);
+							Global::ModInfoList[i].CurrentModActor->CallFunctionByNameWithArguments(FuncNameAndArgs.c_str(), nullptr, NULL, true);
+						}
+					}
+					ImGui::Separator();
+				}
+				ImGui::TreePop();
+			}
 			std::string ActiveLabel = "Enable##" + std::to_string(i);
 			ImGui::Checkbox(ActiveLabel.c_str(), &Global::ModInfoList[i].IsEnabled);
-			if (Global::ModInfoList[i].IsEnabled && Global::ModInfoList[i].CurrentModActor && Global::ModInfoList[i].ContainsButton)
-			{
-				for (size_t bi = 0; bi < Global::ModInfoList[i].ModButtons.size(); bi++)
-				{
-					auto currentmodbutton = Global::ModInfoList[i].ModButtons[bi];
-					std::string ButtonLabel = currentmodbutton + "##" + std::to_string(i + bi);
-					if (ImGui::Button(ButtonLabel.c_str()))
-					{
-						std::wstring FuncNameAndArgs = L"ModMenuButtonPressed " + std::to_wstring(bi);
-						Global::ModInfoList[i].CurrentModActor->CallFunctionByNameWithArguments(FuncNameAndArgs.c_str(), nullptr, NULL, true);
-					}
-				}
-			}
 			ImGui::TreePop();
 		}
 	}
