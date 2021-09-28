@@ -206,6 +206,7 @@ void SetupProfile(std::string Path)
 				GameProfile::SelectedGameProfile.BeginPlay = (DWORD64)GetModuleHandleW(0) + StringToDWord(GameInfo.get("FunctionInfo", "BeginPlay", ""));
 				GameProfile::SelectedGameProfile.StaticLoadObject = (DWORD64)GetModuleHandleW(0) + StringToDWord(GameInfo.get("FunctionInfo", "StaticLoadObject", ""));
 				GameProfile::SelectedGameProfile.SpawnActorFTrans = (DWORD64)GetModuleHandleW(0) + StringToDWord(GameInfo.get("FunctionInfo", "SpawnActorFTrans", ""));
+				GameProfile::SelectedGameProfile.CallFunctionByNameWithArguments = (DWORD64)GetModuleHandleW(0) + StringToDWord(GameInfo.get("FunctionInfo", "CallFunctionByNameWithArguments", ""));
 				GameProfile::SelectedGameProfile.ProcessEvent = (DWORD64)GetModuleHandleW(0) + StringToDWord(GameInfo.get("FunctionInfo", "ProcessEvent", ""));
 				GameProfile::SelectedGameProfile.CreateDefaultObject = (DWORD64)GetModuleHandleW(0) + StringToDWord(GameInfo.get("FunctionInfo", "CreateDefaultObject", ""));
 				Log::Info("Function Offsets Set!");
@@ -216,6 +217,7 @@ void SetupProfile(std::string Path)
 				GameProfile::SelectedGameProfile.BeginPlay = (DWORD64)Pattern::Find(GameInfo.get("FunctionInfo", "BeginPlay", "").c_str());
 				GameProfile::SelectedGameProfile.StaticLoadObject = (DWORD64)Pattern::Find(GameInfo.get("FunctionInfo", "StaticLoadObject", "").c_str());
 				GameProfile::SelectedGameProfile.SpawnActorFTrans = (DWORD64)Pattern::Find(GameInfo.get("FunctionInfo", "SpawnActorFTrans", "").c_str());
+				GameProfile::SelectedGameProfile.CallFunctionByNameWithArguments = (DWORD64)Pattern::Find(GameInfo.get("FunctionInfo", "CallFunctionByNameWithArguments", "").c_str());
 				GameProfile::SelectedGameProfile.ProcessEvent = (DWORD64)Pattern::Find(GameInfo.get("FunctionInfo", "ProcessEvent", "").c_str());
 				GameProfile::SelectedGameProfile.CreateDefaultObject = (DWORD64)Pattern::Find(GameInfo.get("FunctionInfo", "CreateDefaultObject", "").c_str());
 				Log::Info("Function Patterns Set!");
@@ -297,6 +299,28 @@ void SetupProfile(std::string Path)
 
 			GameProfile::SelectedGameProfile.SpawnActorFTrans = (DWORD64)MEM::GetAddressPTR(SpawnActorFTrans, 0x1, 0x5);
 			std::cout << "GameProfile::SelectedGameProfile.SpawnActorFTrans: " << (void*)GameProfile::SelectedGameProfile.SpawnActorFTrans << std::endl;
+
+			auto CallFunctionByNameWithArguments = Pattern::Find("8B ? E8 ? ? ? ? ? 0A E8 FF C3 EB 9E ? 8B");
+			if (CallFunctionByNameWithArguments != nullptr)
+			{
+				CallFunctionByNameWithArguments += 0x2;
+				GameProfile::SelectedGameProfile.CallFunctionByNameWithArguments = (DWORD64)MEM::GetAddressPTR(CallFunctionByNameWithArguments, 0x1, 0x5);
+				std::cout << "GameProfile::SelectedGameProfile.CallFunctionByNameWithArguments: " << (void*)GameProfile::SelectedGameProfile.CallFunctionByNameWithArguments << std::endl;
+			}
+			else
+			{
+				CallFunctionByNameWithArguments = Pattern::Find("49 8B D4 E8 ? ? ? ? 44 0A F8 FF C3 EB 9A");
+				if (CallFunctionByNameWithArguments != nullptr)
+				{
+					CallFunctionByNameWithArguments += 0x3;
+					GameProfile::SelectedGameProfile.CallFunctionByNameWithArguments = (DWORD64)MEM::GetAddressPTR(CallFunctionByNameWithArguments, 0x1, 0x5);
+					std::cout << "GameProfile::SelectedGameProfile.CallFunctionByNameWithArguments: " << (void*)GameProfile::SelectedGameProfile.CallFunctionByNameWithArguments << std::endl;
+				}
+				else
+				{
+					Log::Error("CallFunctionByNameWithArguments NOT FOUND!");
+				}
+			}
 
 			auto ProcessEvent = Pattern::Find("75 0E ? ? ? 48 ? ? 48 ? ? E8 ? ? ? ? 48 8B ? 24 ? 48 8B ? 24 38 48 8B ? 24 40");
 			ProcessEvent += 0xB;

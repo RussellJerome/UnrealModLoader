@@ -16,6 +16,7 @@ struct ModInfo
 	bool IsEnabled;
 	bool ContainsButton;
 	bool WasInitialized;
+	std::vector<std::string> ModButtons;
 };
 
 class LOADER_API Global {

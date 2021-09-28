@@ -61,6 +61,8 @@ public:
 
 	DWORD64 ProcessInternals;
 
+	DWORD64 CallFunctionByNameWithArguments;
+
 	bool IsEngineDefsMissing;
 
 	bool IsPropertyMissing;

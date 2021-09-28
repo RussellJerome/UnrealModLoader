@@ -66,15 +66,7 @@ namespace Hooks
 				{
 					if (CurrentModActor->IsA(UE4::AActor::StaticClass()))
 					{
-						if (CurrentModActor->GetFunction("ModCleanUp"))
-						{
-							struct
-							{
-
-							}CleanParams;
-
-							CurrentModActor->ProcessEvent(CurrentModActor->GetFunction("ModCleanUp"), &CleanParams);
-						}
+						CurrentModActor->CallFunctionByNameWithArguments(L"ModCleanUp", nullptr, NULL, true);
 					}
 				}
 				
@@ -145,6 +137,7 @@ namespace Hooks
 												UE4::FString Author;
 												UE4::FString Description;
 												UE4::FString Version;
+												UE4::TArray<UE4::FString> ModButtons;
 												if (UE4::GetVariable<UE4::FString>(ModActor, "ModAuthor", Author))
 												{
 													if (Author.IsValid())
@@ -166,22 +159,22 @@ namespace Hooks
 														Global::ModInfoList[i].ModVersion = Version.ToString();
 													}
 												}
+												if (UE4::GetVariable<UE4::TArray<UE4::FString>>(ModActor, "ModButtons", ModButtons))
+												{
+													for (size_t bi = 0; bi < ModButtons.Num(); bi++)
+													{
+														auto CurrentButton = ModButtons[bi];
+														if (CurrentButton.IsValid())
+														{
+															Global::ModInfoList[i].ModButtons.push_back(CurrentButton.ToString());
+														}
+													}
+												}
 												Global::ModInfoList[i].WasInitialized = true;
 											}
 										}
 									}
-									/*UE4::UFunction* PreBegin;
-									UE4::GetVariable<UE4::UFunction*>(ModActor, "PreBeginPlay", PreBegin);
-									ModActor->ProcessEvent(PreBegin, nullptr);*/
-
-									struct
-									{
-
-									}PreBeginPlayParams;
-									if (ModActor->DoesObjectContainFunction("PreBeginPlay"))
-									{
-										ModActor->ProcessEvent(ModActor->GetFunction("PreBeginPlay"), &PreBeginPlayParams);
-									}
+									ModActor->CallFunctionByNameWithArguments(L"PreBeginPlay", nullptr, NULL, true);
 									
 									Log::Info("Sucessfully Loaded %s", str);
 								}
@@ -213,15 +206,7 @@ namespace Hooks
 						UE4::AActor* CurrentModActor = Global::ModInfoList[i].CurrentModActor;
 						if (CurrentModActor != nullptr)
 						{
-							struct
-							{
-
-							}PostBeginPlayParams;
-
-							if (CurrentModActor->DoesObjectContainFunction("PostBeginPlay"))
-							{
-								CurrentModActor->ProcessEvent(CurrentModActor->GetFunction("PostBeginPlay"), &PostBeginPlayParams);
-							}
+							CurrentModActor->CallFunctionByNameWithArguments(L"PostBeginPlay", nullptr, NULL, true);
 							Global::eventSystem.dispatchEvent("PostBeginPlay", Global::ModInfoList[i].ModName, CurrentModActor);
 						}
 					}

@@ -7,7 +7,6 @@ namespace ClassDefFinder
 		Log::Info("Scanning For UObject Index Def.");
 		bool HasIndexNotBeenFound = true;
 
-		//Read<int32_t>((byte*)CoreUObject + GameProfile::SelectedGameProfile.defs.UObject.Index) != 1
 		while (HasIndexNotBeenFound)
 		{
 			GameProfile::SelectedGameProfile.defs.UObject.Index = GameProfile::SelectedGameProfile.defs.UObject.Index + 0x4;

@@ -91,7 +91,6 @@ void UILogicTick()
 			TickVars::bExecuteConsoleCommand = false;
 			UE4::UGameplayStatics::ExecuteConsoleCommand(TickVars::CurrentCommand.c_str(), nullptr);
 			TickVars::CurrentCommand = L"";
-
 		}
 		Sleep(1000 / 60);
 	}
@@ -152,16 +151,14 @@ void ShowLogicMods()
 			ImGui::Checkbox(ActiveLabel.c_str(), &Global::ModInfoList[i].IsEnabled);
 			if (Global::ModInfoList[i].IsEnabled && Global::ModInfoList[i].CurrentModActor && Global::ModInfoList[i].ContainsButton)
 			{
-				std::string ButtonLabel = str + " Button" + "##" + std::to_string(i);
-				if (ImGui::Button(ButtonLabel.c_str()))
+				for (size_t bi = 0; bi < Global::ModInfoList[i].ModButtons.size(); bi++)
 				{
-					struct
+					auto currentmodbutton = Global::ModInfoList[i].ModButtons[bi];
+					std::string ButtonLabel = currentmodbutton + "##" + std::to_string(i + bi);
+					if (ImGui::Button(ButtonLabel.c_str()))
 					{
-
-					}ModMenuButtonPressedParams;
-					if (Global::ModInfoList[i].CurrentModActor->DoesObjectContainFunction("ModMenuButtonPressed"))
-					{
-						Global::ModInfoList[i].CurrentModActor->ProcessEvent(Global::ModInfoList[i].CurrentModActor->GetFunction("ModMenuButtonPressed"), &ModMenuButtonPressedParams);
+						std::wstring FuncNameAndArgs = L"ModMenuButtonPressed " + std::to_wstring(bi);
+						Global::ModInfoList[i].CurrentModActor->CallFunctionByNameWithArguments(FuncNameAndArgs.c_str(), nullptr, NULL, true);
 					}
 				}
 			}

@@ -9,7 +9,7 @@ This software is provided by the author "as is". In no event shall the author be
 theory of liability, whether in contract, strict liability, or tort (including negligence or otherwise) arising in any way out of the use of this software, even if advised of the possibility of such damage.
 
 # Docs
-All documentation and guides can be found [here](https://github.com/RussellJerome/UnrealModLoader-Guides).
+All video documentation and guides can be found [here](https://www.youtube.com/channel/UCrMwqkaPAc4OZCe1FDtik3g).
 
 # Extra Info
 	* You can enable or disable the mod loader output console via the ini (NOTE: This is not related to the UE4 Console.)
