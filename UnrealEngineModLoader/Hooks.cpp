@@ -107,9 +107,9 @@ namespace Hooks
 								{
 									if (!bIsProcessInternalsHooked)
 									{
-										if (GameProfile::SelectedGameProfile.UsesFNamePool)
+										if (GameProfile::SelectedGameProfile.UsesFNamePool || GameProfile::SelectedGameProfile.IsUsing4_22)
 										{
-											DWORD64 ProcessAddy = (DWORD64)Pattern::Find("41 F6 C7 02 74 10 4C 8B C7 48 8B D5 48 8B CB E8 ? ? ? ? EB 79");
+											DWORD64 ProcessAddy = (DWORD64)Pattern::Find("41 F6 C7 02 74 ? 4C 8B C7 48 8B ? ? 8B ? E8");
 											auto ProcessAddyOffset = *reinterpret_cast<uint32_t*>(ProcessAddy + 16);
 											GameProfile::SelectedGameProfile.ProcessInternals = (ProcessAddy + 20 + ProcessAddyOffset);
 										}
