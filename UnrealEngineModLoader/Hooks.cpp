@@ -119,6 +119,10 @@ namespace Hooks
 											{
 												GameProfile::SelectedGameProfile.ProcessInternals = (DWORD64)ModActor->GetFunction("PostBeginPlay")->GetFunction();
 											}
+											else if (ModActor->DoesObjectContainFunction("ModMenuButtonPressed"))
+											{
+												GameProfile::SelectedGameProfile.ProcessInternals = (DWORD64)ModActor->GetFunction("ModMenuButtonPressed")->GetFunction();
+											}
 										}
 										bIsProcessInternalsHooked = true;
 										if (GameProfile::SelectedGameProfile.ProcessInternals)
