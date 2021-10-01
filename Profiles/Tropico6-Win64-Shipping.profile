@@ -1,8 +1,5 @@
 #Games Basic Information
 [GameInfo]
-GameName=Tropico 6
-ModuleName=Tropico6-Win64-Shipping
-SupportedVersion=1
 UsesFNamePool=0
 IsUsingFChunkedFixedUObjectArray=1
 IsUsingDeferedSpawn=1

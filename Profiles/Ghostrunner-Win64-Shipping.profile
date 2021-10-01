@@ -1,13 +1,7 @@
 #Games Basic Information
 [GameInfo]
-GameName=Ghostrunner
-ModuleName=Ghostrunner-Win64-Shipping
-SupportedVersion=1
 UsesFNamePool=1
 IsUsingFChunkedFixedUObjectArray=1
-IsUsingDeferedSpawn=0
-#Overwrites the BeginPlay hook which calls PostBeginPlay and PostLoaderStart. To use PlayerController default leave empty.
-BeginPlayOverwrite=
 
 #Function Offsets needed for hooks ad calls
 [FunctionInfo]
