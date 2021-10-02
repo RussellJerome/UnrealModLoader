@@ -6,7 +6,7 @@ This software is provided by the author "as is". In no event shall the author be
 theory of liability, whether in contract, strict liability, or tort (including negligence or otherwise) arising in any way out of the use of this software, even if advised of the possibility of such damage.
 
 # Discord
-https://discord.gg/xmXUSNvypY
+If you have any problems, or just want to provide feedback click [here](https://discord.gg/xmXUSNvypY)
 
 # Docs
 All video documentation and guides can be found [here](https://www.youtube.com/playlist?list=PL-dFOLrGFgdwbzcHmZ2ghuN3LXxlazbZP).
