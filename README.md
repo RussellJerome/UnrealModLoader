@@ -1,8 +1,5 @@
-# Unreal Engine Mod Loader Development Branch
+# Unreal Engine Mod Loader
 A tool used to load Blueprint and basic SDK based C++ Mods for Unreal Engine 4 games
-
-# WARNING
-This branch of the Unreal Mod Loader is currently under development and is NOT stable. Use this version at your own risk.
 
 # DISCLAIMER
 This software is provided by the author "as is". In no event shall the author be liable for any direct, indirect, incidental, special, exemplary, or consequential damages (including, but not limited to procurement of substitute goods or services; loss of use, data, or profits; or business interruption) however caused and on any 
