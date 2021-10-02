@@ -1,8 +1,9 @@
 #include "Globals.h"
-
 // Global defines
 
-std::vector<std::wstring> Global::modnames;
+std::vector<ModInfo> Global::ModInfoList;
 std::string Global::GameName;
-std::vector<UE4::AActor*> Global::ModActors;
-UE4::AActor* Global::ModLoaderActor;
+bool Global::bIsMenuOpen;
+std::string Global::Version = "2.0.0";
+EventDispatcher Global::eventSystem;
+std::vector<class Mod*> Global::CoreMods;

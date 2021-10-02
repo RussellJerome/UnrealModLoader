@@ -19,21 +19,48 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Hooks.cpp" />
+    <ClCompile Include="ImGui\imgui.cpp" />
+    <ClCompile Include="ImGui\imgui_demo.cpp" />
+    <ClCompile Include="ImGui\imgui_draw.cpp" />
+    <ClCompile Include="ImGui\imgui_impl_dx11.cpp" />
+    <ClCompile Include="ImGui\imgui_impl_win32.cpp" />
+    <ClCompile Include="ImGui\imgui_tables.cpp" />
+    <ClCompile Include="ImGui\imgui_widgets.cpp" />
+    <ClCompile Include="LoaderUI.cpp" />
     <ClCompile Include="PakLoader.cpp" />
     <ClCompile Include="UE4\Basic.cpp" />
     <ClCompile Include="UE4\CoreUObject_functions.cpp" />
     <ClCompile Include="UnrealEngineModLoader\dllmain.cpp" />
     <ClCompile Include="UnrealEngineModLoader\GameInfo\GameInfo.cpp" />
+    <ClCompile Include="UnrealEngineModLoader\Memory\CoreModLoader.cpp" />
     <ClCompile Include="UnrealEngineModLoader\Memory\mem.cpp" />
+    <ClCompile Include="UnrealEngineModLoader\Mod\Mod.cpp" />
+    <ClCompile Include="UnrealEngineModLoader\Utilities\Dumper.cpp" />
     <ClCompile Include="UnrealEngineModLoader\Utilities\EngineDefFinder.cpp" />
     <ClCompile Include="UnrealEngineModLoader\Utilities\Globals.cpp" />
+    <ClCompile Include="UnrealEngineModLoader\Utilities\Logger.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="EventSystem.h" />
+    <ClInclude Include="Hooks.h" />
+    <ClInclude Include="ImGui\imconfig.h" />
+    <ClInclude Include="ImGui\imgui.h" />
+    <ClInclude Include="ImGui\imgui_impl_dx11.h" />
+    <ClInclude Include="ImGui\imgui_impl_win32.h" />
+    <ClInclude Include="ImGui\imgui_internal.h" />
+    <ClInclude Include="ImGui\imstb_rectpack.h" />
+    <ClInclude Include="ImGui\imstb_textedit.h" />
+    <ClInclude Include="ImGui\imstb_truetype.h" />
+    <ClInclude Include="Lib.h" />
+    <ClInclude Include="LoaderUI.h" />
     <ClInclude Include="PakLoader.h" />
     <ClInclude Include="UE4\CoreUObject_classes.hpp" />
     <ClInclude Include="UE4\Ue4.hpp" />
     <ClInclude Include="UnrealEngineModLoader\GameInfo\GameInfo.h" />
+    <ClInclude Include="UnrealEngineModLoader\Memory\CoreModLoader.h" />
     <ClInclude Include="UnrealEngineModLoader\Memory\mem.h" />
+    <ClInclude Include="UnrealEngineModLoader\Mod\Mod.h" />
     <ClInclude Include="UnrealEngineModLoader\Utilities\Dumper.h" />
     <ClInclude Include="UnrealEngineModLoader\Utilities\EngineDefFinder.h" />
     <ClInclude Include="UnrealEngineModLoader\Utilities\Globals.h" />
@@ -151,6 +178,8 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
+      <IgnoreAllDefaultLibraries>
+      </IgnoreAllDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -163,6 +192,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(MSBuildProjectDirectory)\UnrealEngineModLoader\;$(MSBuildProjectDirectory)\MinHook\;$(MSBuildProjectDirectory)\packages\minhook.1.3\lib\native\lib;$(MSBuildProjectDirectory)\INI\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

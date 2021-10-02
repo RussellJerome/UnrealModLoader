@@ -1,4 +1,5 @@
 #pragma once
+#include "../Lib.h"
 #include <string>
 #include <vector>
 #include <Windows.h>
@@ -6,38 +7,38 @@
 
 struct Offsets {
 	struct {
-		uint16_t Index = 0;
-		uint16_t Class = 0;
-		uint16_t Name = 0;
-		uint16_t Outer = 0;
+		uint16_t Index = 0x0;
+		uint16_t Class = 0x0;
+		uint16_t Name = 0x0;
+		uint16_t Outer = 0x0;
 	} UObject;
 	struct {
-		uint16_t Next = 0;
+		uint16_t Next = 0x0;
 	} UField;
 	struct {
-		uint16_t SuperStruct = 0;
-		uint16_t Children = 0;
-		uint16_t PropertiesSize = 0;
-		uint16_t OverallUStructSize = 0;
+		uint16_t SuperStruct = 0x0;
+		uint16_t Children = 0x0;
+		uint16_t PropertiesSize = 0x0;
+		uint16_t OverallUStructSize = 0x0;
 	} UStruct;
 	struct {
-		uint16_t FunctionFlags = 0;
-		uint16_t Func = 0;
+		uint16_t FunctionFlags = 0x0;
+		uint16_t Func = 0x0;
 	} UFunction;
 	struct {
-		uint16_t PersistentLevel = 0x0;
-		uint16_t AuthorityGameMode = 0x0;
-	}UWorld;
+		uint16_t Next = 0x0;
+		uint16_t Name = 0x0;
+	} FField;
 	struct {
-		uint16_t WorldArray = 0x0;
-	}ULevel;
+		uint16_t ArrayDim = 0x0;
+		uint16_t Offset = 0x0;
+	} Property;
 };
 
-extern Offsets defs;
-
-class GameProfile
+class LOADER_API GameProfile
 {
 public:
+	std::string ProfileName;
 	std::string LoaderPath;
 	int UsesFNamePool;
 	std::string BeginPlayOverwrite = "Class Engine.PlayerController";
@@ -52,16 +53,25 @@ public:
 
 	bool IsFunctionPatterns;
 	DWORD64 ProcessEvent;
-	DWORD64 CreateDefualtObject;
+	DWORD64 CreateDefaultObject;
 	DWORD64 GameStateInit;
 	DWORD64 BeginPlay;
-	DWORD64 Say;
 	DWORD64 StaticLoadObject;
 	DWORD64 SpawnActorFTrans;
+
+	DWORD64 ProcessInternals;
+
 	DWORD64 CallFunctionByNameWithArguments;
 
 	bool IsEngineDefsMissing;
-	bool IsUWorldMissing;
+
+	bool IsPropertyMissing;
+
+	bool bIsFProperty;
+
+	bool bIsDefaultObjectArrayed;
+
+	Offsets defs;
 
 	static GameProfile SelectedGameProfile;
 	static void CreateGameProfile();

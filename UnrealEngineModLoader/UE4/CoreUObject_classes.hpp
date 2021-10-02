@@ -13,14 +13,13 @@ namespace UE4
 	//---------------------------------------------------------------------------
 	//Classes
 	//---------------------------------------------------------------------------
-
 	class UObject
 	{
 	public:
 		static FUObjectArray* GObjects;
-		int32_t GetIndex() const { return Read<int32_t>((byte*)this + defs.UObject.Index); };
-		UClass* GetClass() const { return Read<class UClass*>((byte*)this + defs.UObject.Class); };
-		UObject* GetOuter() const { return Read<UObject*>((byte*)this + defs.UObject.Outer); };
+		int32_t GetIndex() const;
+		UClass* GetClass() const;
+		UObject* GetOuter() const;
 
 		static inline bool IsChunkedArray()
 		{
@@ -72,6 +71,109 @@ namespace UE4
 			}
 		}
 
+		template<typename T>
+		static std::vector<T*> GetAllObjectsOfType(UClass* Class, bool filterDefualts)
+		{
+			if (IsChunkedArray())
+			{
+				std::vector<T*> ret;
+				//auto v = T::StaticClass();
+				for (int i = 0; i < GObjects->GetAsChunckArray().Num(); ++i)
+				{
+					auto object = GObjects->GetAsChunckArray().GetByIndex(i).Object;
+
+					if (object == nullptr)
+					{
+						continue;
+					}
+
+					if (object->IsA(Class))
+					{
+						if (filterDefualts)
+						{
+							if (object->GetName().find("Default__") != std::string::npos) {
+								continue;
+							}
+						}
+						ret.push_back(static_cast<T*>(object));
+					}
+				}
+				return ret;
+			}
+			else
+			{
+				std::vector<T*> ret;
+				for (int i = 0; i < GObjects->GetAsTUArray().Num(); ++i)
+				{
+					auto object = GObjects->GetAsTUArray().GetByIndex(i).Object;
+
+					if (object == nullptr)
+					{
+						continue;
+					}
+
+					if (object->IsA(Class))
+					{
+						if (filterDefualts)
+						{
+							if (object->GetName().find("Default__") != std::string::npos) {
+								continue;
+							}
+						}
+						ret.push_back(static_cast<T*>(object));
+					}
+				}
+				return ret;
+			}
+		}
+
+		template<typename T>
+		static T* GetDefaultObjectFromArray(UClass* Class)
+		{
+			if (IsChunkedArray())
+			{
+				for (int i = 0; i < GObjects->GetAsChunckArray().Num(); ++i)
+				{
+					auto object = GObjects->GetAsChunckArray().GetByIndex(i).Object;
+
+					if (object == nullptr)
+					{
+						continue;
+					}
+
+					if (object->IsA(Class))
+					{
+						if (object->GetName().find("Default__") != std::string::npos) 
+						{
+							return static_cast<T*>(object);
+						}
+					}
+				}
+				return nullptr;
+			}
+			else
+			{
+				for (int i = 0; i < GObjects->GetAsTUArray().Num(); ++i)
+				{
+					auto object = GObjects->GetAsTUArray().GetByIndex(i).Object;
+
+					if (object == nullptr)
+					{
+						continue;
+					}
+
+					if (object->IsA(Class))
+					{
+						if (object->GetName().find("Default__") != std::string::npos) 
+						{
+							return static_cast<T*>(object);
+						}
+					}
+				}
+				return nullptr;
+			}
+		}
+
 		static UClass* FindClass(const std::string& name)
 		{
 			return FindObject<UClass>(name);
@@ -85,20 +187,15 @@ namespace UE4
 			return ptr;
 		}
 
-		inline void ProcessEvent(class UFunction* function, void* parms)
-		{
-			return reinterpret_cast<void(*)(UObject*, class UFunction*, void*)>(GameProfile::SelectedGameProfile.ProcessEvent)(this, function, parms);
-		}
+		bool DoesObjectContainFunction(std::string Function);
 
-		static inline UObject* StaticLoadObject(class UClass* uclass, UObject* InOuter, const wchar_t* InName, const wchar_t* Filename, unsigned int LoadFlags, void* Sandbox, bool bAllowObjectReconciliation)
-		{
-			return reinterpret_cast<UObject* (__fastcall*)(class UClass*, UObject*, const wchar_t*, const wchar_t*, unsigned int, void*, bool)>(GameProfile::SelectedGameProfile.StaticLoadObject)(uclass, InOuter, InName, Filename, LoadFlags, Sandbox, bAllowObjectReconciliation);
-		}
+		class UFunction* GetFunction(std::string Function);
 
-		inline UObject* CallFunctionByNameWithArguments(const wchar_t* Str, void* Ar, UE4::UObject* Executor, bool bForceCallWithNonExec)
-		{
-			return reinterpret_cast<UE4::UObject*(*)(UE4::UObject*, const wchar_t*, void*, UE4::UObject*, bool)>(GameProfile::SelectedGameProfile.CallFunctionByNameWithArguments)(this, Str, Ar, Executor, bForceCallWithNonExec);
-		}
+		void ProcessEvent(class UFunction* function, void* parms);
+
+		static UObject* StaticLoadObject(class UClass* uclass, UObject* InOuter, const wchar_t* InName, const wchar_t* Filename, unsigned int LoadFlags, void* Sandbox, bool bAllowObjectReconciliation);
+
+		bool CallFunctionByNameWithArguments(const wchar_t* Str, void* Ar, UE4::UObject* Executor, bool bForceCallWithNonExec);
 
 		void ExecuteUbergraph(int EntryPoint);
 	};
@@ -106,7 +203,7 @@ namespace UE4
 	class UField : public UObject
 	{
 	public:
-		UField* GetNext() const { return Read<UField*>((byte*)this + defs.UField.Next); };
+		UField* GetNext() const;
 
 		static UClass* StaticClass()
 		{
@@ -119,9 +216,9 @@ namespace UE4
 	class UStruct : public UField
 	{
 	public:
-		UStruct* GetSuperField() const { return Read<UStruct*>((byte*)this + defs.UStruct.SuperStruct); };
-		UField* GetChildren() const { return Read<UField*>((byte*)this + defs.UStruct.Children); };
-		int32_t GetPropertySize() const { return Read<int32_t>((byte*)this + defs.UStruct.PropertiesSize); };
+		UStruct* GetSuperField() const;
+		UField* GetChildren() const;
+		int32_t GetPropertySize() const;
 		
 		static UClass* StaticClass()
 		{
@@ -137,6 +234,10 @@ namespace UE4
 		template<typename T>
 		inline T* CreateDefaultObject()
 		{
+			if (GameProfile::SelectedGameProfile.bIsDefaultObjectArrayed == true)
+			{
+				return UE4::UObject::GetDefaultObjectFromArray<T>(this);
+			}
 			return static_cast<T*>(CreateDefaultObject());
 		}
 
@@ -148,21 +249,26 @@ namespace UE4
 
 		inline UObject* CreateDefaultObject()
 		{
-			return reinterpret_cast<UObject*(*)(UClass*)>(this, GameProfile::SelectedGameProfile.CreateDefualtObject)(this);
+
+			if (GameProfile::SelectedGameProfile.bIsDefaultObjectArrayed == true)
+			{
+				return UE4::UObject::GetDefaultObjectFromArray<UObject>(this);
+			}
+			else
+			{
+				return reinterpret_cast<UObject * (*)(UClass*)>(this, GameProfile::SelectedGameProfile.CreateDefaultObject)(this);
+			}
 		}
 
-		static inline UClass* LoadClassFromString(const wchar_t* InName, bool bAllowObjectReconciliation)
-		{
-			return (UClass*)UObject::StaticLoadObject(UClass::StaticClass(), nullptr, InName, nullptr, 0, nullptr, bAllowObjectReconciliation);
-		}
+		static UClass* LoadClassFromString(const wchar_t* InName, bool bAllowObjectReconciliation);
 
 	};
 
 	class UFunction : public UStruct
 	{
 	public:
-		int32_t GetFunctionFlags() const { return Read<int32_t>((byte*)this + defs.UFunction.FunctionFlags); };
-		void* GetFunction() const { return Read<void*>((byte*)this + defs.UFunction.Func); };
+		int32_t GetFunctionFlags() const;
+		void* GetFunction() const;
 		
 		static UClass* StaticClass()
 		{
@@ -171,12 +277,28 @@ namespace UE4
 		}
 
 	};
+	// UE4.25 AND UP
+	class FField
+	{
+	public:
+		//FName* GetClass() const;
+		FField* GetNext() const;
+		std::string GetName() const;
+	};
+
+	class UEProperty
+	{
+	public:
+		FField* GetParentFProperty() { return (FField*)this; }
+		UField* GetParentUProperty() { return (UField*)this; }
+		int32_t GetArrayDim() const;
+		//int32_t GetElementSize() const;
+		int32_t GetOffset() const;
+	};
 
 	class ULevel : public UObject
 	{
 	public:
-		TArray<class AActor*> GetWorldActors() const { return Read<TArray<class AActor*>>((byte*)this + defs.ULevel.WorldArray); };
-
 		static UClass* StaticClass()
 		{
 			static auto ptr = UObject::FindClass("Class Engine.Level");
@@ -184,38 +306,10 @@ namespace UE4
 		}
 	};
 
-	class ULevelStreaming : public UObject
-	{
-	public:
-
-		struct FName GetWorldAssetPackageFName()
-		{
-			static auto fn = UObject::FindObject<UFunction>("Function Engine.LevelStreaming.GetWorldAssetPackageFName");
-			struct
-			{
-				struct FName ReturnValue;
-			}params;
-			UObject::ProcessEvent(fn, &params);
-			return params.ReturnValue;
-		}
-
-		static UClass* StaticClass()
-		{
-			static auto ptr = UObject::FindClass("Class Engine.LevelStreaming");
-			return ptr;
-		}
-	};
-
 	class UWorld : public UObject
 	{
 	public:
-		ULevel* GetPersistentLevel() const { return Read<ULevel*>((byte*)this + defs.UWorld.PersistentLevel); };
-		class AGameModeBase* GetAuthorityGameMode() const { return Read<class AGameModeBase*>((byte*)this + defs.UWorld.AuthorityGameMode); };
-
-		inline AActor* SpawnActor(UClass* uclass, const  FTransform* transform, const FActorSpawnParameters* params)
-		{
-			return reinterpret_cast<AActor* (*)(UWorld*, UClass*, const FTransform*, const FActorSpawnParameters*)>(GameProfile::SelectedGameProfile.SpawnActorFTrans)(this, uclass, transform, params);
-		}
+		AActor* SpawnActor(UClass* uclass, const  FTransform* transform, const FActorSpawnParameters* params);
 
 		static UWorld** GWorld;
 		static inline UWorld* GetWorld()
@@ -233,28 +327,14 @@ namespace UE4
 	class AActor : public UObject
 	{
 	public:
+		// WARNING TENDS TO CRASH AND I HAVE NO FUCKING CLUE WHY
+		FTransform GetTransform();
 
-		FTransform GetTransform()
-		{
-			static auto fn = UObject::FindObject<UFunction>("Function Engine.Actor.GetTransform");
-			struct
-			{
-				FTransform ReturnValue;
-			}params;
-			UObject::ProcessEvent(fn, &params);
-			return params.ReturnValue;
-		}
+		FRotator GetActorRotation();
 
-		FRotator GetActorRotation()
-		{
-			static auto fn = UObject::FindObject<UFunction>("Function Engine.Actor.K2_GetActorRotation");
-			struct
-			{
-				FRotator ReturnValue;
-			}params;
-			UObject::ProcessEvent(fn, &params);
-			return params.ReturnValue;
-		}
+		FVector GetActorLocation();
+
+		FVector GetActorScale3D();
 
 		static UClass* StaticClass()
 		{
@@ -283,6 +363,42 @@ namespace UE4
 		}
 	};
 
+	class AGameMode : public AActor
+	{
+	public:
+
+	};
+
+	class AGameState : public AActor
+	{
+	public:
+		static UClass* StaticClass()
+		{
+			static auto ptr = UObject::FindClass("Class Engine.GameState");
+			return ptr;
+		}
+	};
+
+	class UGameInstance : public UObject
+	{
+	public:
+		static UClass* StaticClass()
+		{
+			static auto ptr = UObject::FindClass("Class Engine.GameInstance");
+			return ptr;
+		}
+	};
+
+	class APawn : public AActor
+	{
+	public:
+		static UClass* StaticClass()
+		{
+			static auto ptr = UObject::FindClass("Class Engine.Pawn");
+			return ptr;
+		}
+	};
+
 	class ACustomClass : public UObject
 	{
 	public:
@@ -307,47 +423,128 @@ namespace UE4
 	{
 	public:
 
-		class AActor* BeginDeferredActorSpawnFromClass(class UClass* ActorClass, const struct FTransform& SpawnTransform, ESpawnActorCollisionHandlingMethod CollisionHandlingOverride, class AActor* Owner)
-		{
-			static auto fn = UObject::FindObject<UFunction>("Function Engine.GameplayStatics.BeginDeferredActorSpawnFromClass");
-			struct
-			{
-				class UObject* WorldContextObject;
-				class UClass* ActorClass;
-				struct FTransform SpawnTransform;
-				ESpawnActorCollisionHandlingMethod CollisionHandlingOverride;
-				class AActor* Owner;
-				class AActor* ReturnValue;
-			}params;
-			params.WorldContextObject = UWorld::GetWorld();
-			params.ActorClass = ActorClass;
-			params.SpawnTransform = SpawnTransform;
-			params.CollisionHandlingOverride = CollisionHandlingOverride;
-			params.Owner = Owner;
-			UObject::ProcessEvent(fn, &params);
-			return params.ReturnValue;
-		};
+		static class AActor* BeginDeferredActorSpawnFromClass(class UClass* ActorClass, const struct FTransform& SpawnTransform, ESpawnActorCollisionHandlingMethod CollisionHandlingOverride, class AActor* Owner);
 
-		class FString GetCurrentLevelName(bool bRemovePrefixString)
-		{
-			static auto fn = UObject::FindObject<UFunction>("Function Engine.GameplayStatics.GetCurrentLevelName");
-			struct
-			{
-				class UObject* WorldContextObject;
-				bool bRemovePrefixString;
-				class FString ReturnValue;
-			}params;
-			params.WorldContextObject = UWorld::GetWorld();
-			params.bRemovePrefixString = bRemovePrefixString;
-			UObject::ProcessEvent(fn, &params);
-			return params.ReturnValue;
-		}
+		static class FString GetCurrentLevelName(bool bRemovePrefixString);
+
+		static class AGameState* GetGameState();
+		static class AGameMode* GetGameMode();
+		static class UGameInstance* GetGameInstance();
+		static class APawn* GetPlayerPawn(int PlayerIndex);
+		static class APlayerController* GetPlayerController(int PlayerIndex);
+
+		static void ExecuteConsoleCommand(const class FString& Command, class APlayerController* SpecificPlayer);
 
 		static UClass* StaticClass()
 		{
 			static auto ptr = UObject::FindClass("Class Engine.GameplayStatics");
 			return ptr;
 		}
+	};
+
+	static UE4::UEProperty* _dummy_foobar = nullptr;
+	template<typename T>
+	bool GetVariable(UE4::UObject* Object, std::string Name, T& Variable, UE4::UEProperty*& Property = _dummy_foobar)
+	{
+		UE4::UClass* ObjectClass = Object->GetClass();
+		if (GameProfile::SelectedGameProfile.bIsFProperty)
+		{
+			auto Children = (UE4::FField*)ObjectClass->GetChildren();
+			bool VarFound = false;
+			while (!VarFound)
+			{
+				if (!Children)
+					break;
+				if (Children->GetName() == Name)
+				{
+					VarFound = true;
+					auto varProperty = (UE4::UEProperty*)Children;
+					Property = varProperty;
+					Variable= Read<T>((byte*)Object + varProperty->GetOffset());
+					return true;
+				}
+				Children = Children->GetNext();
+			}
+			
+		}
+		else
+		{
+			auto Children = (UE4::UField*)ObjectClass->GetChildren();
+			bool VarFound = false;
+			while (!VarFound)
+			{
+				if (!Children)
+					break;
+				if (Children->GetName() == Name)
+				{
+					VarFound = true;
+					auto varProperty = (UE4::UEProperty*)Children;
+					Property = varProperty;
+					Variable = Read<T>((byte*)Object + varProperty->GetOffset());
+					return true;
+				}
+				Children = Children->GetNext();
+			}
+		}
+		return false;
+	}
+
+	template<typename T>
+	bool SetVariable(UE4::UObject* Object, std::string Name, T Value)
+	{
+		UE4::UClass* ObjectClass = Object->GetClass();
+		if (GameProfile::SelectedGameProfile.bIsFProperty)
+		{
+			auto Children = (UE4::FField*)ObjectClass->GetChildren();
+			bool VarFound = false;
+			while (!VarFound)
+			{
+				if (!Children)
+					break;
+				if (Children->GetName() == Name)
+				{
+					VarFound = true;
+					auto varProperty = (UE4::UEProperty*)Children;
+					Write<T>((byte*)Object + varProperty->GetOffset(), Value);
+					return true;
+				}
+				Children = Children->GetNext();
+			}
+
+		}
+		else
+		{
+			auto Children = (UE4::UField*)ObjectClass->GetChildren();
+			bool VarFound = false;
+			while (!VarFound)
+			{
+				if (!Children)
+					break;
+				if (Children->GetName() == Name)
+				{
+					VarFound = true;
+					auto varProperty = (UE4::UEProperty*)Children;
+					Write<T>((byte*)Object + varProperty->GetOffset(), Value);
+					return true;
+				}
+				Children = Children->GetNext();
+			}
+		}
+		return false;
+	}
+
+	class FFrame
+	{
+	public:
+		char pad_0x0000[0x10]; //0x0000
+		UFunction* Node; //0x0010 
+		UObject* Object; //0x0018 
+		uint8_t* Code; //0x0020 
+		uint8_t* Locals; //0x0028
+
+		template<typename T>
+		T* GetParams() { return (T*)Locals; }
+
 	};
 }
 

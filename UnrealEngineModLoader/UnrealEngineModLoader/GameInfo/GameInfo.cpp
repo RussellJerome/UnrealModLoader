@@ -5,10 +5,9 @@
 #include <filesystem>
 #include "INI.h"
 #include "Utilities/Pattern.h"
-#include "../PakLoader.h"
+#include "../Hooks.h"
 #include "../UE4/Ue4.hpp"
 GameProfile GameProfile::SelectedGameProfile;
-Offsets defs;
 
 DWORD StringToDWord(std::string str)
 {
@@ -52,10 +51,11 @@ void SetupProfile(std::string Path)
 		FreeConsole();
 		AllocConsole();
 		freopen("CON", "w", LOG_STREAM);
-		Log::Info("Created by ~Russell.J Release V1.0.0");
+		Log::Info("Created by ~Russell.J Release V2.0.0");
 	}
 	if (std::filesystem::exists(Profile))
 	{
+		GameProfile::SelectedGameProfile.ProfileName = gamename;
 		Log::Info("Profile Detected: %s", gamename.c_str());
 		std::ifstream file("Profile");
 
@@ -65,6 +65,8 @@ void SetupProfile(std::string Path)
 		GameProfile::SelectedGameProfile.UsesFNamePool = GameInfo.getAs<int>("GameInfo", "UsesFNamePool", 0);
 		GameProfile::SelectedGameProfile.IsUsingDeferedSpawn = GameInfo.getAs<int>("GameInfo", "IsUsingDeferedSpawn", 0);
 		GameProfile::SelectedGameProfile.IsUsing4_22 = GameInfo.getAs<int>("GameInfo", "IsUsing4_22", 0);
+		GameProfile::SelectedGameProfile.bIsDefaultObjectArrayed = GameInfo.getAs<int>("GameInfo", "IsDefaultObjectArrayed", 0);
+
 		if (GameInfo.get("GameInfo", "BeginPlayOverwrite", "") != "")
 		{
 			GameProfile::SelectedGameProfile.BeginPlayOverwrite = GameInfo.get("GameInfo", "BeginPlayOverwrite", "");
@@ -155,22 +157,22 @@ void SetupProfile(std::string Path)
 
 		if (GameInfo.select("UObjectDef"))
 		{
-			defs.UObject.Index = StringToDWord(GameInfo.get("UObjectDef", "Index", ""));
-			defs.UObject.Class = StringToDWord(GameInfo.get("UObjectDef", "Class", ""));
-			defs.UObject.Name = StringToDWord(GameInfo.get("UObjectDef", "Name", ""));
-			defs.UObject.Outer = StringToDWord(GameInfo.get("UObjectDef", "Outer", ""));
+			GameProfile::SelectedGameProfile.defs.UObject.Index = StringToDWord(GameInfo.get("UObjectDef", "Index", ""));
+			GameProfile::SelectedGameProfile.defs.UObject.Class = StringToDWord(GameInfo.get("UObjectDef", "Class", ""));
+			GameProfile::SelectedGameProfile.defs.UObject.Name = StringToDWord(GameInfo.get("UObjectDef", "Name", ""));
+			GameProfile::SelectedGameProfile.defs.UObject.Outer = StringToDWord(GameInfo.get("UObjectDef", "Outer", ""));
 			
 			GameInfo.select("UFieldDef");
-			defs.UField.Next = StringToDWord(GameInfo.get("UFieldDef", "Next", ""));
+			GameProfile::SelectedGameProfile.defs.UField.Next = StringToDWord(GameInfo.get("UFieldDef", "Next", ""));
 			
 			GameInfo.select("UStructDef");
-			defs.UStruct.SuperStruct = StringToDWord(GameInfo.get("UStructDef", "SuperStruct", ""));
-			defs.UStruct.Children = StringToDWord(GameInfo.get("UStructDef", "Children", ""));
-			defs.UStruct.PropertiesSize = StringToDWord(GameInfo.get("UStructDef", "PropertiesSize", ""));
+			GameProfile::SelectedGameProfile.defs.UStruct.SuperStruct = StringToDWord(GameInfo.get("UStructDef", "SuperStruct", ""));
+			GameProfile::SelectedGameProfile.defs.UStruct.Children = StringToDWord(GameInfo.get("UStructDef", "Children", ""));
+			GameProfile::SelectedGameProfile.defs.UStruct.PropertiesSize = StringToDWord(GameInfo.get("UStructDef", "PropertiesSize", ""));
 			
 			GameInfo.select("UFunctionDef");
-			defs.UFunction.FunctionFlags = StringToDWord(GameInfo.get("UFunctionDef", "FunctionFlags", ""));
-			defs.UFunction.Func = StringToDWord(GameInfo.get("UFunctionDef", "Func", ""));
+			GameProfile::SelectedGameProfile.defs.UFunction.FunctionFlags = StringToDWord(GameInfo.get("UFunctionDef", "FunctionFlags", ""));
+			GameProfile::SelectedGameProfile.defs.UFunction.Func = StringToDWord(GameInfo.get("UFunctionDef", "Func", ""));
 			
 		}
 		else
@@ -178,17 +180,23 @@ void SetupProfile(std::string Path)
 			GameProfile::SelectedGameProfile.IsEngineDefsMissing = true;
 		}
 
-		if (GameInfo.select("UWorldDef"))
+		if (GameInfo.select("Property"))
 		{
-			defs.UWorld.PersistentLevel = StringToDWord(GameInfo.get("UWorldDef", "PersistentLevel", ""));
-			defs.UWorld.AuthorityGameMode = StringToDWord(GameInfo.get("UWorldDef", "AuthorityGameMode", ""));
-			GameInfo.select("ULevelDef");
-			defs.ULevel.WorldArray = StringToDWord(GameInfo.get("ULevelDef", "WorldArray", ""));
+			GameProfile::SelectedGameProfile.bIsFProperty = GameInfo.getAs<int>("Property", "IsFProperty", 0);
+			GameProfile::SelectedGameProfile.defs.Property.ArrayDim = StringToDWord(GameInfo.get("Property", "ArrayDim", ""));
+			GameProfile::SelectedGameProfile.defs.Property.Offset = StringToDWord(GameInfo.get("Property", "Offset", ""));
+			if (GameProfile::SelectedGameProfile.bIsFProperty)
+			{
+				GameInfo.select("FField");
+				GameProfile::SelectedGameProfile.defs.FField.Name = StringToDWord(GameInfo.get("FField", "Name", ""));
+				GameProfile::SelectedGameProfile.defs.FField.Next = StringToDWord(GameInfo.get("FField", "Next", ""));
+			}
 		}
 		else
 		{
-			GameProfile::SelectedGameProfile.IsUWorldMissing = true;
+			GameProfile::SelectedGameProfile.IsPropertyMissing = true;
 		}
+
 
 		if (GameInfo.select("FunctionInfo"))
 		{
@@ -196,33 +204,161 @@ void SetupProfile(std::string Path)
 			{
 				GameProfile::SelectedGameProfile.GameStateInit = (DWORD64)GetModuleHandleW(0) + StringToDWord(GameInfo.get("FunctionInfo", "GameStateInit", ""));
 				GameProfile::SelectedGameProfile.BeginPlay = (DWORD64)GetModuleHandleW(0) + StringToDWord(GameInfo.get("FunctionInfo", "BeginPlay", ""));
-				GameProfile::SelectedGameProfile.Say = (DWORD64)GetModuleHandleW(0) + StringToDWord(GameInfo.get("FunctionInfo", "Say", ""));
 				GameProfile::SelectedGameProfile.StaticLoadObject = (DWORD64)GetModuleHandleW(0) + StringToDWord(GameInfo.get("FunctionInfo", "StaticLoadObject", ""));
 				GameProfile::SelectedGameProfile.SpawnActorFTrans = (DWORD64)GetModuleHandleW(0) + StringToDWord(GameInfo.get("FunctionInfo", "SpawnActorFTrans", ""));
 				GameProfile::SelectedGameProfile.CallFunctionByNameWithArguments = (DWORD64)GetModuleHandleW(0) + StringToDWord(GameInfo.get("FunctionInfo", "CallFunctionByNameWithArguments", ""));
 				GameProfile::SelectedGameProfile.ProcessEvent = (DWORD64)GetModuleHandleW(0) + StringToDWord(GameInfo.get("FunctionInfo", "ProcessEvent", ""));
-				GameProfile::SelectedGameProfile.CreateDefualtObject = (DWORD64)GetModuleHandleW(0) + StringToDWord(GameInfo.get("FunctionInfo", "CreateDefualtObject", ""));
+				GameProfile::SelectedGameProfile.CreateDefaultObject = (DWORD64)GetModuleHandleW(0) + StringToDWord(GameInfo.get("FunctionInfo", "CreateDefaultObject", ""));
 				Log::Info("Function Offsets Set!");
 			}
 			else
 			{
 				GameProfile::SelectedGameProfile.GameStateInit = (DWORD64)Pattern::Find(GameInfo.get("FunctionInfo", "GameStateInit", "").c_str());
 				GameProfile::SelectedGameProfile.BeginPlay = (DWORD64)Pattern::Find(GameInfo.get("FunctionInfo", "BeginPlay", "").c_str());
-				GameProfile::SelectedGameProfile.Say = (DWORD64)Pattern::Find(GameInfo.get("FunctionInfo", "Say", "").c_str());
 				GameProfile::SelectedGameProfile.StaticLoadObject = (DWORD64)Pattern::Find(GameInfo.get("FunctionInfo", "StaticLoadObject", "").c_str());
 				GameProfile::SelectedGameProfile.SpawnActorFTrans = (DWORD64)Pattern::Find(GameInfo.get("FunctionInfo", "SpawnActorFTrans", "").c_str());
 				GameProfile::SelectedGameProfile.CallFunctionByNameWithArguments = (DWORD64)Pattern::Find(GameInfo.get("FunctionInfo", "CallFunctionByNameWithArguments", "").c_str());
 				GameProfile::SelectedGameProfile.ProcessEvent = (DWORD64)Pattern::Find(GameInfo.get("FunctionInfo", "ProcessEvent", "").c_str());
-				GameProfile::SelectedGameProfile.CreateDefualtObject = (DWORD64)Pattern::Find(GameInfo.get("FunctionInfo", "CreateDefualtObject", "").c_str());
+				GameProfile::SelectedGameProfile.CreateDefaultObject = (DWORD64)Pattern::Find(GameInfo.get("FunctionInfo", "CreateDefaultObject", "").c_str());
 				Log::Info("Function Patterns Set!");
 			}
 		}
 		else
 		{
-			Log::SetupErrorMessage("Function Information Could Not Be Found!");
+			GameProfile::SelectedGameProfile.GameStateInit = (DWORD64)Pattern::Find("40 53 48 83 EC 20 48 8B 41 10 48 8B D9 48 8B 91");
+			Log::Info("GameStateInit: 0x%p", (void*)GameProfile::SelectedGameProfile.GameStateInit);
+			if (!GameProfile::SelectedGameProfile.GameStateInit)
+			{
+				Log::Error("GameStateInit NOT FOUND!");
+			}
+
+			auto BeginPlay = Pattern::Find("48 8B D9 E8 ?? ?? ?? ?? F6 83 ?? ?? ?? ?? ?? 74 12 48 8B 03");
+			BeginPlay += 0x3;
+			if (BeginPlay != nullptr)
+			{
+				GameProfile::SelectedGameProfile.BeginPlay = (DWORD64)MEM::GetAddressPTR(BeginPlay, 0x1, 0x5);
+				Log::Info("AActor::BeginPlay: 0x%p", (void*)GameProfile::SelectedGameProfile.BeginPlay);
+			}
+			else
+			{
+				Log::Error("AActor::BeginPlay NOT FOUND!");
+			}
+
+			auto StaticLoadObject = Pattern::Find("89 64 24 ? 48 8B C8 E8 ? ? ? ? 41 BE ? ? ? ? EB 05 E8"); // Sig 1
+			if (StaticLoadObject != nullptr)
+			{
+				StaticLoadObject += 0x7;
+			}
+			else
+			{
+				StaticLoadObject = Pattern::Find("C7 44 24 ? ? ? ? ? E8 ? ? ? ? 48 8B 8D ? ? ? ? 48 85 C9 74 05 E8 ? ? ? ? 45 33 C9 ? 89 74 24");
+				if (StaticLoadObject != nullptr)
+				{
+					StaticLoadObject += 0x8;
+				}
+				else
+				{
+					StaticLoadObject = Pattern::Find("89 6C 24 20 48 8B C8 E8 ? ? ? ? 48 8B 4C 24 ? 48 8B F0 48 85 C9 74 05");
+					if (StaticLoadObject != nullptr)
+					{
+						StaticLoadObject += 0x7;
+					}
+					else
+					{
+						if (StaticLoadObject = Pattern::Find("48 8B C8 89 5C 24 20 E8 ? ? ? ? 48"))
+						{
+							StaticLoadObject += 0x7;
+						}
+						else
+						{
+							Log::Error("StaticLoadObject NOT FOUND!");
+						}
+					}
+				}
+			}
+			GameProfile::SelectedGameProfile.StaticLoadObject = (DWORD64)MEM::GetAddressPTR(StaticLoadObject, 0x1, 0x5);
+
+			Log::Info("StaticLoadObject: 0x%p", (void*)GameProfile::SelectedGameProfile.StaticLoadObject);
+
+			auto SpawnActorFTrans = Pattern::Find("4C 8B C6 48 8B C8 48 8B D3 E8 ? ? ? ? 48 8B 5C 24 ? 48 8B 74 24");
+			if (SpawnActorFTrans != nullptr)
+			{
+				SpawnActorFTrans += 0x9;
+			}
+			else
+			{
+				SpawnActorFTrans = Pattern::Find("4C 8B CE 4C 8D 44 24 ? 48 8B D7 48 8B CB E8 ? ? ? ? 48 8B 4C 24 ? 48 33 CC");
+				if (SpawnActorFTrans != nullptr)
+				{
+					SpawnActorFTrans += 0xE;
+				}
+				else
+				{
+					Log::Error("SpawnActorFTrans NOT FOUND!");
+				}
+			}
+
+			GameProfile::SelectedGameProfile.SpawnActorFTrans = (DWORD64)MEM::GetAddressPTR(SpawnActorFTrans, 0x1, 0x5);
+			Log::Info("UWorld::SpawnActor: 0x%p", (void*)GameProfile::SelectedGameProfile.SpawnActorFTrans);
+
+			auto CallFunctionByNameWithArguments = Pattern::Find("8B ? E8 ? ? ? ? ? 0A E8 FF ? EB 9E ? 8B");
+			if (CallFunctionByNameWithArguments != nullptr)
+			{
+				CallFunctionByNameWithArguments += 0x2;
+				GameProfile::SelectedGameProfile.CallFunctionByNameWithArguments = (DWORD64)MEM::GetAddressPTR(CallFunctionByNameWithArguments, 0x1, 0x5);
+			}
+			else
+			{
+				CallFunctionByNameWithArguments = Pattern::Find("49 8B D4 E8 ? ? ? ? 44 0A F8 FF C3 EB 9A");
+				if (CallFunctionByNameWithArguments != nullptr)
+				{
+					CallFunctionByNameWithArguments += 0x3;
+					GameProfile::SelectedGameProfile.CallFunctionByNameWithArguments = (DWORD64)MEM::GetAddressPTR(CallFunctionByNameWithArguments, 0x1, 0x5);
+				}
+				else
+				{
+					Log::Error("CallFunctionByNameWithArguments NOT FOUND!");
+				}
+			}
+			Log::Info("CallFunctionByNameWithArguments: 0x%p", (void*)GameProfile::SelectedGameProfile.CallFunctionByNameWithArguments);
+
+			auto ProcessEvent = Pattern::Find("75 0E ? ? ? 48 ? ? 48 ? ? E8 ? ? ? ? 48 8B ? 24 ? 48 8B ? 24 38 48 8B ? 24 40");
+			ProcessEvent += 0xB;
+			if (ProcessEvent != nullptr)
+			{
+				GameProfile::SelectedGameProfile.ProcessEvent = (DWORD64)MEM::GetAddressPTR(ProcessEvent, 0x1, 0x5);
+				Log::Info("UObject::ProcessEvent: 0x%p", (void*)GameProfile::SelectedGameProfile.ProcessEvent);
+			}
+			else
+			{
+				Log::Error("ProcessEvent NOT FOUND!");
+			}
+
+			GameProfile::SelectedGameProfile.CreateDefaultObject = (DWORD64)Pattern::Find("4C 8B DC 57 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 84 24 ? ? ? ? 48 83 B9 ? ? ? ? ? 48 8B F9 ");
+			if (!GameProfile::SelectedGameProfile.CreateDefaultObject)
+			{
+				//FallBack 1
+				GameProfile::SelectedGameProfile.CreateDefaultObject = (DWORD64)Pattern::Find("4C 8B DC 55 53 49 8D AB ? ? ? ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 48 83 B9 ? ? ? ? ? 48 8B D9 0F 85");
+				if (!GameProfile::SelectedGameProfile.CreateDefaultObject)
+				{
+					//FallBack 2
+					GameProfile::SelectedGameProfile.CreateDefaultObject = (DWORD64)Pattern::Find("4C 8B DC 53 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 84 24 ? ? ? ? 48 83 B9");
+					if (!GameProfile::SelectedGameProfile.CreateDefaultObject)
+					{
+						//Final FallBack
+						GameProfile::SelectedGameProfile.CreateDefaultObject = (DWORD64)Pattern::Find("4C 8B DC ?? ?? ?? ?? ?? ? ? ? ? ?? ?? ?? ? ? ? ? ?? ?? ?? ? ? ? ? ?? ?? ?? 48 ?? ?? ? ? ? ? ?? ?? ?? ? ? ? ? ? ?? ?? ?? ?? ?? ? ? ? ? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ? ? ? ? ?? 8B ?? ? ? ? ? ?? ?? ?? ?? ?? ?? 8B ?? ?? ?? ?? ?? ?? ? ? ? ? ?? ?? ?? ? ? ? ? ?? ?? ?? ?? ?? ?? ? ? ? ? ?? ?? ?? ?? ?? ? ? ? ? ?? ?? ? ? ? ? ?? ?? ?? 48");
+						if (!GameProfile::SelectedGameProfile.CreateDefaultObject)
+						{
+							GameProfile::SelectedGameProfile.bIsDefaultObjectArrayed = true;
+							Log::Warn("CreateDefualtObject NOT FOUND!, Will Use Object Array Instead!");
+						}
+					}
+				}
+			}
+			Log::Info("UClass::CreateDefualtObject: 0x%p", (void*)GameProfile::SelectedGameProfile.CreateDefaultObject);
 		}
 		Log::Info("Setup %s", gamename.c_str());
-		PakLoader::SetupLoader();
+		Hooks::SetupHooks();
 	}
 	else
 	{

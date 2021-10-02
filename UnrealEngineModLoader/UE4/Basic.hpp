@@ -90,11 +90,6 @@ public:
 		return NumElements;
 	}
 
-	/*enum
-	{
-		NumElementsPerChunk = 64 * 1024,
-	};*/
-
 	inline FUObjectItem const* GetObjectPtr(int Index) const
 	{
 		auto ElementsPerChunk = MaxElements / MaxChunks;
