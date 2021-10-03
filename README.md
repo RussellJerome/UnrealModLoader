@@ -1,15 +1,15 @@
-# Unreal Engine Mod Loader Development Branch
+# Unreal Engine Mod Loader
 A tool used to load Blueprint and basic SDK based C++ Mods for Unreal Engine 4 games
-
-# WARNING
-This branch of the Unreal Mod Loader is currently under development and is NOT stable. Use this version at your own risk.
 
 # DISCLAIMER
 This software is provided by the author "as is". In no event shall the author be liable for any direct, indirect, incidental, special, exemplary, or consequential damages (including, but not limited to procurement of substitute goods or services; loss of use, data, or profits; or business interruption) however caused and on any 
 theory of liability, whether in contract, strict liability, or tort (including negligence or otherwise) arising in any way out of the use of this software, even if advised of the possibility of such damage.
 
+# Discord
+If you have any problems, or just want to provide feedback click [here](https://discord.gg/xmXUSNvypY)
+
 # Docs
-All video documentation and guides can be found [here](https://www.youtube.com/channel/UCrMwqkaPAc4OZCe1FDtik3g).
+All video documentation and guides can be found [here](https://www.youtube.com/playlist?list=PL-dFOLrGFgdwbzcHmZ2ghuN3LXxlazbZP).
 
 # Extra Info
 	* You can enable or disable the mod loader output console via the ini (NOTE: This is not related to the UE4 Console.)
