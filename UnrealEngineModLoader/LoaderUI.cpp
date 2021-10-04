@@ -103,33 +103,41 @@ void UILogicTick()
 
 HRESULT LoaderUI::LoaderResizeBuffers(IDXGISwapChain* pSwapChain, UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT NewFormat, UINT SwapChainFlags)
 {
-	if (LoaderUI::GetUI()->pRenderTargetView) {
-		LoaderUI::GetUI()->pContext->OMSetRenderTargets(0, 0, 0);
-		LoaderUI::GetUI()->pRenderTargetView->Release();
+	if (!LoaderUI::GetUI()->initRendering)
+	{
+		if (LoaderUI::GetUI()->pRenderTargetView) {
+			LoaderUI::GetUI()->pContext->OMSetRenderTargets(0, 0, 0);
+			LoaderUI::GetUI()->pRenderTargetView->Release();
+		}
+
+		HRESULT hr = ResizeBuffers(pSwapChain, BufferCount, Width, Height, NewFormat, SwapChainFlags);
+
+		ID3D11Texture2D* pBuffer;
+		pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&pBuffer);
+		// Perform error handling here!
+
+		LoaderUI::GetUI()->pDevice->CreateRenderTargetView(pBuffer, NULL, &LoaderUI::GetUI()->pRenderTargetView);
+		// Perform error handling here!
+		pBuffer->Release();
+
+		LoaderUI::GetUI()->pContext->OMSetRenderTargets(1, &LoaderUI::GetUI()->pRenderTargetView, NULL);
+
+		// Set up the viewport.
+		D3D11_VIEWPORT vp;
+		vp.Width = Width;
+		vp.Height = Height;
+		vp.MinDepth = 0.0f;
+		vp.MaxDepth = 1.0f;
+		vp.TopLeftX = 0;
+		vp.TopLeftY = 0;
+		LoaderUI::GetUI()->pContext->RSSetViewports(1, &vp);
+		return hr;
 	}
-
-	HRESULT hr = ResizeBuffers(pSwapChain, BufferCount, Width, Height, NewFormat, SwapChainFlags);
-
-	ID3D11Texture2D* pBuffer;
-	pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&pBuffer);
-	// Perform error handling here!
-
-	LoaderUI::GetUI()->pDevice->CreateRenderTargetView(pBuffer, NULL, &LoaderUI::GetUI()->pRenderTargetView);
-	// Perform error handling here!
-	pBuffer->Release();
-
-	LoaderUI::GetUI()->pContext->OMSetRenderTargets(1, &LoaderUI::GetUI()->pRenderTargetView, NULL);
-
-	// Set up the viewport.
-	D3D11_VIEWPORT vp;
-	vp.Width = Width;
-	vp.Height = Height;
-	vp.MinDepth = 0.0f;
-	vp.MaxDepth = 1.0f;
-	vp.TopLeftX = 0;
-	vp.TopLeftY = 0;
-	LoaderUI::GetUI()->pContext->RSSetViewports(1, &vp);
-	return hr;
+	else
+	{
+		HRESULT hr = ResizeBuffers(pSwapChain, BufferCount, Width, Height, NewFormat, SwapChainFlags);
+		return hr;
+	}
 }
 
 void ShowLogicMods()
@@ -315,8 +323,6 @@ void LoaderUI::LoaderD3D11Present(IDXGISwapChain* pSwapChain, UINT SyncInterval,
 		//ImGui_ImplDX11_CreateDeviceObjects();
 		ImGui_ImplDX11_Init(LoaderUI::GetUI()->pDevice, LoaderUI::GetUI()->pContext);
 
-		MinHook::Add((DWORD64)LoaderUI::GetUI()->pSwapChainVtable[13], &hookResizeBuffers, &LoaderUI::GetUI()->ResizeBuffers, "DX11-ResizeBuffers");
-
 		LoaderUI::GetUI()->initRendering = false;
 	}
 
@@ -482,6 +488,7 @@ DWORD __stdcall InitDX11Hook(LPVOID)
 	LoaderUI::GetUI()->pSwapChainVtable = (DWORD_PTR*)pSwapChain;
 	LoaderUI::GetUI()->pSwapChainVtable = (DWORD_PTR*)LoaderUI::GetUI()->pSwapChainVtable[0];
 	LoaderUI::GetUI()->phookD3D11Present = (LoaderUI::D3D11PresentHook)LoaderUI::GetUI()->pSwapChainVtable[8];
+	MinHook::Add((DWORD64)LoaderUI::GetUI()->pSwapChainVtable[13], &hookResizeBuffers, &LoaderUI::GetUI()->ResizeBuffers, "DX11-ResizeBuffers");
 	MinHook::Add((DWORD64)LoaderUI::GetUI()->phookD3D11Present, &hookD3D11Present, &D3D11Present, "DX11-Present");
 
 	DWORD dPresentwOld;
