@@ -221,7 +221,6 @@ void ShowCoreMods()
 	}
 }
 
-
 void ShowTools()
 {
 	if (!ImGui::CollapsingHeader("Tools"))
