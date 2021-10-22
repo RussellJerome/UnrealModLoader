@@ -169,12 +169,12 @@ namespace Hooks
 									}
 									ModActor->CallFunctionByNameWithArguments(L"PreBeginPlay", nullptr, NULL, true);
 									
-									Log::Info("Sucessfully Loaded %s", str);
+									Log::Info("Sucessfully Loaded %s", str.c_str());
 								}
 							}
 							else
 							{
-								Log::Info("Could not locate ModActor for %s", str);
+								Log::Info("Could not locate ModActor for %s", str.c_str());
 							}
 						}
 					}
