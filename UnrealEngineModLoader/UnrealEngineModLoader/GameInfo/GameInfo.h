@@ -71,6 +71,8 @@ public:
 
 	bool bIsDefaultObjectArrayed;
 
+	bool bDelayGUISpawn;
+
 	Offsets defs;
 
 	static GameProfile SelectedGameProfile;

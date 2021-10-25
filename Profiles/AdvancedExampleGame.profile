@@ -16,6 +16,9 @@
 #UE4.22 changes the namepool weird, only set this to 1 if the game uses 4.22
 #IsUsing4_22=0
 
+#If you get any Direct X errors such as resizing, enable this to delay the hook and prevent most issues.
+#DelayGUISpawn=1
+
 #GName, GWorld, and GObject patterns with op code (EXAMPLE BELOW, FILL OUT PATTERNS YOURSELF IF NEEDED)
 #[GInfo]
 

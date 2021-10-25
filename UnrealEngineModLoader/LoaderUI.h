@@ -44,6 +44,10 @@ public:
 	static LoaderUI* GetUI();
 
 	bool initRendering = true;
+
+	static void HookDX();
+
+	bool IsDXHooked;
 	
 private:
 	static LoaderUI* UI;

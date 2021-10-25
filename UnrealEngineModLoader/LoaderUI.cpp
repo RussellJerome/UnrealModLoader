@@ -3,6 +3,7 @@
 #include "Memory/mem.h"
 #include "Utilities/Dumper.h"
 #include "Utilities/Globals.h"
+#include "Utilities/MinHook.h"
 
 LoaderUI* LoaderUI::UI;
 
@@ -64,6 +65,10 @@ void UILogicTick()
 			}
 			else
 			{
+				if (!LoaderUI::GetUI()->IsDXHooked)
+				{
+					LoaderUI::HookDX();
+				}
 				Global::bIsMenuOpen = true;
 			}
 		}
@@ -98,33 +103,41 @@ void UILogicTick()
 
 HRESULT LoaderUI::LoaderResizeBuffers(IDXGISwapChain* pSwapChain, UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT NewFormat, UINT SwapChainFlags)
 {
-	if (LoaderUI::GetUI()->pRenderTargetView) {
-		LoaderUI::GetUI()->pContext->OMSetRenderTargets(0, 0, 0);
-		LoaderUI::GetUI()->pRenderTargetView->Release();
+	if (!LoaderUI::GetUI()->initRendering)
+	{
+		if (LoaderUI::GetUI()->pRenderTargetView) {
+			LoaderUI::GetUI()->pContext->OMSetRenderTargets(0, 0, 0);
+			LoaderUI::GetUI()->pRenderTargetView->Release();
+		}
+
+		HRESULT hr = ResizeBuffers(pSwapChain, BufferCount, Width, Height, NewFormat, SwapChainFlags);
+
+		ID3D11Texture2D* pBuffer;
+		pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&pBuffer);
+		// Perform error handling here!
+
+		LoaderUI::GetUI()->pDevice->CreateRenderTargetView(pBuffer, NULL, &LoaderUI::GetUI()->pRenderTargetView);
+		// Perform error handling here!
+		pBuffer->Release();
+
+		LoaderUI::GetUI()->pContext->OMSetRenderTargets(1, &LoaderUI::GetUI()->pRenderTargetView, NULL);
+
+		// Set up the viewport.
+		D3D11_VIEWPORT vp;
+		vp.Width = Width;
+		vp.Height = Height;
+		vp.MinDepth = 0.0f;
+		vp.MaxDepth = 1.0f;
+		vp.TopLeftX = 0;
+		vp.TopLeftY = 0;
+		LoaderUI::GetUI()->pContext->RSSetViewports(1, &vp);
+		return hr;
 	}
-
-	HRESULT hr = ResizeBuffers(pSwapChain, BufferCount, Width, Height, NewFormat, SwapChainFlags);
-
-	ID3D11Texture2D* pBuffer;
-	pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&pBuffer);
-	// Perform error handling here!
-
-	LoaderUI::GetUI()->pDevice->CreateRenderTargetView(pBuffer, NULL, &LoaderUI::GetUI()->pRenderTargetView);
-	// Perform error handling here!
-	pBuffer->Release();
-
-	LoaderUI::GetUI()->pContext->OMSetRenderTargets(1, &LoaderUI::GetUI()->pRenderTargetView, NULL);
-
-	// Set up the viewport.
-	D3D11_VIEWPORT vp;
-	vp.Width = Width;
-	vp.Height = Height;
-	vp.MinDepth = 0.0f;
-	vp.MaxDepth = 1.0f;
-	vp.TopLeftX = 0;
-	vp.TopLeftY = 0;
-	LoaderUI::GetUI()->pContext->RSSetViewports(1, &vp);
-	return hr;
+	else
+	{
+		HRESULT hr = ResizeBuffers(pSwapChain, BufferCount, Width, Height, NewFormat, SwapChainFlags);
+		return hr;
+	}
 }
 
 void ShowLogicMods()
@@ -208,7 +221,6 @@ void ShowCoreMods()
 	}
 }
 
-
 void ShowTools()
 {
 	if (!ImGui::CollapsingHeader("Tools"))
@@ -265,6 +277,12 @@ LRESULT CALLBACK LoaderUI::hookWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 	return CallWindowProc(LoaderUI::GetUI()->hGameWindowProc, hWnd, uMsg, wParam, lParam);
 }
 
+
+HRESULT hookResizeBuffers(IDXGISwapChain* pSwapChain, UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT NewFormat, UINT SwapChainFlags)
+{
+	return LoaderUI::GetUI()->LoaderResizeBuffers(pSwapChain, BufferCount, Width, Height, NewFormat, SwapChainFlags);
+}
+
 void LoaderUI::LoaderD3D11Present(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags)
 {
 	if (LoaderUI::GetUI()->initRendering)
@@ -304,7 +322,6 @@ void LoaderUI::LoaderD3D11Present(IDXGISwapChain* pSwapChain, UINT SyncInterval,
 		//ImGui_ImplDX11_CreateDeviceObjects();
 		ImGui_ImplDX11_Init(LoaderUI::GetUI()->pDevice, LoaderUI::GetUI()->pContext);
 
-		LoaderUI::GetUI()->CreateUILogicThread();
 		LoaderUI::GetUI()->initRendering = false;
 	}
 
@@ -390,6 +407,112 @@ void LoaderUI::LoaderD3D11Present(IDXGISwapChain* pSwapChain, UINT SyncInterval,
 
 	ImGui::Render();
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+}
+
+HRESULT(*D3D11Present)(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags);
+HRESULT __stdcall hookD3D11Present(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags)
+{
+	LoaderUI::GetUI()->LoaderD3D11Present(pSwapChain, SyncInterval, Flags);
+	return D3D11Present(pSwapChain, SyncInterval, Flags);
+}
+
+DWORD __stdcall InitDX11Hook(LPVOID)
+{
+	Log::Info("Setting up D3D11Present hook");
+
+	HMODULE hDXGIDLL = 0;
+	do
+	{
+		hDXGIDLL = GetModuleHandle(L"dxgi.dll");
+		Sleep(100);
+	} while (!hDXGIDLL);
+	Sleep(100);
+
+	IDXGISwapChain* pSwapChain;
+
+	WNDCLASSEXA wc = { sizeof(WNDCLASSEX), CS_CLASSDC, DefWindowProc, 0L, 0L, GetModuleHandleA(NULL), NULL, NULL, NULL, NULL, "DX", NULL };
+	RegisterClassExA(&wc);
+
+	HWND hWnd = CreateWindowA("DX", NULL, WS_OVERLAPPEDWINDOW, 100, 100, 300, 300, NULL, NULL, wc.hInstance, NULL);
+
+	D3D_FEATURE_LEVEL requestedLevels[] = { D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_10_1 };
+	D3D_FEATURE_LEVEL obtainedLevel;
+	ID3D11Device* d3dDevice = nullptr;
+	ID3D11DeviceContext* d3dContext = nullptr;
+
+	DXGI_SWAP_CHAIN_DESC scd;
+	ZeroMemory(&scd, sizeof(scd));
+	scd.BufferCount = 1;
+	scd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	scd.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
+	scd.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+	scd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+
+	scd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
+	scd.OutputWindow = hWnd;
+	scd.SampleDesc.Count = 1;
+	scd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
+	scd.Windowed = ((GetWindowLongPtr(hWnd, GWL_STYLE) & WS_POPUP) != 0) ? false : true;
+
+	scd.BufferDesc.Width = 1;
+	scd.BufferDesc.Height = 1;
+	scd.BufferDesc.RefreshRate.Numerator = 0;
+	scd.BufferDesc.RefreshRate.Denominator = 1;
+
+	UINT createFlags = 0;
+#ifdef _DEBUG
+	createFlags |= D3D11_CREATE_DEVICE_DEBUG;
+#endif
+
+	IDXGISwapChain* d3dSwapChain = 0;
+
+	if (FAILED(D3D11CreateDeviceAndSwapChain(
+		nullptr,
+		D3D_DRIVER_TYPE_HARDWARE,
+		nullptr,
+		createFlags,
+		requestedLevels,
+		sizeof(requestedLevels) / sizeof(D3D_FEATURE_LEVEL),
+		D3D11_SDK_VERSION,
+		&scd,
+		&pSwapChain,
+		&LoaderUI::GetUI()->pDevice,
+		&obtainedLevel,
+		&LoaderUI::GetUI()->pContext)))
+	{
+		Log::Error("Failed to create D3D device and swapchain");
+		return NULL;
+	}
+
+	LoaderUI::GetUI()->pSwapChainVtable = (DWORD_PTR*)pSwapChain;
+	LoaderUI::GetUI()->pSwapChainVtable = (DWORD_PTR*)LoaderUI::GetUI()->pSwapChainVtable[0];
+	LoaderUI::GetUI()->phookD3D11Present = (LoaderUI::D3D11PresentHook)LoaderUI::GetUI()->pSwapChainVtable[8];
+	MinHook::Add((DWORD64)LoaderUI::GetUI()->pSwapChainVtable[13], &hookResizeBuffers, &LoaderUI::GetUI()->ResizeBuffers, "DX11-ResizeBuffers");
+	MinHook::Add((DWORD64)LoaderUI::GetUI()->phookD3D11Present, &hookD3D11Present, &D3D11Present, "DX11-Present");
+
+	DWORD dPresentwOld;
+	DWORD dResizeOld;
+	VirtualProtect(LoaderUI::GetUI()->phookD3D11Present, 2, PAGE_EXECUTE_READWRITE, &dPresentwOld);
+	VirtualProtect((LPVOID)LoaderUI::GetUI()->pSwapChainVtable[13], 2, PAGE_EXECUTE_READWRITE, &dResizeOld);
+
+	while (true)
+	{
+		Sleep(10);
+	}
+
+	LoaderUI::GetUI()->pDevice->Release();
+	LoaderUI::GetUI()->pContext->Release();
+	pSwapChain->Release();
+	return NULL;
+}
+
+void LoaderUI::HookDX()
+{
+	if (!LoaderUI::GetUI()->IsDXHooked)
+	{
+		CreateThread(NULL, 0, InitDX11Hook, NULL, 0, NULL);
+		LoaderUI::GetUI()->IsDXHooked = true;
+	}
 }
 
 DWORD __stdcall LogicThread(LPVOID)

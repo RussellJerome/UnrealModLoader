@@ -31,7 +31,7 @@ namespace PakLoader
 				if (modNameW.substr(modNameW.length() - 2, 2) == L"_P")
 					modNameW = modNameW.substr(0, modNameW.length() - 2);
 				std::string str(modNameW.begin(), modNameW.end());
-				Log::Info("PakModLoaded: %s", str);
+				Log::Info("PakModLoaded: %s", str.c_str());
 				ModInfo CurrentMod;
 				CurrentMod.ModName = modNameW;
 				CurrentMod.IsEnabled = true;
