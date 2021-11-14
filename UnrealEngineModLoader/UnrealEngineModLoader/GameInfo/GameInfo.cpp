@@ -51,7 +51,7 @@ void SetupProfile(std::string Path)
 		FreeConsole();
 		AllocConsole();
 		freopen("CON", "w", LOG_STREAM);
-		Log::Info("Created by ~Russell.J Release V2.0.0");
+		Log::Info("Created by ~Russell.J Release V2.0.2");
 	}
 	if (std::filesystem::exists(Profile))
 	{
