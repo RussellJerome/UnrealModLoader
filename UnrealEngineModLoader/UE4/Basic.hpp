@@ -286,16 +286,7 @@ class FNameEntry
 public:
 	inline const char* GetAnsiName() const
 	{
-		char buf[1024];
-		if (GameProfile::SelectedGameProfile.IsUsing4_22)
-		{
-			Read((byte*)this + 0xC, buf, 1024);
-		}
-		else
-		{
-			Read((byte*)this + 0x10, buf, 1024);
-		}
-		return buf;
+		return (char*)this + (GameProfile::SelectedGameProfile.IsUsing4_22 ? 0xC : 0x10);
 	}
 };
 
