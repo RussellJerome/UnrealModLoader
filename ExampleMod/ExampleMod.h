@@ -12,7 +12,7 @@ public:
 		ModVersion = "1.0.0"; // Mod Version
 		ModDescription = "HAHAHAHA MOD GO BURR"; // Mod Description
 		ModAuthors = "RussellJ"; // Mod Author
-		ModLoaderVersion = "2.0.1";
+		ModLoaderVersion = "2.1.0";
 
 		// Dont Touch The Internal Stuff
 		ModRef = this;

@@ -611,6 +611,35 @@ struct FActorSpawnParameters
 	int ObjectFlags;
 };
 
+enum EInternalObjectFlags
+{
+	None = 0,
+	ReachableInCluster = 1 << 23,
+	ClusterRoot = 1 << 24,
+	Native = 1 << 25,
+	Async = 1 << 26,
+	AsyncLoading = 1 << 27,
+	Unreachable = 1 << 28,
+	PendingKill = 1 << 29,
+	RootSet = 1 << 30,
+	GarbageCollectionKeepFlags = Native | Async | AsyncLoading,
+	AllFlags = ReachableInCluster | ClusterRoot | Native | Async | AsyncLoading | Unreachable | PendingKill | RootSet,
+};
+
+struct FStaticConstructObjectParameters
+{
+	const UClass* Class;
+	UObject* Outer;
+	FName Name;
+	unsigned int SetFlags = 0x00000000;
+	EInternalObjectFlags InternalSetFlags = EInternalObjectFlags::None;
+	bool bCopyTransientsFromClassDefaults = false;
+	bool bAssumeTemplateIsArchetype = false;
+	UObject* Template = nullptr;
+	void* InstanceGraph = nullptr;
+	void* ExternalPackage = nullptr;
+};
+
 struct FKey
 {
 	FName KeyName;

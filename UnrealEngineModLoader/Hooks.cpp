@@ -10,6 +10,7 @@
 #include "LoaderUI.h"
 bool bIsProcessInternalsHooked = false;
 bool GameStateClassInitNotRan = true;
+
 namespace Hooks
 {
 	namespace HookedFunctions
@@ -17,6 +18,11 @@ namespace Hooks
 		struct PrintStringParams
 		{
 			UE4::FString Message;
+		};
+
+		struct GetPersistentObject
+		{
+			UE4::FString ModName;
 		};
 
 		PVOID(*origProcessFunction)(UE4::UObject*, UE4::FFrame*, void* const);
@@ -30,6 +36,21 @@ namespace Hooks
 					if (msg.IsValid())
 					{
 						Log::Print("%s", msg.ToString().c_str());
+					}
+				}
+				if (Frame->Node->GetName() == "GetPersistentObject")
+				{
+					auto ModName = Frame->GetParams<GetPersistentObject>()->ModName;
+					for (size_t i = 0; i < Global::ModInfoList.size(); i++)
+					{
+						auto ModInfo = Global::ModInfoList[i];
+						if (ModName.c_str() == ModInfo.ModName)
+						{
+							if (ModInfo.PersistentObject)
+							{
+								UE4::SetVariable<UE4::UObject*>(ModInfo.CurrentModActor, "GetPersistentObjectReturnValue", ModInfo.PersistentObject);
+							}
+						}
 					}
 				}
 				Global::eventSystem.dispatchEvent("ProcessFunction", obj, Frame);
@@ -107,21 +128,18 @@ namespace Hooks
 								{
 									if (!bIsProcessInternalsHooked)
 									{
-										if (GameProfile::SelectedGameProfile.UsesFNamePool || GameProfile::SelectedGameProfile.IsUsing4_22)
+										if (!GameProfile::SelectedGameProfile.ProcessInternals)
 										{
-											DWORD64 ProcessAddy = (DWORD64)Pattern::Find("41 F6 C7 02 74 ? 4C 8B C7 48 8B ? ? 8B ? E8");
-											auto ProcessAddyOffset = *reinterpret_cast<uint32_t*>(ProcessAddy + 16);
-											GameProfile::SelectedGameProfile.ProcessInternals = (ProcessAddy + 20 + ProcessAddyOffset);
-										}
-										else
-										{
-											if (ModActor->DoesObjectContainFunction("PostBeginPlay"))
+											if (!GameProfile::SelectedGameProfile.UsesFNamePool || !GameProfile::SelectedGameProfile.IsUsing4_22)
 											{
-												GameProfile::SelectedGameProfile.ProcessInternals = (DWORD64)ModActor->GetFunction("PostBeginPlay")->GetFunction();
-											}
-											else if (ModActor->DoesObjectContainFunction("ModMenuButtonPressed"))
-											{
-												GameProfile::SelectedGameProfile.ProcessInternals = (DWORD64)ModActor->GetFunction("ModMenuButtonPressed")->GetFunction();
+												if (ModActor->DoesObjectContainFunction("PostBeginPlay"))
+												{
+													GameProfile::SelectedGameProfile.ProcessInternals = (DWORD64)ModActor->GetFunction("PostBeginPlay")->GetFunction();
+												}
+												else if (ModActor->DoesObjectContainFunction("ModMenuButtonPressed"))
+												{
+													GameProfile::SelectedGameProfile.ProcessInternals = (DWORD64)ModActor->GetFunction("ModMenuButtonPressed")->GetFunction();
+												}
 											}
 										}
 										bIsProcessInternalsHooked = true;
@@ -163,12 +181,17 @@ namespace Hooks
 														Global::ModInfoList[i].ModVersion = Version.ToString();
 													}
 												}
+												const std::wstring ModInstancePath = L"/Game/Mods/" + CurrentMod + L"/ModInstanceObject.ModInstanceObject_C";
+												UE4::UClass* ModObjectInstanceClass = UE4::UClass::LoadClassFromString(ModInstancePath.c_str(), false);
+												if (ModObjectInstanceClass)	// Check if ModInstanceObject Exists
+												{
+													Global::ModInfoList[i].PersistentObject = UE4::UObject::StaticConstructObject_Internal(ModObjectInstanceClass, UE4::UGameplayStatics::GetGameInstance(), "", 0, UE4::EInternalObjectFlags::GarbageCollectionKeepFlags, nullptr, false, nullptr, false);
+												}
 												Global::ModInfoList[i].WasInitialized = true;
 											}
 										}
 									}
 									ModActor->CallFunctionByNameWithArguments(L"PreBeginPlay", nullptr, NULL, true);
-									
 									Log::Info("Sucessfully Loaded %s", str.c_str());
 								}
 							}

@@ -13,6 +13,7 @@ struct ModInfo
 	std::string ModDescription = "No Description";
 	std::string ModVersion = "Unknown Version";
 	UE4::AActor* CurrentModActor;
+	UE4::UObject* PersistentObject;
 	bool IsEnabled;
 	bool ContainsButton;
 	bool WasInitialized;

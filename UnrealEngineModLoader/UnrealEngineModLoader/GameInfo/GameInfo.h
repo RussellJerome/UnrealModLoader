@@ -60,6 +60,8 @@ public:
 	DWORD64 SpawnActorFTrans;
 
 	DWORD64 ProcessInternals;
+	DWORD64 StaticConstructObject_Internal;
+	bool IsUsingUpdatedStaticConstruct;
 
 	DWORD64 CallFunctionByNameWithArguments;
 
