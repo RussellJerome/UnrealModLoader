@@ -67,7 +67,23 @@ namespace Hooks
 			{
 				UE4::InitSDK();
 				Log::Info("Engine Classes Loaded");
-				CoreModLoader::LoadCoreMods();
+				if (Global::CoreMods.size() > 0)
+				{
+					for (size_t i = 0; i < Global::CoreMods.size(); i++)
+					{
+						auto CurrentCoreMod = Global::CoreMods[i];
+						if (CurrentCoreMod->IsFinishedCreating)
+						{
+							Log::Info("InitializeMod Called For %s", CurrentCoreMod->ModName);
+							CurrentCoreMod->InitializeMod();
+						}
+						else
+						{
+							Log::Error("Mod %s wasnt setup in time"), CurrentCoreMod->ModName;
+						}
+					}
+				}
+
 				UE4::FTransform transform = UE4::FTransform::FTransform();
 				UE4::FActorSpawnParameters spawnParams = UE4::FActorSpawnParameters::FActorSpawnParameters();
 				if (GameProfile::SelectedGameProfile.StaticLoadObject)
@@ -249,6 +265,9 @@ namespace Hooks
 	{
 		MinHook::Init();
 		Log::Info("MinHook Setup");
+		Log::Info("Loading Core Mods");
+		CoreModLoader::LoadCoreMods();
+		Sleep(10);
 		PakLoader::ScanLoadedPaks();
 		Log::Info("ScanLoadedPaks Setup");
 		MinHook::Add(GameProfile::SelectedGameProfile.GameStateInit, &HookedFunctions::hookInitGameState, &HookedFunctions::origInitGameState, "AGameModeBase::InitGameState");
