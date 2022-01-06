@@ -72,11 +72,7 @@ bool Dumper::DumpWorldActors()
 {
 	FILE* Log = NULL;
 	std::string FileName = UE4::UGameplayStatics::GetCurrentLevelName(false).ToString() + "_Dump.txt";
-
-	//auto GameplayStatics = (UE4::UGameplayStatics*)UE4::UGameplayStatics::StaticClass()->CreateDefaultObject();
-
 	auto GameplayStatics = UE4::UObject::GetDefaultObjectFromArray<UE4::UGameplayStatics>(UE4::UGameplayStatics::StaticClass());
-	std::cout << GameplayStatics->GetFullName() << std::endl;
 	fopen_s(&Log, FileName.c_str(), "w+");
 	auto actors = UE4::UObject::GetAllObjectsOfType<UE4::AActor>(UE4::AActor::StaticClass(), true);
 	for (size_t i = 0; i < actors.size(); i++)
