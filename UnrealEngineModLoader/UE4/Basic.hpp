@@ -42,6 +42,13 @@ public:
 		return Data[i];
 	};
 
+	void Add(T InputData)
+	{
+		Data = (T*)realloc(Data, sizeof(T) * (Count + 1));
+		Data[Count++] = InputData;
+		Max = Count;
+	};
+
 	inline bool IsValidIndex(int i) const
 	{
 		return i < Num();

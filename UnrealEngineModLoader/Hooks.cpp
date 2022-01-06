@@ -74,7 +74,7 @@ namespace Hooks
 						auto CurrentCoreMod = Global::CoreMods[i];
 						if (CurrentCoreMod->IsFinishedCreating)
 						{
-							Log::Info("InitializeMod Called For %s", CurrentCoreMod->ModName);
+							Log::Info("InitializeMod Called For %s", CurrentCoreMod->ModName.c_str());
 							CurrentCoreMod->InitializeMod();
 						}
 						else
