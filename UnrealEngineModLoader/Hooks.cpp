@@ -48,7 +48,7 @@ namespace Hooks
 						{
 							if (ModInfo.PersistentObject)
 							{
-								UE4::SetVariable<UE4::UObject*>(ModInfo.CurrentModActor, "GetPersistentObjectReturnValue", ModInfo.PersistentObject);
+								UE4::SetVariable<UE4::UObject*>(obj, "GetPersistentObjectReturnValue", ModInfo.PersistentObject);
 							}
 						}
 					}
