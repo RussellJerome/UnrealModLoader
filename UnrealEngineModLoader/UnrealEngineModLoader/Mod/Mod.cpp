@@ -72,7 +72,6 @@ void Mod::CompleteModCreation()
 	{
 		Log::Warn("Mod: %s was created with a different version of the Unreal Mod Loader. This mod may be unstable.", ModName.c_str());
 	}
-	InitializeMod();
 }
 
 void Mod::InitializeMod()

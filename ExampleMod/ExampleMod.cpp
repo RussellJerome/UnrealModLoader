@@ -1,4 +1,5 @@
 #include "ExampleMod.h"
+#include "Utilities/MinHook.h"
 
 // Only Called Once, if you need to hook shit, declare some global non changing values
 void ExampleMod::InitializeMod()

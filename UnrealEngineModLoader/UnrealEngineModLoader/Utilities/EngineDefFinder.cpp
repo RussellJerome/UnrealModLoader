@@ -25,10 +25,17 @@ namespace ClassDefFinder
 	bool FindUObjectNameDefs(UE4::UObject* CoreUObject)
 	{
 		bool HasNameNotBeenFound = true;
+		bool HasHardNameCheck = false;
 		Log::Info("Scanning For UObject Name Def.");
 		while (HasNameNotBeenFound)
 		{
-			auto Name = *reinterpret_cast<UE4::FName*>((byte*)CoreUObject + GameProfile::SelectedGameProfile.defs.UObject.Name);
+			UE4::FName Name;
+			if (HasHardNameCheck == false)
+			{
+				GameProfile::SelectedGameProfile.defs.UObject.Name = 0x18;
+				HasHardNameCheck = true;
+			}
+			Name = *reinterpret_cast<UE4::FName*>((byte*)CoreUObject + GameProfile::SelectedGameProfile.defs.UObject.Name);
 			if (GameProfile::SelectedGameProfile.UsesFNamePool)
 			{
 				if (UE4::FName::GetFNamePool().IsValidIndex(Name.ComparisonIndex))
@@ -61,10 +68,22 @@ namespace ClassDefFinder
 	bool FindUObjectClassDefs(UE4::UObject* CoreUObject)
 	{
 		bool HasClassNotBeenFound = true;
+		bool HasFinishedHardCheck = false;
 		Log::Info("Scanning For UObject Class Def.");
 		while (HasClassNotBeenFound)
 		{
-			auto Class = Read<UE4::UClass*>((byte*)CoreUObject + GameProfile::SelectedGameProfile.defs.UObject.Class);
+			UE4::UClass* Class;
+			if (HasFinishedHardCheck == false)
+			{
+				GameProfile::SelectedGameProfile.defs.UObject.Class = 0x10;
+				Class = Read<UE4::UClass*>((byte*)CoreUObject + GameProfile::SelectedGameProfile.defs.UObject.Class);
+				HasFinishedHardCheck = true;
+			}
+			else
+			{
+				Class = Read<UE4::UClass*>((byte*)CoreUObject + GameProfile::SelectedGameProfile.defs.UObject.Class);
+			}
+			
 			auto ClassIndex = Class->GetIndex();
 			UE4::UObject* ClassCheck;
 			if (GameProfile::SelectedGameProfile.IsUsingFChunkedFixedUObjectArray)

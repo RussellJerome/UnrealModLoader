@@ -42,6 +42,13 @@ public:
 		return Data[i];
 	};
 
+	void Add(T InputData)
+	{
+		Data = (T*)realloc(Data, sizeof(T) * (Count + 1));
+		Data[Count++] = InputData;
+		Max = Count;
+	};
+
 	inline bool IsValidIndex(int i) const
 	{
 		return i < Num();
@@ -286,16 +293,7 @@ class FNameEntry
 public:
 	inline const char* GetAnsiName() const
 	{
-		char buf[1024];
-		if (GameProfile::SelectedGameProfile.IsUsing4_22)
-		{
-			Read((byte*)this + 0xC, buf, 1024);
-		}
-		else
-		{
-			Read((byte*)this + 0x10, buf, 1024);
-		}
-		return buf;
+		return (char*)this + (GameProfile::SelectedGameProfile.IsUsing4_22 ? 0xC : 0x10);
 	}
 };
 
@@ -618,6 +616,35 @@ struct FActorSpawnParameters
 	int	bDeferConstruction : 1;
 	int	bAllowDuringConstructionScript : 1;
 	int ObjectFlags;
+};
+
+enum EInternalObjectFlags
+{
+	None = 0,
+	ReachableInCluster = 1 << 23,
+	ClusterRoot = 1 << 24,
+	Native = 1 << 25,
+	Async = 1 << 26,
+	AsyncLoading = 1 << 27,
+	Unreachable = 1 << 28,
+	PendingKill = 1 << 29,
+	RootSet = 1 << 30,
+	GarbageCollectionKeepFlags = Native | Async | AsyncLoading,
+	AllFlags = ReachableInCluster | ClusterRoot | Native | Async | AsyncLoading | Unreachable | PendingKill | RootSet,
+};
+
+struct FStaticConstructObjectParameters
+{
+	const UClass* Class;
+	UObject* Outer;
+	FName Name;
+	unsigned int SetFlags = 0x00000000;
+	EInternalObjectFlags InternalSetFlags = EInternalObjectFlags::None;
+	bool bCopyTransientsFromClassDefaults = false;
+	bool bAssumeTemplateIsArchetype = false;
+	UObject* Template = nullptr;
+	void* InstanceGraph = nullptr;
+	void* ExternalPackage = nullptr;
 };
 
 struct FKey
