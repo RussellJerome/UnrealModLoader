@@ -9,11 +9,17 @@ void ExampleMod::InitializeMod()
 	//UseMenuButton = true; // Allows Mod Loader To Show Button
 }
 
+void WriteToFile(UE4::FString FilePath, UE4::FString Contents)
+{
+
+}
+
 void ExampleMod::ProcessFunction(UE4::UObject* obj, UE4::FFrame* Frame)
 {
 	if (obj)
 	{
 		//if(obj == ModActor) // Checks If the actor calling this function is your Mod Actor Function
+		PROPERFUNCTION(WriteToFile);
 	}
 }
 

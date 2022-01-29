@@ -59,9 +59,9 @@ void UILogicTick()
 		else if (TickVars::f1_pressed)
 		{
 			TickVars::f1_pressed = false;
-			if (Global::bIsMenuOpen)
+			if (Global::GetGlobals()->bIsMenuOpen)
 			{
-				Global::bIsMenuOpen = false;
+				Global::GetGlobals()->bIsMenuOpen = false;
 			}
 			else
 			{
@@ -69,7 +69,7 @@ void UILogicTick()
 				{
 					LoaderUI::HookDX();
 				}
-				Global::bIsMenuOpen = true;
+				Global::GetGlobals()->bIsMenuOpen = true;
 			}
 		}
 
@@ -145,33 +145,33 @@ void ShowLogicMods()
 	if (!ImGui::CollapsingHeader("Logic Mods"))
 		return;
 
-	for (size_t i = 0; i < Global::ModInfoList.size(); i++)
+	for (size_t i = 0; i < Global::GetGlobals()->ModInfoList.size(); i++)
 	{
-		std::string str(Global::ModInfoList[i].ModName.begin(), Global::ModInfoList[i].ModName.end());
+		std::string str(Global::GetGlobals()->ModInfoList[i].ModName.begin(), Global::GetGlobals()->ModInfoList[i].ModName.end());
 		std::string ModLabel = str + "##" + std::to_string(i);
 		if (ImGui::TreeNode(ModLabel.c_str()))
 		{
-			std::string Author = "Created By: " + Global::ModInfoList[i].ModAuthor;
+			std::string Author = "Created By: " + Global::GetGlobals()->ModInfoList[i].ModAuthor;
 			ImGui::Text(Author.c_str());
 			ImGui::Separator();
-			std::string Description = "Description: " + Global::ModInfoList[i].ModDescription;
+			std::string Description = "Description: " + Global::GetGlobals()->ModInfoList[i].ModDescription;
 			ImGui::Text(Description.c_str());
 			ImGui::Separator();
-			std::string Version = "Version: " + Global::ModInfoList[i].ModVersion;
+			std::string Version = "Version: " + Global::GetGlobals()->ModInfoList[i].ModVersion;
 			ImGui::Text(Version.c_str());
 			ImGui::Separator();
 			if (ImGui::TreeNode("Mod Buttons"))
 			{
-				if (Global::ModInfoList[i].IsEnabled && Global::ModInfoList[i].CurrentModActor && Global::ModInfoList[i].ContainsButton)
+				if (Global::GetGlobals()->ModInfoList[i].IsEnabled && Global::GetGlobals()->ModInfoList[i].CurrentModActor && Global::GetGlobals()->ModInfoList[i].ContainsButton)
 				{
-					for (size_t bi = 0; bi < Global::ModInfoList[i].ModButtons.size(); bi++)
+					for (size_t bi = 0; bi < Global::GetGlobals()->ModInfoList[i].ModButtons.size(); bi++)
 					{
-						auto currentmodbutton = Global::ModInfoList[i].ModButtons[bi];
+						auto currentmodbutton = Global::GetGlobals()->ModInfoList[i].ModButtons[bi];
 						std::string ButtonLabel = currentmodbutton + "##" + std::to_string(i + bi);
 						if (ImGui::Button(ButtonLabel.c_str()))
 						{
 							std::wstring FuncNameAndArgs = L"ModMenuButtonPressed " + std::to_wstring(bi);
-							Global::ModInfoList[i].CurrentModActor->CallFunctionByNameWithArguments(FuncNameAndArgs.c_str(), nullptr, NULL, true);
+							Global::GetGlobals()->ModInfoList[i].CurrentModActor->CallFunctionByNameWithArguments(FuncNameAndArgs.c_str(), nullptr, NULL, true);
 						}
 					}
 					ImGui::Separator();
@@ -179,7 +179,7 @@ void ShowLogicMods()
 				ImGui::TreePop();
 			}
 			std::string ActiveLabel = "Enable##" + std::to_string(i);
-			ImGui::Checkbox(ActiveLabel.c_str(), &Global::ModInfoList[i].IsEnabled);
+			ImGui::Checkbox(ActiveLabel.c_str(), &Global::GetGlobals()->ModInfoList[i].IsEnabled);
 			ImGui::TreePop();
 		}
 	}
@@ -190,29 +190,29 @@ void ShowCoreMods()
 	if (!ImGui::CollapsingHeader("Core Mods"))
 		return;
 
-	for (size_t i = 0; i < Global::CoreMods.size(); i++)
+	for (size_t i = 0; i < Global::GetGlobals()->CoreMods.size(); i++)
 	{
-		std::string str(Global::CoreMods[i]->ModName.begin(), Global::CoreMods[i]->ModName.end());
+		std::string str(Global::GetGlobals()->CoreMods[i]->ModName.begin(), Global::GetGlobals()->CoreMods[i]->ModName.end());
 		std::string ModLabel = str + "##cm" + std::to_string(i);
 		if (ImGui::TreeNode(ModLabel.c_str()))
 		{
 
-			std::string Author = "Created By: " + Global::CoreMods[i]->ModAuthors;
+			std::string Author = "Created By: " + Global::GetGlobals()->CoreMods[i]->ModAuthors;
 			ImGui::Text(Author.c_str());
 			ImGui::Separator();
-			std::string Description = "Description: " + Global::CoreMods[i]->ModDescription;
+			std::string Description = "Description: " + Global::GetGlobals()->CoreMods[i]->ModDescription;
 			ImGui::Text(Description.c_str());
 			ImGui::Separator();
-			std::string Version = "Version: " + Global::CoreMods[i]->ModVersion;
+			std::string Version = "Version: " + Global::GetGlobals()->CoreMods[i]->ModVersion;
 			ImGui::Text(Version.c_str());
 			ImGui::Separator();
 
-			if (Global::CoreMods[i]->UseMenuButton && Global::CoreMods[i]->IsFinishedCreating)
+			if (Global::GetGlobals()->CoreMods[i]->UseMenuButton && Global::GetGlobals()->CoreMods[i]->IsFinishedCreating)
 			{
 				std::string ButtonLabel = str + " Button" + "##cm" + std::to_string(i);
 				if (ImGui::Button(ButtonLabel.c_str()))
 				{
-					Global::CoreMods[i]->OnModMenuButtonPressed();
+					Global::GetGlobals()->CoreMods[i]->OnModMenuButtonPressed();
 				}
 			}
 
@@ -258,7 +258,7 @@ void DrawImGui()
 {
 	ImGui::Begin("Unreal Mod Loader", NULL, NULL);
 	ImGui::Spacing();
-	ImGui::Text("Unreal Mod Loader V: %s", Global::Version.c_str());
+	ImGui::Text("Unreal Mod Loader V: %s", Global::GetGlobals()->Version.c_str());
 	ShowLogicMods();
 	ShowCoreMods();
 	ShowTools();
@@ -333,8 +333,8 @@ void LoaderUI::LoaderD3D11Present(IDXGISwapChain* pSwapChain, UINT SyncInterval,
 	ImGui_ImplDX11_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
-	ImGui::GetIO().MouseDrawCursor = Global::bIsMenuOpen;
-	if (Global::bIsMenuOpen)
+	ImGui::GetIO().MouseDrawCursor = Global::GetGlobals()->bIsMenuOpen;
+	if (Global::GetGlobals()->bIsMenuOpen)
 	{
 		/*
 		* STYLE
@@ -402,7 +402,7 @@ void LoaderUI::LoaderD3D11Present(IDXGISwapChain* pSwapChain, UINT SyncInterval,
 		style->TabRounding = 0.0f;
 		style->WindowRounding = 4.0f;
 		DrawImGui();
-		Global::eventSystem.dispatchEvent("DrawImGui");
+		Global::GetGlobals()->eventSystem.dispatchEvent("DrawImGui");
 	}
 
 	ImGui::Render();

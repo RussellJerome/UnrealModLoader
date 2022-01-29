@@ -12,25 +12,29 @@ struct ModInfo
 	std::string ModAuthor = "Unknown Author";
 	std::string ModDescription = "No Description";
 	std::string ModVersion = "Unknown Version";
-	UE4::AActor* CurrentModActor;
-	UE4::UObject* PersistentObject;
-	bool IsEnabled;
-	bool ContainsButton;
-	bool WasInitialized;
+	UE4::AActor* CurrentModActor = nullptr;
+	UE4::UObject* PersistentObject = nullptr;
+	bool IsEnabled = 0;
+	bool ContainsButton = 0;
+	bool WasInitialized = 0;
 	std::vector<std::string> ModButtons;
 };
 
 class LOADER_API Global {
 public:
-	static std::vector<ModInfo> ModInfoList;
-	static std::string GameName;
-	static bool bIsMenuOpen;
-	static std::string Version;
-	static std::vector<class Mod*> CoreMods;
-	static EventDispatcher eventSystem;
+	std::vector<ModInfo> ModInfoList;
+	std::string GameName;
+	bool bIsMenuOpen;
+	std::string Version = "2.1.0";
+	std::vector<class Mod*> CoreMods;
+	EventDispatcher eventSystem;
 
-	static void AddToCoreMods(Mod* mod)
+	static Global* GetGlobals();
+
+	void AddToCoreMods(Mod* mod)
 	{
 		CoreMods.push_back(mod);
 	}
+private:
+	static Global* glb;
 };

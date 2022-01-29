@@ -40,40 +40,40 @@ class LOADER_API GameProfile
 public:
 	std::string ProfileName;
 	std::string LoaderPath;
-	int UsesFNamePool;
+	int UsesFNamePool = 0;
 	std::string BeginPlayOverwrite = "Class Engine.PlayerController";
 
-	bool IsGInfoPatterns;
-	DWORD64 GName;
-	DWORD64 GObject;
-	DWORD64 GWorld;
-	bool IsUsingDeferedSpawn;
-	bool IsUsingFChunkedFixedUObjectArray;
-	bool IsUsing4_22;
+	bool IsGInfoPatterns = false;
+	DWORD64 GName = 0x0;
+	DWORD64 GObject = 0x0;
+	DWORD64 GWorld = 0x0;
+	bool IsUsingDeferedSpawn = false;
+	bool IsUsingFChunkedFixedUObjectArray = false;
+	bool IsUsing4_22 = false;
 
-	bool IsFunctionPatterns;
-	DWORD64 ProcessEvent;
-	DWORD64 CreateDefaultObject;
-	DWORD64 GameStateInit;
-	DWORD64 BeginPlay;
-	DWORD64 StaticLoadObject;
-	DWORD64 SpawnActorFTrans;
+	bool IsFunctionPatterns = false;
+	DWORD64 ProcessEvent = 0x0;
+	DWORD64 CreateDefaultObject = 0x0;
+	DWORD64 GameStateInit = 0x0;
+	DWORD64 BeginPlay = 0x0;
+	DWORD64 StaticLoadObject = 0x0;
+	DWORD64 SpawnActorFTrans = 0x0;
 
-	DWORD64 ProcessInternals;
-	DWORD64 StaticConstructObject_Internal;
-	bool IsUsingUpdatedStaticConstruct;
+	DWORD64 ProcessInternals = 0x0;
+	DWORD64 StaticConstructObject_Internal = 0x0;
+	bool IsUsingUpdatedStaticConstruct = false;
 
-	DWORD64 CallFunctionByNameWithArguments;
+	DWORD64 CallFunctionByNameWithArguments = 0x0;
 
-	bool IsEngineDefsMissing;
+	bool IsEngineDefsMissing = false;
 
-	bool IsPropertyMissing;
+	bool IsPropertyMissing = false;
 
-	bool bIsFProperty;
+	bool bIsFProperty = false;
 
-	bool bIsDefaultObjectArrayed;
+	bool bIsDefaultObjectArrayed = false;
 
-	bool bDelayGUISpawn;
+	bool bDelayGUISpawn = false;
 
 	Offsets defs;
 

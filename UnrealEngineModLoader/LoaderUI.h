@@ -31,7 +31,7 @@ public:
 	float screenCenterX = 0;
 	float screenCenterY = 0;
 
-	HRESULT(*ResizeBuffers)(IDXGISwapChain*, UINT, UINT, UINT, DXGI_FORMAT, UINT);
+	HRESULT(*ResizeBuffers)(IDXGISwapChain*, UINT, UINT, UINT, DXGI_FORMAT, UINT) = NULL;
 
 	HRESULT LoaderResizeBuffers(IDXGISwapChain* pSwapChain, UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT NewFormat, UINT SwapChainFlags);
 
@@ -47,7 +47,7 @@ public:
 
 	static void HookDX();
 
-	bool IsDXHooked;
+	bool IsDXHooked = 0;
 	
 private:
 	static LoaderUI* UI;

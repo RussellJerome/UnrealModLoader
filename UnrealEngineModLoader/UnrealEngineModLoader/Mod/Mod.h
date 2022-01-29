@@ -7,6 +7,14 @@
 #include "Ue4.hpp"
 #define BPFUNCTION(Name, Frame) if(Name == Frame->Node->GetName())
 
+#define PROPERFUNCTION(Function) \
+{\
+if(&Function != nullptr);\
+} \
+//#define PROPERFUNCTION(Name) ({\
+//\
+//})
+
 class LOADER_API Mod
 {
 public:
@@ -16,9 +24,9 @@ public:
 	std::string ModDescription;
 	std::string ModAuthors;
 	std::string ModLoaderVersion;
-	bool UseMenuButton;
+	bool UseMenuButton = 0;
 	//ModInternals
-	bool IsFinishedCreating;
+	bool IsFinishedCreating = 0;
 	
 	//Used Internally to setup Hook Event System
 	void SetupHooks();

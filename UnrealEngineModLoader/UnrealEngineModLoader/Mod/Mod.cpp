@@ -56,19 +56,19 @@ void Mod::DrawImGui()
 
 void Mod::SetupHooks()
 {
-	Global::eventSystem.registerEvent(new Event<UE4::AActor*>("BeginPlay", &CallBackHandler::CallBackBeginPlay));
-	Global::eventSystem.registerEvent(new Event<>("InitGameState", &CallBackHandler::CallBackInitGameState));
-	Global::eventSystem.registerEvent(new Event<UE4::UObject*, UE4::FFrame*>("ProcessFunction", &CallBackHandler::CallBackProcessFunction));
-	Global::eventSystem.registerEvent(new Event<std::wstring, UE4::AActor*>("PostBeginPlay", &CallBackHandler::CallBackPostBeginPlay));
-	Global::eventSystem.registerEvent(new Event<>("DrawImGui", &CallBackHandler::CallBackDrawImGui));
+	Global::GetGlobals()->eventSystem.registerEvent(new Event<UE4::AActor*>("BeginPlay", &CallBackHandler::CallBackBeginPlay));
+	Global::GetGlobals()->eventSystem.registerEvent(new Event<>("InitGameState", &CallBackHandler::CallBackInitGameState));
+	Global::GetGlobals()->eventSystem.registerEvent(new Event<UE4::UObject*, UE4::FFrame*>("ProcessFunction", &CallBackHandler::CallBackProcessFunction));
+	Global::GetGlobals()->eventSystem.registerEvent(new Event<std::wstring, UE4::AActor*>("PostBeginPlay", &CallBackHandler::CallBackPostBeginPlay));
+	Global::GetGlobals()->eventSystem.registerEvent(new Event<>("DrawImGui", &CallBackHandler::CallBackDrawImGui));
 }
 
 void Mod::CompleteModCreation()
 {
 	IsFinishedCreating = true;
-	Global::AddToCoreMods(ModRef);
+	Global::GetGlobals()->AddToCoreMods(ModRef);
 	Log::Info("Core Mod Created: %s", ModName.c_str());
-	if (ModLoaderVersion != Global::Version)
+	if (ModLoaderVersion != Global::GetGlobals()->Version)
 	{
 		Log::Warn("Mod: %s was created with a different version of the Unreal Mod Loader. This mod may be unstable.", ModName.c_str());
 	}
