@@ -17,10 +17,8 @@ BPFUNCTION(WriteToFile)
 		UE4::FString NameTest;
 	};
 	auto Inputs = stack->GetInputParams<InputParams>();
-
-	std::cout << "Inputs: " << Inputs->NameTest.ToString() << std::endl;
 	stack->SetOutput<UE4::FString>("OutPutString", L"KboyGang");
-	stack->SetOutput<int>("ReturnValue", 67);
+	stack->SetOutput<bool>("ReturnValue", true);
 }
 
 void ExampleMod::ProcessFunction(UE4::UObject* obj, UE4::FFrame* Frame, void* Result)

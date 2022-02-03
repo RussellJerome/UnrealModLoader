@@ -1,4 +1,5 @@
 #include "Mod.h"
+#include "Utilities/MinHook.h"
 
 Mod* Mod::ModRef;
 
@@ -61,6 +62,7 @@ void Mod::SetupHooks()
 	Global::GetGlobals()->eventSystem.registerEvent(new Event<UE4::UObject*, UE4::FFrame*, void*>("ProcessFunction", &CallBackHandler::CallBackProcessFunction));
 	Global::GetGlobals()->eventSystem.registerEvent(new Event<std::wstring, UE4::AActor*>("PostBeginPlay", &CallBackHandler::CallBackPostBeginPlay));
 	Global::GetGlobals()->eventSystem.registerEvent(new Event<>("DrawImGui", &CallBackHandler::CallBackDrawImGui));
+	MinHook::Init();
 }
 
 void Mod::CompleteModCreation()
