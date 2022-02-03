@@ -142,5 +142,8 @@
     <ClInclude Include="ImGui\imgui_impl_dx11.h">
       <Filter>ImGui</Filter>
     </ClInclude>
+    <ClInclude Include="UnrealEngineModLoader\Utilities\Version.h">
+      <Filter>UnrealModLoader\Utilities</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

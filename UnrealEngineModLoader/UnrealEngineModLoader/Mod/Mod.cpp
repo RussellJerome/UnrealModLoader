@@ -1,5 +1,6 @@
 #include "Mod.h"
 #include "Utilities/MinHook.h"
+#include "Utilities/Version.h"
 
 Mod* Mod::ModRef;
 
@@ -62,7 +63,6 @@ void Mod::SetupHooks()
 	Global::GetGlobals()->eventSystem.registerEvent(new Event<UE4::UObject*, UE4::FFrame*, void*>("ProcessFunction", &CallBackHandler::CallBackProcessFunction));
 	Global::GetGlobals()->eventSystem.registerEvent(new Event<std::wstring, UE4::AActor*>("PostBeginPlay", &CallBackHandler::CallBackPostBeginPlay));
 	Global::GetGlobals()->eventSystem.registerEvent(new Event<>("DrawImGui", &CallBackHandler::CallBackDrawImGui));
-	MinHook::Init();
 }
 
 void Mod::CompleteModCreation()
@@ -70,7 +70,7 @@ void Mod::CompleteModCreation()
 	IsFinishedCreating = true;
 	Global::GetGlobals()->AddToCoreMods(ModRef);
 	Log::Info("Core Mod Created: %s", ModName.c_str());
-	if (ModLoaderVersion != Global::GetGlobals()->Version)
+	if (ModLoaderVersion != MODLOADER_VERSION)
 	{
 		Log::Warn("Mod: %s was created with a different version of the Unreal Mod Loader. This mod may be unstable.", ModName.c_str());
 	}

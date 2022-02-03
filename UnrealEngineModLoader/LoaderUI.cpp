@@ -4,6 +4,7 @@
 #include "Utilities/Dumper.h"
 #include "Utilities/Globals.h"
 #include "Utilities/MinHook.h"
+#include "Utilities/Version.h"
 
 LoaderUI* LoaderUI::UI;
 
@@ -258,7 +259,7 @@ void DrawImGui()
 {
 	ImGui::Begin("Unreal Mod Loader", NULL, NULL);
 	ImGui::Spacing();
-	ImGui::Text("Unreal Mod Loader V: %s", Global::GetGlobals()->Version.c_str());
+	ImGui::Text("Unreal Mod Loader V: %s", MODLOADER_VERSION);
 	ShowLogicMods();
 	ShowCoreMods();
 	ShowTools();

@@ -67,6 +67,7 @@
     <ClInclude Include="UnrealEngineModLoader\Utilities\Logger.h" />
     <ClInclude Include="UnrealEngineModLoader\Utilities\MinHook.h" />
     <ClInclude Include="UnrealEngineModLoader\Utilities\Pattern.h" />
+    <ClInclude Include="UnrealEngineModLoader\Utilities\Version.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

@@ -25,7 +25,6 @@ public:
 	std::vector<ModInfo> ModInfoList;
 	std::string GameName;
 	bool bIsMenuOpen;
-	std::string Version = "2.1.0";
 	std::vector<class Mod*> CoreMods;
 	EventDispatcher eventSystem;
 

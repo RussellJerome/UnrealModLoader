@@ -6,6 +6,9 @@ void ExampleMod::InitializeMod()
 {
 	UE4::InitSDK();
 	SetupHooks();
+
+	//MinHook::Init(); //Uncomment if you plan to do hooks
+
 	//UseMenuButton = true; // Allows Mod Loader To Show Button
 }
 

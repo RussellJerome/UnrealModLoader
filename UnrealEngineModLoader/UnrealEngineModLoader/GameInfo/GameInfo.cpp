@@ -5,6 +5,7 @@
 #include <filesystem>
 #include "INI.h"
 #include "Utilities/Pattern.h"
+#include "Utilities/Version.h"
 #include "../Hooks.h"
 #include "../UE4/Ue4.hpp"
 GameProfile GameProfile::SelectedGameProfile;
@@ -51,7 +52,7 @@ void SetupProfile(std::string Path)
 		FreeConsole();
 		AllocConsole();
 		freopen("CON", "w", LOG_STREAM);
-		Log::Info("Created by ~Russell.J Release V2.1.0");
+		Log::Info("Created by ~Russell.J Release V %s", MODLOADER_VERSION);
 	}
 	if (std::filesystem::exists(Profile))
 	{
