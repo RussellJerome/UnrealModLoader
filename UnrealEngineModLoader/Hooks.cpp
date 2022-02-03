@@ -28,11 +28,12 @@ namespace Hooks
 		PVOID(*origProcessFunction)(UE4::UObject*, UE4::FFrame*, void* const);
 		PVOID hookProcessFunction(UE4::UObject* obj, UE4::FFrame* Frame, void* const Result)
 		{
+			PVOID ret = nullptr;
 			if (!GameStateClassInitNotRan)
 			{
 				if (Frame->Node->GetName() == "PrintToModLoader")
 				{
-					auto msg = Frame->GetParams<PrintStringParams>()->Message;
+					auto msg = Frame->GetInputParams<PrintStringParams>()->Message;
 					if (msg.IsValid())
 					{
 						Log::Print("%s", msg.ToString().c_str());
@@ -40,7 +41,7 @@ namespace Hooks
 				}
 				if (Frame->Node->GetName() == "GetPersistentObject")
 				{
-					auto ModName = Frame->GetParams<GetPersistentObject>()->ModName;
+					auto ModName = Frame->GetInputParams<GetPersistentObject>()->ModName;
 					for (size_t i = 0; i < Global::GetGlobals()->ModInfoList.size(); i++)
 					{
 						auto ModInfo = Global::GetGlobals()->ModInfoList[i];
@@ -53,9 +54,10 @@ namespace Hooks
 						}
 					}
 				}
-				Global::GetGlobals()->eventSystem.dispatchEvent("ProcessFunction", obj, Frame);
+				ret = origProcessFunction(obj, Frame, Result);
+				Global::GetGlobals()->eventSystem.dispatchEvent("ProcessFunction", obj, Frame, (void*)Result);
 			}
-			return origProcessFunction(obj, Frame, Result);
+			return ret;
 
 		}
 

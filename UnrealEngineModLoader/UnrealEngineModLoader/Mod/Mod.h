@@ -5,15 +5,9 @@
 #include "Utilities/Globals.h"
 #include "../LoaderUI.h"
 #include "Ue4.hpp"
-#define BPFUNCTION(Name, Frame) if(Name == Frame->Node->GetName())
 
-#define PROPERFUNCTION(Function) \
-{\
-if(&Function != nullptr);\
-} \
-//#define PROPERFUNCTION(Name) ({\
-//\
-//})
+#define BPFUNCTION(Function) void Function(UE4::UObject* ContextObject, UE4::FFrame* stack, void* const ret)
+#define REGISTER_FUNCTION(Function) if(#Function == Frame->Node->GetName()) Function(obj, Frame, Result);
 
 class LOADER_API Mod
 {
@@ -35,7 +29,7 @@ public:
 	virtual void InitializeMod();
 
 	//Either ProcessInternals or ProcessLocalScriptFunction which you use to communicate between your BPMod and your C++ Mod
-	virtual void ProcessFunction(UE4::UObject* obj, UE4::FFrame* Frame);
+	virtual void ProcessFunction(UE4::UObject* obj, UE4::FFrame* Frame, void* Result);
 
 	//InitGameState Call
 	virtual void InitGameState();

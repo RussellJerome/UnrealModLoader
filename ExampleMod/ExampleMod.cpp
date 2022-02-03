@@ -9,18 +9,23 @@ void ExampleMod::InitializeMod()
 	//UseMenuButton = true; // Allows Mod Loader To Show Button
 }
 
-void WriteToFile(UE4::FString FilePath, UE4::FString Contents)
+BPFUNCTION(WriteToFile)
 {
+	std::cout << "WriteToFile" << std::endl;
+	struct InputParams
+	{
+		UE4::FString NameTest;
+	};
+	auto Inputs = stack->GetInputParams<InputParams>();
 
+	std::cout << "Inputs: " << Inputs->NameTest.ToString() << std::endl;
+	stack->SetOutput<UE4::FString>("OutPutString", L"KboyGang");
+	stack->SetOutput<int>("ReturnValue", 67);
 }
 
-void ExampleMod::ProcessFunction(UE4::UObject* obj, UE4::FFrame* Frame)
+void ExampleMod::ProcessFunction(UE4::UObject* obj, UE4::FFrame* Frame, void* Result)
 {
-	if (obj)
-	{
-		//if(obj == ModActor) // Checks If the actor calling this function is your Mod Actor Function
-		PROPERFUNCTION(WriteToFile);
-	}
+	REGISTER_FUNCTION(WriteToFile);
 }
 
 void ExampleMod::InitGameState()

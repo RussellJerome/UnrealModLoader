@@ -23,7 +23,7 @@ public:
 	virtual void InitializeMod() override;
 
 	//Either ProcessInternals or ProcessLocalScriptFunction which you use to communicate between your BPMod and your C++ Mod
-	virtual void ProcessFunction(UE4::UObject* obj, UE4::FFrame* Frame) override;
+	virtual void ProcessFunction(UE4::UObject* obj, UE4::FFrame* Frame, void* Result) override;
 
 	//InitGameState Call
 	virtual void InitGameState() override;

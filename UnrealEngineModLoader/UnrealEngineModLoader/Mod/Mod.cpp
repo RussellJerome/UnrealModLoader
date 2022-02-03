@@ -19,9 +19,9 @@ namespace CallBackHandler
 		Mod::ModRef->DrawImGui();
 	}
 
-	void CallBackProcessFunction(UE4::UObject* obj, UE4::FFrame* Frame)
+	void CallBackProcessFunction(UE4::UObject* obj, UE4::FFrame* Frame, void* Result)
 	{
-		Mod::ModRef->ProcessFunction(obj, Frame);
+		Mod::ModRef->ProcessFunction(obj, Frame, Result);
 	}
 
 	void CallBackPostBeginPlay(std::wstring ModActorName, UE4::AActor* Actor)
@@ -30,7 +30,7 @@ namespace CallBackHandler
 	}
 }
 
-void Mod::ProcessFunction(UE4::UObject* obj, UE4::FFrame* Frame)
+void Mod::ProcessFunction(UE4::UObject* obj, UE4::FFrame* Frame, void* Result)
 {
 }
 
@@ -58,7 +58,7 @@ void Mod::SetupHooks()
 {
 	Global::GetGlobals()->eventSystem.registerEvent(new Event<UE4::AActor*>("BeginPlay", &CallBackHandler::CallBackBeginPlay));
 	Global::GetGlobals()->eventSystem.registerEvent(new Event<>("InitGameState", &CallBackHandler::CallBackInitGameState));
-	Global::GetGlobals()->eventSystem.registerEvent(new Event<UE4::UObject*, UE4::FFrame*>("ProcessFunction", &CallBackHandler::CallBackProcessFunction));
+	Global::GetGlobals()->eventSystem.registerEvent(new Event<UE4::UObject*, UE4::FFrame*, void*>("ProcessFunction", &CallBackHandler::CallBackProcessFunction));
 	Global::GetGlobals()->eventSystem.registerEvent(new Event<std::wstring, UE4::AActor*>("PostBeginPlay", &CallBackHandler::CallBackPostBeginPlay));
 	Global::GetGlobals()->eventSystem.registerEvent(new Event<>("DrawImGui", &CallBackHandler::CallBackDrawImGui));
 }
