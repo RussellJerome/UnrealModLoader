@@ -54,10 +54,16 @@ namespace Hooks
 						}
 					}
 				}
-				ret = origProcessFunction(obj, Frame, Result);
-				Global::GetGlobals()->eventSystem.dispatchEvent("ProcessFunction", obj, Frame, (void*)Result);
+				for (size_t i = 0; i < Global::GetGlobals()->GetBPFunctionWrappers().size(); i++)
+				{
+					if (Frame->Node->GetName() == Global::GetGlobals()->GetBPFunctionWrappers()[i].FunctionName)
+					{
+						reinterpret_cast<void(*)(UE4::UObject*, UE4::FFrame*, void*)> (Global::GetGlobals()->GetBPFunctionWrappers()[i].FuncPtr) (obj, Frame, (void*)Result);
+						return nullptr;
+					}
+				}
 			}
-			return ret;
+			return origProcessFunction(obj, Frame, Result);
 
 		}
 

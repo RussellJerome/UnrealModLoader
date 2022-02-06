@@ -7,7 +7,8 @@
 #include "Ue4.hpp"
 
 #define BPFUNCTION(Function) void Function(UE4::UObject* ContextObject, UE4::FFrame* stack, void* const ret)
-#define REGISTER_FUNCTION(Function) if(#Function == Frame->Node->GetName()) Function(obj, Frame, Result);
+
+#define REGISTER_FUNCTION(Function) Global::GetGlobals()->AddBPFunctionWrapper(#Function, Function);
 
 class LOADER_API Mod
 {
@@ -27,9 +28,6 @@ public:
 
 	//Called after each mod is injected, Looped through via gloabals
 	virtual void InitializeMod();
-
-	//Either ProcessInternals or ProcessLocalScriptFunction which you use to communicate between your BPMod and your C++ Mod
-	virtual void ProcessFunction(UE4::UObject* obj, UE4::FFrame* Frame, void* Result);
 
 	//InitGameState Call
 	virtual void InitGameState();

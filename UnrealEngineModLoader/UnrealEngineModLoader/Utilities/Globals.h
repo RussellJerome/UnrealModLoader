@@ -22,18 +22,38 @@ struct ModInfo
 
 class LOADER_API Global {
 public:
+	struct BPFunctionWrapper
+	{
+		std::string FunctionName;
+		void* FuncPtr;
+	};
 	std::vector<ModInfo> ModInfoList;
 	std::string GameName;
 	bool bIsMenuOpen;
 	std::vector<class Mod*> CoreMods;
+	std::vector<BPFunctionWrapper> BPFunctionWrappers;
 	EventDispatcher eventSystem;
 
 	static Global* GetGlobals();
+
+	void AddBPFunctionWrapper(std::string FunctionName, void* FuncPtr)
+	{
+		BPFunctionWrapper FunctionWrap;
+		FunctionWrap.FunctionName = FunctionName;
+		FunctionWrap.FuncPtr = FuncPtr;
+		BPFunctionWrappers.push_back(FunctionWrap);
+	}
 
 	void AddToCoreMods(Mod* mod)
 	{
 		CoreMods.push_back(mod);
 	}
+
+	std::vector<BPFunctionWrapper> GetBPFunctionWrappers()
+	{
+		return BPFunctionWrappers;
+	}
+
 private:
 	static Global* glb;
 };

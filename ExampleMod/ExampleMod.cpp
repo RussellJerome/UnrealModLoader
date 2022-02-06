@@ -1,17 +1,6 @@
 #include "ExampleMod.h"
 #include "Utilities/MinHook.h"
 
-// Only Called Once, if you need to hook shit, declare some global non changing values
-void ExampleMod::InitializeMod()
-{
-	UE4::InitSDK();
-	SetupHooks();
-
-	//MinHook::Init(); //Uncomment if you plan to do hooks
-
-	//UseMenuButton = true; // Allows Mod Loader To Show Button
-}
-
 BPFUNCTION(WriteToFile)
 {
 	std::cout << "WriteToFile" << std::endl;
@@ -24,9 +13,17 @@ BPFUNCTION(WriteToFile)
 	stack->SetOutput<bool>("ReturnValue", true);
 }
 
-void ExampleMod::ProcessFunction(UE4::UObject* obj, UE4::FFrame* Frame, void* Result)
+// Only Called Once, if you need to hook shit, declare some global non changing values
+void ExampleMod::InitializeMod()
 {
+	UE4::InitSDK();
+	SetupHooks();
+
 	REGISTER_FUNCTION(WriteToFile);
+
+	//MinHook::Init(); //Uncomment if you plan to do hooks
+
+	//UseMenuButton = true; // Allows Mod Loader To Show Button
 }
 
 void ExampleMod::InitGameState()
