@@ -65,7 +65,10 @@ public:
 
 	DWORD64 CallFunctionByNameWithArguments = 0x0;
 
-	bool IsEngineDefsMissing = false;
+	bool IsUObjectMissing = true;
+	bool IsUFieldMissing = true;
+	bool IsUStructMissing = true;
+	bool IsUFunctionMissing = true;
 
 	bool IsPropertyMissing = false;
 
