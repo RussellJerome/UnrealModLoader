@@ -45,6 +45,10 @@ void ExampleMod::PostBeginPlay(std::wstring ModActorName, UE4::AActor* Actor)
 	}
 }
 
+void ExampleMod::DX11Present(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, ID3D11RenderTargetView* pRenderTargetView)
+{
+}
+
 void ExampleMod::OnModMenuButtonPressed()
 {
 }

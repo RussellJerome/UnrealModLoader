@@ -413,7 +413,10 @@ void LoaderUI::LoaderD3D11Present(IDXGISwapChain* pSwapChain, UINT SyncInterval,
 HRESULT(*D3D11Present)(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags);
 HRESULT __stdcall hookD3D11Present(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags)
 {
-	LoaderUI::GetUI()->LoaderD3D11Present(pSwapChain, SyncInterval, Flags);
+	// LoaderUI initializes D3D objects, mods can then use those objects for drawing, hardware access, etc.
+	LoaderUI* UI = LoaderUI::GetUI();
+	UI->LoaderD3D11Present(pSwapChain, SyncInterval, Flags);
+	Global::GetGlobals()->eventSystem.dispatchEvent("DX11Present", UI->pDevice, UI->pContext, UI->pRenderTargetView);
 	return D3D11Present(pSwapChain, SyncInterval, Flags);
 }
 
