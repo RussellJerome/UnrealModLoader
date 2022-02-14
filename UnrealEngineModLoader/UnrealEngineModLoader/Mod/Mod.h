@@ -6,10 +6,6 @@
 #include "../LoaderUI.h"
 #include "Ue4.hpp"
 
-#define BPFUNCTION(Function) void Function(UE4::UObject* ContextObject, UE4::FFrame* stack, void* const ret)
-
-#define REGISTER_FUNCTION(Function) Global::GetGlobals()->AddBPFunctionWrapper(#Function, Function);
-
 class LOADER_API Mod
 {
 public:

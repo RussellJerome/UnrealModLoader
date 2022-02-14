@@ -3,7 +3,7 @@
 #include <map>
 #include <iostream>
 #include <string>
-#include "../Lib.h"
+#include "../UMLDefs.h"
 #include "../Mod/Mod.h"
 #include "../EventSystem.h"
 struct ModInfo

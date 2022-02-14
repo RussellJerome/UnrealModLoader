@@ -113,7 +113,6 @@
     <ClInclude Include="UnrealEngineModLoader\Memory\CoreModLoader.h" />
     <ClInclude Include="Hooks.h" />
     <ClInclude Include="LoaderUI.h" />
-    <ClInclude Include="Lib.h" />
     <ClInclude Include="EventSystem.h" />
     <ClInclude Include="UnrealEngineModLoader\Mod\Mod.h">
       <Filter>UnrealModLoader\Mod</Filter>
@@ -145,5 +144,6 @@
     <ClInclude Include="UnrealEngineModLoader\Utilities\Version.h">
       <Filter>UnrealModLoader\Utilities</Filter>
     </ClInclude>
+    <ClInclude Include="UMLDefs.h" />
   </ItemGroup>
 </Project>

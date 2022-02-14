@@ -1,7 +1,10 @@
 #pragma once
 #include <windows.h>
-#include "../Lib.h"
+#include <vector>
 #include <string>
+
+#include "../UMLDefs.h"
+
 #define APP_NAME "UnrealModLoader"
 #define LOG_STREAM stdout
 
