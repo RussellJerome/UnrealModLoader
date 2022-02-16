@@ -30,14 +30,49 @@ namespace UE4
 		UWorld::GWorld = (UWorld**)GWorldObjects;
 
 		#ifdef UNREALENGINEMODLOADER_EXPORTS //Stops dumb errors from the ExampleMod shit
-		if (GameProfile::SelectedGameProfile.IsEngineDefsMissing)
+		if (GameProfile::SelectedGameProfile.IsUObjectMissing)
 		{
-			if (ClassDefFinder::FindEngineClasses())
+			Log::Warn("UObject Not Defined. Scanning for def.");
+			UE4::UObject* CoreUobjectObject;
+			UE4::UObject* UEObject;
+			if (GameProfile::SelectedGameProfile.IsUsingFChunkedFixedUObjectArray)
 			{
-				Log::Info("All Engine Classes Found");
-				GameProfile::SelectedGameProfile.IsEngineDefsMissing = false;
+				CoreUobjectObject = UE4::UObject::GObjects->GetAsChunckArray().GetByIndex(1).Object;
+				UEObject = UE4::UObject::GObjects->GetAsChunckArray().GetByIndex(2).Object;
 			}
+			else
+			{
+				CoreUobjectObject = UE4::UObject::GObjects->GetAsTUArray().GetByIndex(1).Object;
+				UEObject = UE4::UObject::GObjects->GetAsTUArray().GetByIndex(2).Object;
+			}
+			ClassDefFinder::FindUObjectDefs(CoreUobjectObject, UEObject);
+			GameProfile::SelectedGameProfile.IsUObjectMissing = false;
 		}
+
+		if (GameProfile::SelectedGameProfile.IsUFieldMissing)
+		{
+			Log::Warn("UField Not Defined. Scanning for def.");
+			ClassDefFinder::FindUFieldDefs();
+			GameProfile::SelectedGameProfile.IsUFieldMissing = false;
+		}
+		if (GameProfile::SelectedGameProfile.IsUStructMissing)
+		{
+			Log::Warn("UStruct Not Defined. Scanning for def.");
+			ClassDefFinder::FindUStructDefs();
+			GameProfile::SelectedGameProfile.IsUStructMissing = false;
+		}
+		if (GameProfile::SelectedGameProfile.IsUFunctionMissing)
+		{
+			Log::Warn("UFunction Not Defined. Scanning for def.");
+			ClassDefFinder::FindUFunctionDefs();
+			GameProfile::SelectedGameProfile.IsUFunctionMissing = false;
+		}
+
+		if (GameProfile::SelectedGameProfile.IsPropertyMissing)
+		{
+			ClassDefFinder::FindUEProperty();
+		}
+		Log::Info("All Engine Classes Found");
 		#endif
 
 	}

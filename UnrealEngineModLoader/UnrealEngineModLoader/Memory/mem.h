@@ -1,5 +1,5 @@
 #pragma once
-#include "../Lib.h"
+#include "../UMLDefs.h"
 #include <windows.h>
 #include <cstdio>
 #include <cinttypes>

@@ -5,6 +5,7 @@
 #include <filesystem>
 #include "INI.h"
 #include "Utilities/Pattern.h"
+#include "Utilities/Version.h"
 #include "../Hooks.h"
 #include "../UE4/Ue4.hpp"
 GameProfile GameProfile::SelectedGameProfile;
@@ -51,7 +52,7 @@ void SetupProfile(std::string Path)
 		FreeConsole();
 		AllocConsole();
 		freopen("CON", "w", LOG_STREAM);
-		Log::Info("Created by ~Russell.J Release V2.1.0");
+		Log::Info("Created by ~Russell.J Release V %s", MODLOADER_VERSION);
 	}
 	if (std::filesystem::exists(Profile))
 	{
@@ -158,27 +159,34 @@ void SetupProfile(std::string Path)
 
 		if (GameInfo.select("UObjectDef"))
 		{
+			GameProfile::SelectedGameProfile.IsUObjectMissing = false;
 			GameProfile::SelectedGameProfile.defs.UObject.Index = StringToDWord(GameInfo.get("UObjectDef", "Index", ""));
 			GameProfile::SelectedGameProfile.defs.UObject.Class = StringToDWord(GameInfo.get("UObjectDef", "Class", ""));
 			GameProfile::SelectedGameProfile.defs.UObject.Name = StringToDWord(GameInfo.get("UObjectDef", "Name", ""));
 			GameProfile::SelectedGameProfile.defs.UObject.Outer = StringToDWord(GameInfo.get("UObjectDef", "Outer", ""));
-			
+		}
+
+		if (GameInfo.select("UFieldDef"))
+		{
+			GameProfile::SelectedGameProfile.IsUFieldMissing = false;
+
 			GameInfo.select("UFieldDef");
 			GameProfile::SelectedGameProfile.defs.UField.Next = StringToDWord(GameInfo.get("UFieldDef", "Next", ""));
-			
+		}
+		if (GameInfo.select("UStructDef"))
+		{
+			GameProfile::SelectedGameProfile.IsUStructMissing = false;
 			GameInfo.select("UStructDef");
 			GameProfile::SelectedGameProfile.defs.UStruct.SuperStruct = StringToDWord(GameInfo.get("UStructDef", "SuperStruct", ""));
 			GameProfile::SelectedGameProfile.defs.UStruct.Children = StringToDWord(GameInfo.get("UStructDef", "Children", ""));
 			GameProfile::SelectedGameProfile.defs.UStruct.PropertiesSize = StringToDWord(GameInfo.get("UStructDef", "PropertiesSize", ""));
-			
+		}
+		if (GameInfo.select("UFunctionDef"))
+		{
+			GameProfile::SelectedGameProfile.IsUFunctionMissing = false;
 			GameInfo.select("UFunctionDef");
 			GameProfile::SelectedGameProfile.defs.UFunction.FunctionFlags = StringToDWord(GameInfo.get("UFunctionDef", "FunctionFlags", ""));
 			GameProfile::SelectedGameProfile.defs.UFunction.Func = StringToDWord(GameInfo.get("UFunctionDef", "Func", ""));
-			
-		}
-		else
-		{
-			GameProfile::SelectedGameProfile.IsEngineDefsMissing = true;
 		}
 
 		if (GameInfo.select("Property"))
@@ -197,7 +205,6 @@ void SetupProfile(std::string Path)
 		{
 			GameProfile::SelectedGameProfile.IsPropertyMissing = true;
 		}
-
 
 		if (GameInfo.select("FunctionInfo"))
 		{

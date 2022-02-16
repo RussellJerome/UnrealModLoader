@@ -5,7 +5,6 @@
 #include "Utilities/Globals.h"
 #include "../LoaderUI.h"
 #include "Ue4.hpp"
-#define BPFUNCTION(Name, Frame) if(Name == Frame->Node->GetName())
 
 class LOADER_API Mod
 {
@@ -16,18 +15,15 @@ public:
 	std::string ModDescription;
 	std::string ModAuthors;
 	std::string ModLoaderVersion;
-	bool UseMenuButton;
+	bool UseMenuButton = 0;
 	//ModInternals
-	bool IsFinishedCreating;
+	bool IsFinishedCreating = 0;
 	
 	//Used Internally to setup Hook Event System
 	void SetupHooks();
 
 	//Called after each mod is injected, Looped through via gloabals
 	virtual void InitializeMod();
-
-	//Either ProcessInternals or ProcessLocalScriptFunction which you use to communicate between your BPMod and your C++ Mod
-	virtual void ProcessFunction(UE4::UObject* obj, UE4::FFrame* Frame);
 
 	//InitGameState Call
 	virtual void InitGameState();
@@ -40,6 +36,9 @@ public:
 
 	//PostBeginPlay of EVERY Blueprint ModActor
 	virtual void PostBeginPlay(std::wstring ModActorName, UE4::AActor* Actor);
+
+	//DX11 hook for when an image will be presented to the screen
+	virtual void DX11Present(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, ID3D11RenderTargetView* pRenderTargetView);
 
 	virtual void OnModMenuButtonPressed();
 

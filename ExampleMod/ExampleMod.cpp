@@ -1,20 +1,29 @@
 #include "ExampleMod.h"
 #include "Utilities/MinHook.h"
 
+BPFUNCTION(WriteToFile)
+{
+	std::cout << "WriteToFile" << std::endl;
+	struct InputParams
+	{
+		UE4::FString NameTest;
+	};
+	auto Inputs = stack->GetInputParams<InputParams>();
+	stack->SetOutput<UE4::FString>("OutPutString", L"KboyGang");
+	stack->SetOutput<bool>("ReturnValue", true);
+}
+
 // Only Called Once, if you need to hook shit, declare some global non changing values
 void ExampleMod::InitializeMod()
 {
 	UE4::InitSDK();
 	SetupHooks();
-	//UseMenuButton = true; // Allows Mod Loader To Show Button
-}
 
-void ExampleMod::ProcessFunction(UE4::UObject* obj, UE4::FFrame* Frame)
-{
-	if (obj)
-	{
-		//if(obj == ModActor) // Checks If the actor calling this function is your Mod Actor Function
-	}
+	REGISTER_FUNCTION(WriteToFile);
+
+	//MinHook::Init(); //Uncomment if you plan to do hooks
+
+	//UseMenuButton = true; // Allows Mod Loader To Show Button
 }
 
 void ExampleMod::InitGameState()
@@ -34,6 +43,10 @@ void ExampleMod::PostBeginPlay(std::wstring ModActorName, UE4::AActor* Actor)
 		//Sets ModActor Ref
 		ModActor = Actor;
 	}
+}
+
+void ExampleMod::DX11Present(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, ID3D11RenderTargetView* pRenderTargetView)
+{
 }
 
 void ExampleMod::OnModMenuButtonPressed()

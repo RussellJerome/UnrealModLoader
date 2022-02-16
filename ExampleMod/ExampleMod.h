@@ -12,7 +12,7 @@ public:
 		ModVersion = "1.0.0"; // Mod Version
 		ModDescription = "HAHAHAHA MOD GO BURR"; // Mod Description
 		ModAuthors = "RussellJ"; // Mod Author
-		ModLoaderVersion = "2.1.0";
+		ModLoaderVersion = "2.2.0";
 
 		// Dont Touch The Internal Stuff
 		ModRef = this;
@@ -22,9 +22,6 @@ public:
 	//Called When Internal Mod Setup is finished
 	virtual void InitializeMod() override;
 
-	//Either ProcessInternals or ProcessLocalScriptFunction which you use to communicate between your BPMod and your C++ Mod
-	virtual void ProcessFunction(UE4::UObject* obj, UE4::FFrame* Frame) override;
-
 	//InitGameState Call
 	virtual void InitGameState() override;
 
@@ -33,6 +30,9 @@ public:
 
 	//PostBeginPlay of EVERY Blueprint ModActor
 	virtual void PostBeginPlay(std::wstring ModActorName, UE4::AActor* Actor) override;
+
+	//DX11 hook for when an image will be presented to the screen
+	virtual void DX11Present(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, ID3D11RenderTargetView* pRenderTargetView) override;
 
 	virtual void OnModMenuButtonPressed() override;
 

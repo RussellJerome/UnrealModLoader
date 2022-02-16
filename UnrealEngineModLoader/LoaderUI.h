@@ -1,17 +1,17 @@
 #pragma once
-#include "Lib.h"
 #include <Windows.h>
 #include <inttypes.h>
 #include <string>
 #include <d3d11.h>
 #include <D3D11Shader.h>
 #include <D3Dcompiler.h>
-#pragma comment(lib, "d3d11.lib")
-#pragma comment(lib, "D3dcompiler.lib")
 #include "ImGui/imgui.h"
 #include "ImGui/imgui_internal.h"
 #include "ImGui/imgui_impl_dx11.h"
 #include "ImGui/imgui_impl_win32.h"
+
+#pragma comment(lib, "d3d11.lib")
+#pragma comment(lib, "D3dcompiler.lib")
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 class LOADER_API LoaderUI
@@ -31,7 +31,7 @@ public:
 	float screenCenterX = 0;
 	float screenCenterY = 0;
 
-	HRESULT(*ResizeBuffers)(IDXGISwapChain*, UINT, UINT, UINT, DXGI_FORMAT, UINT);
+	HRESULT(*ResizeBuffers)(IDXGISwapChain*, UINT, UINT, UINT, DXGI_FORMAT, UINT) = NULL;
 
 	HRESULT LoaderResizeBuffers(IDXGISwapChain* pSwapChain, UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT NewFormat, UINT SwapChainFlags);
 
@@ -47,7 +47,7 @@ public:
 
 	static void HookDX();
 
-	bool IsDXHooked;
+	bool IsDXHooked = 0;
 	
 private:
 	static LoaderUI* UI;

@@ -19,7 +19,8 @@ namespace PakLoader
 		{
 			std::filesystem::create_directory(path);
 		}
-		Global::ModInfoList.empty();
+		if(Global::GetGlobals()->ModInfoList.size() >= 1)
+			Global::GetGlobals()->ModInfoList.empty();
 		for (const auto& entry : fs::directory_iterator(path))
 		{
 			if (entry.path().extension().string() == ".pak")
@@ -35,7 +36,7 @@ namespace PakLoader
 				ModInfo CurrentMod;
 				CurrentMod.ModName = modNameW;
 				CurrentMod.IsEnabled = true;
-				Global::ModInfoList.push_back(CurrentMod);
+				Global::GetGlobals()->ModInfoList.push_back(CurrentMod);
 			}
 		}
 	}

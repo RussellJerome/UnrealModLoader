@@ -510,30 +510,4 @@ namespace ClassDefFinder
 		}
 		return true;
 	}
-
-	bool FindEngineClasses()
-	{
-		Log::Warn("Engine Classes Not Defined. Starting Automatic Class Finder.");
-		UE4::UObject* CoreUobjectObject;
-		UE4::UObject* UEObject;
-		if (GameProfile::SelectedGameProfile.IsUsingFChunkedFixedUObjectArray)
-		{
-			CoreUobjectObject = UE4::UObject::GObjects->GetAsChunckArray().GetByIndex(1).Object;
-			UEObject = UE4::UObject::GObjects->GetAsChunckArray().GetByIndex(2).Object;
-		}
-		else
-		{
-			CoreUobjectObject = UE4::UObject::GObjects->GetAsTUArray().GetByIndex(1).Object;
-			UEObject = UE4::UObject::GObjects->GetAsTUArray().GetByIndex(2).Object;
-		}
-		if (FindUObjectDefs(CoreUobjectObject, UEObject) && FindUFieldDefs() && FindUStructDefs() && FindUFunctionDefs())
-		{
-			if (GameProfile::SelectedGameProfile.IsPropertyMissing)
-			{
-				FindUEProperty();
-			}
-			return true;
-		}
-		return false;
-	};
 };
