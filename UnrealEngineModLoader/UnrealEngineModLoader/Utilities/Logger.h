@@ -96,7 +96,7 @@ public:
 		MessageBoxA(NULL, (Message).c_str(), Info.c_str(), MB_OK | MB_SYSTEMMODAL);
 	}
 
-	static bool DumpLog()
+	static DumpLog()
 	{
 		FILE* Log = NULL;
 		fopen_s(&Log, "UML-Log.txt", "w+");
