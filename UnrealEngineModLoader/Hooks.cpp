@@ -67,10 +67,13 @@ namespace Hooks
 
 		}
 
+		bool isModsLoadedWorld = false;
+
 		PVOID(*origInitGameState)(void*);
 		PVOID hookInitGameState(void* Ret)
 		{
 			Log::Info("GameStateHook");
+			isModsLoadedWorld = false;
 			if (GameStateClassInitNotRan)
 			{
 				UE4::InitSDK();
@@ -258,11 +261,15 @@ namespace Hooks
 									}
 								}
 							}
-							CurrentModActor->CallFunctionByNameWithArguments(L"PostBeginPlay", nullptr, NULL, true);
-							Global::GetGlobals()->eventSystem.dispatchEvent("PostBeginPlay", Global::GetGlobals()->ModInfoList[i].ModName, CurrentModActor);
+							if (!isModsLoadedWorld)
+							{
+								CurrentModActor->CallFunctionByNameWithArguments(L"PostBeginPlay", nullptr, NULL, true);
+								Global::GetGlobals()->eventSystem.dispatchEvent("PostBeginPlay", Global::GetGlobals()->ModInfoList[i].ModName, CurrentModActor);
+							}
 						}
 					}
 				}
+				isModsLoadedWorld = true;
 				Global::GetGlobals()->eventSystem.dispatchEvent("BeginPlay", Actor);
 			}
 			return origBeginPlay(Actor);
