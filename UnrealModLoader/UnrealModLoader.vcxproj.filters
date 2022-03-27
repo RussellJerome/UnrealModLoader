@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="UnrealModLoader.cpp" />
+    <ClCompile Include="Utilities\Utility.cpp" />
+    <ClCompile Include="Utilities\Logger.cpp" />
+    <ClCompile Include="Memory\VariableGrabber.cpp" />
+    <ClCompile Include="Memory\FunctionGrabber.cpp" />
+    <ClCompile Include="Memory\Memory.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="UnrealModLoader.h" />
+    <ClInclude Include="GameInfo.h" />
+    <ClInclude Include="Utilities\Utility.h" />
+    <ClInclude Include="Utilities\Logger.h" />
+    <ClInclude Include="INI\INI.h" />
+    <ClInclude Include="Memory\VariableGrabber.h" />
+    <ClInclude Include="Memory\FunctionGrabber.h" />
+    <ClInclude Include="Memory\Memory.h" />
+  </ItemGroup>
+</Project>
