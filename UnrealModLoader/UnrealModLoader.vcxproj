@@ -119,11 +119,14 @@
       <PreprocessorDefinitions>_DEBUG;UNREALMODLOADER_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir)UnrealModLoader\Utilities;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
+      <AdditionalLibraryDirectories>$(SolutionDir)UnrealModLoader\MinHook\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libMinHook-x64-v141-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -135,6 +138,7 @@
       <PreprocessorDefinitions>NDEBUG;UNREALMODLOADER_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir)UnrealModLoader\Utilities;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -142,12 +146,15 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
+      <AdditionalLibraryDirectories>$(SolutionDir)UnrealModLoader\MinHook\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libMinHook-x64-v141-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Memory\FunctionGrabber.cpp" />
     <ClCompile Include="Memory\Memory.cpp" />
     <ClCompile Include="Memory\VariableGrabber.cpp" />
+    <ClCompile Include="ModLoader\ModLoader.cpp" />
     <ClCompile Include="UnrealModLoader.cpp" />
     <ClCompile Include="Utilities\Logger.cpp" />
     <ClCompile Include="Utilities\Utility.cpp" />
@@ -158,8 +165,11 @@
     <ClInclude Include="Memory\FunctionGrabber.h" />
     <ClInclude Include="Memory\Memory.h" />
     <ClInclude Include="Memory\VariableGrabber.h" />
+    <ClInclude Include="MinHook\include\MinHook.h" />
+    <ClInclude Include="ModLoader\ModLoader.h" />
     <ClInclude Include="UnrealModLoader.h" />
     <ClInclude Include="Utilities\Logger.h" />
+    <ClInclude Include="Utilities\MinHook.h" />
     <ClInclude Include="Utilities\Utility.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

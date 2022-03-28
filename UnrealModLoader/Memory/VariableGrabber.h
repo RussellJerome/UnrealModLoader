@@ -46,7 +46,7 @@ namespace UML
 			};
 
 			/*
-			* Arry that holds all the AOB information.
+			* Array that holds all the AOB information.
 			*/
 			std::vector<VariableInfo> variableLocations;
 		};

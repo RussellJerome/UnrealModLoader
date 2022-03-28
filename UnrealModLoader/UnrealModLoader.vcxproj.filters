@@ -7,6 +7,7 @@
     <ClCompile Include="Memory\VariableGrabber.cpp" />
     <ClCompile Include="Memory\FunctionGrabber.cpp" />
     <ClCompile Include="Memory\Memory.cpp" />
+    <ClCompile Include="ModLoader\ModLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="UnrealModLoader.h" />
@@ -17,5 +18,8 @@
     <ClInclude Include="Memory\VariableGrabber.h" />
     <ClInclude Include="Memory\FunctionGrabber.h" />
     <ClInclude Include="Memory\Memory.h" />
+    <ClInclude Include="Utilities\MinHook.h" />
+    <ClInclude Include="ModLoader\ModLoader.h" />
+    <ClInclude Include="MinHook\include\MinHook.h" />
   </ItemGroup>
 </Project>

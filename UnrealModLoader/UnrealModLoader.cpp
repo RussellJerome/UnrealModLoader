@@ -5,11 +5,13 @@
 #include "Utilities/Utility.h"
 #include "Memory/VariableGrabber.h"
 #include "Memory/FunctionGrabber.h"
+#include "ModLoader/ModLoader.h"
 #include "INI/INI.h"
-static class GameInfo* gameInfo;
 
 namespace UML
 {
+    class GameInfo* gameInfo;
+
     void StartUML()
     {
         //Get UML location.
@@ -357,6 +359,7 @@ namespace UML
                     LOG_INFO("StaticConstructObject_Internal 0x%p", (void*)GetGameInfo()->StaticConstructObject_Internal);
             }
             LOG_INFO("Setup %s", gamename.c_str());
+            ModLoader::Init();
         }
         else
         {
