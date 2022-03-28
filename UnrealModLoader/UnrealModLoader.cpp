@@ -378,6 +378,7 @@ namespace UML
 
     void CleanUp()
     {
+        ModLoader::CleanUp();
     }
 };
 

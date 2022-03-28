@@ -8,6 +8,10 @@
     <ClCompile Include="Memory\FunctionGrabber.cpp" />
     <ClCompile Include="Memory\Memory.cpp" />
     <ClCompile Include="ModLoader\ModLoader.cpp" />
+    <ClCompile Include="UE4\UObject\Object.cpp" />
+    <ClCompile Include="UE4\UObject\Class.cpp" />
+    <ClCompile Include="UE4\UObject\UnrealType.cpp" />
+    <ClCompile Include="UE4\Engine\World.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="UnrealModLoader.h" />
@@ -21,5 +25,28 @@
     <ClInclude Include="Utilities\MinHook.h" />
     <ClInclude Include="ModLoader\ModLoader.h" />
     <ClInclude Include="MinHook\include\MinHook.h" />
+    <ClInclude Include="UE4\Ue4.hpp" />
+    <ClInclude Include="UE4\UObject\NamePool.h" />
+    <ClInclude Include="UE4\UObject\NameEntryArray.h" />
+    <ClInclude Include="UE4\UObject\NameType.h" />
+    <ClInclude Include="UE4\Containers\Array.h" />
+    <ClInclude Include="UE4\Containers\UnrealString.h" />
+    <ClInclude Include="UE4\UObject\UObjectArray.h" />
+    <ClInclude Include="UE4\UObject\Object.h" />
+    <ClInclude Include="UE4\UObject\Class.h" />
+    <ClInclude Include="UE4\UObject\UnrealType.h" />
+    <ClInclude Include="UE4\Engine\World.h" />
+    <ClInclude Include="UE4\UObject\CoreTypes.h" />
+    <ClInclude Include="UE4\Math\Vector.h" />
+    <ClInclude Include="UE4\Math\Vector4.h" />
+    <ClInclude Include="UE4\Math\Quat.h" />
+    <ClInclude Include="UE4\Math\Rotator.h" />
+    <ClInclude Include="UE4\Math\Color.h" />
+    <ClInclude Include="UE4\Math\Box.h" />
+    <ClInclude Include="UE4\Math\Box2D.h" />
+    <ClInclude Include="UE4\Math\Vector2D.h" />
+    <ClInclude Include="UE4\Math\OrientedBox.h" />
+    <ClInclude Include="UE4\Math\Plane.h" />
+    <ClInclude Include="UE4\Math\TransformNonVectorized.h" />
   </ItemGroup>
 </Project>

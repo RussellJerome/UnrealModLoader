@@ -3,6 +3,7 @@
 #include "MinHook.h"
 #include "../UnrealModLoader.h"
 #include <iostream>
+#include "../UE4/Ue4.hpp"
 namespace ModLoader
 {
 	namespace Hooks
