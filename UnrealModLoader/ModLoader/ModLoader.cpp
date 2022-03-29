@@ -13,16 +13,6 @@ namespace ModLoader
 		{
 			LOG_INFO("AGameModeBase::InitGameState");
 			UE4::InitSDK();
-			LOG_INFO("InitSDK");
-			std::cout << UE4::UObject::GObjects << std::endl;
-			std::cout << UE4::UObject::GObjects->GetAsTUArray().Num() << std::endl;
-			for (size_t i = 0; i < UE4::UObject::GObjects->GetAsTUArray().Num(); i++)
-			{
-				auto Object = UE4::UObject::GObjects->GetAsTUArray().GetByIndex(i).Object;
-				if(Object)
-					std::cout << Object->GetName() << std::endl;
-			}
-
 			return origInitGameState(Ret);
 		}
 

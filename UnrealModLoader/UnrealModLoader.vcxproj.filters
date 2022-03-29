@@ -13,6 +13,7 @@
     <ClCompile Include="UE4\UObject\UnrealType.cpp" />
     <ClCompile Include="UE4\Engine\World.cpp" />
     <ClCompile Include="Memory\EngineDefFinder.cpp" />
+    <ClCompile Include="UE4\GameFramework\Actor.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="UnrealModLoader.h" />
@@ -50,5 +51,8 @@
     <ClInclude Include="UE4\Math\Plane.h" />
     <ClInclude Include="UE4\Math\TransformNonVectorized.h" />
     <ClInclude Include="Memory\EngineDefFinder.h" />
+    <ClInclude Include="UE4\GameFramework\Actor.h" />
+    <ClInclude Include="UE4\Containers\EnumAsByte.h" />
+    <ClInclude Include="UE4\Engine\EngineBaseTypes.h" />
   </ItemGroup>
 </Project>

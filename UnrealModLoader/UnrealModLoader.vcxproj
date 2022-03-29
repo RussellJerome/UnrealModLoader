@@ -157,6 +157,7 @@
     <ClCompile Include="Memory\VariableGrabber.cpp" />
     <ClCompile Include="ModLoader\ModLoader.cpp" />
     <ClCompile Include="UE4\Engine\World.cpp" />
+    <ClCompile Include="UE4\GameFramework\Actor.cpp" />
     <ClCompile Include="UE4\UObject\Class.cpp" />
     <ClCompile Include="UE4\UObject\Object.cpp" />
     <ClCompile Include="UE4\UObject\UnrealType.cpp" />
@@ -174,8 +175,11 @@
     <ClInclude Include="MinHook\include\MinHook.h" />
     <ClInclude Include="ModLoader\ModLoader.h" />
     <ClInclude Include="UE4\Containers\Array.h" />
+    <ClInclude Include="UE4\Containers\EnumAsByte.h" />
     <ClInclude Include="UE4\Containers\UnrealString.h" />
+    <ClInclude Include="UE4\Engine\EngineBaseTypes.h" />
     <ClInclude Include="UE4\Engine\World.h" />
+    <ClInclude Include="UE4\GameFramework\Actor.h" />
     <ClInclude Include="UE4\Math\Box.h" />
     <ClInclude Include="UE4\Math\Box2D.h" />
     <ClInclude Include="UE4\Math\Color.h" />
