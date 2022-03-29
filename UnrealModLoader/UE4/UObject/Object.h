@@ -30,7 +30,7 @@ namespace UE4
 			{
 				for (int i = 0; i < GObjects->GetAsChunckArray().Num(); ++i)
 				{
-					auto object = GObjects->GetAsChunckArray().GetByIndex(i).Object;
+					UE4::UObject* object = GObjects->GetAsChunckArray().GetByIndex(i).Object;
 
 					if (object == nullptr)
 					{
@@ -39,7 +39,7 @@ namespace UE4
 
 					if (object->GetFullName() == name)
 					{
-						return static_cast<T*>(object);
+						return (T*)object;
 					}
 				}
 				return nullptr;
@@ -57,7 +57,7 @@ namespace UE4
 
 					if (object->GetFullName() == name)
 					{
-						return static_cast<T*>(object);
+						return (T*)object;
 					}
 				}
 				return nullptr;

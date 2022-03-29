@@ -4,7 +4,7 @@
 #include "Logger.h"
 #define LOG_INFO(msg, ...) Logger::Info(msg, __VA_ARGS__)
 #define LOG_ERROR(msg, ...) Logger::Error(msg, __VA_ARGS__)
-#define LOG_WARNING(msg, ...) Logger::Error(msg, __VA_ARGS__)
+#define LOG_WARNING(msg, ...) Logger::Warn(msg, __VA_ARGS__)
 
 namespace UML
 {

@@ -151,6 +151,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Memory\EngineDefFinder.cpp" />
     <ClCompile Include="Memory\FunctionGrabber.cpp" />
     <ClCompile Include="Memory\Memory.cpp" />
     <ClCompile Include="Memory\VariableGrabber.cpp" />
@@ -166,6 +167,7 @@
   <ItemGroup>
     <ClInclude Include="GameInfo.h" />
     <ClInclude Include="INI\INI.h" />
+    <ClInclude Include="Memory\EngineDefFinder.h" />
     <ClInclude Include="Memory\FunctionGrabber.h" />
     <ClInclude Include="Memory\Memory.h" />
     <ClInclude Include="Memory\VariableGrabber.h" />

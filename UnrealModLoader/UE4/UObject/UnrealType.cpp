@@ -1,17 +1,18 @@
 #include "UnrealType.h"
 #include "NameType.h"
 #include "../UnrealModLoader.h"
+#include "../Memory/Memory.h"
 
 namespace UE4
 {
 	FField* FField::GetNext() const
 	{
-		return (class FField*)this + UML::GetGameInfo()->defs->FField.Next;
+		return UML::Memory::Read<class FField*>((byte*)this + UML::GetGameInfo()->defs->FField.Next);
 	};
 
 	std::string FField::GetName() const
 	{
-		auto Name = *reinterpret_cast<FName*>((byte*)this + UML::GetGameInfo()->defs->FField.Name);
+		auto Name = UML::Memory::Read<FName>((byte*)this + UML::GetGameInfo()->defs->FField.Name);
 		if (UE4::FName::GetFNamePool().IsValidIndex(Name.ComparisonIndex))
 		{
 			return Name.GetName();
@@ -29,11 +30,11 @@ namespace UE4
 	}
 	int32_t UEProperty::GetArrayDim() const
 	{
-		return (int32_t)this + UML::GetGameInfo()->defs->Property.ArrayDim;
+		return UML::Memory::Read<int32_t>((byte*)this + UML::GetGameInfo()->defs->Property.ArrayDim);
 	};
 
 	int32_t UEProperty::GetOffset() const
 	{
-		return (int32_t)this + UML::GetGameInfo()->defs->Property.Offset;
+		return UML::Memory::Read<int32_t>((byte*)this + UML::GetGameInfo()->defs->Property.Offset);
 	};
 };

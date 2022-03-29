@@ -1,3 +1,4 @@
+#include "../Memory/Memory.h"
 #include "Object.h"
 #include "Class.h"
 #include "NameType.h"
@@ -10,17 +11,17 @@ namespace UE4
 
 	int32_t UObject::GetIndex() const
 	{
-		return (int32_t)this + UML::GetGameInfo()->defs->UObject.Index;
+		return UML::Memory::Read<int32_t>((byte*)this + UML::GetGameInfo()->defs->UObject.Index);
 	};
 
 	UClass* UObject::GetClass() const
 	{
-		return (class UClass*)this + UML::GetGameInfo()->defs->UObject.Class;
+		return UML::Memory::Read<class UClass*>((byte*)this + UML::GetGameInfo()->defs->UObject.Class);
 	};
 
 	UObject* UObject::GetOuter() const
 	{
-		return (UObject*)this + UML::GetGameInfo()->defs->UObject.Outer;
+		return UML::Memory::Read<UObject*>((byte*)this + UML::GetGameInfo()->defs->UObject.Outer);
 	};
 
 	std::string UObject::GetName() const

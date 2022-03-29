@@ -20,7 +20,7 @@ namespace UML
 				VariableInfo info;
 				info.aob = aob;
 				info.FirstOpCodes = firstOpCodes;
-				info.TotalByteInstruction;
+				info.TotalByteInstruction = totalByteInstruction;
 				variableLocations.push_back(info);
 			}
 

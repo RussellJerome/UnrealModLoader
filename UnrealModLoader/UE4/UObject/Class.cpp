@@ -1,25 +1,25 @@
 #include "Class.h"
-
+#include "../Memory/Memory.h"
 namespace UE4
 {
 	UField* UField::GetNext() const
 	{
-		return (UField*)this + UML::GetGameInfo()->defs->UField.Next;
+		return UML::Memory::Read<UField*>((byte*)this + UML::GetGameInfo()->defs->UField.Next);
 	};
 
 	UStruct* UStruct::GetSuperField() const
 	{
-		return (UStruct*)this + UML::GetGameInfo()->defs->UStruct.SuperStruct;
+		return UML::Memory::Read<UStruct*>((byte*)this + UML::GetGameInfo()->defs->UStruct.SuperStruct);
 	};
 
 	UField* UStruct::GetChildren() const
 	{
-		return (UField*)this + UML::GetGameInfo()->defs->UStruct.Children;
+		return UML::Memory::Read<UField*>((byte*)this + UML::GetGameInfo()->defs->UStruct.Children);
 	};
 
 	int32_t UStruct::GetPropertySize() const
 	{
-		return (int32_t)this + UML::GetGameInfo()->defs->UStruct.PropertiesSize;
+		return UML::Memory::Read<int32_t>((byte*)this + UML::GetGameInfo()->defs->UStruct.PropertiesSize);
 	};
 
 	UClass* UClass::LoadClassFromString(const wchar_t* InName, bool bAllowObjectReconciliation)
@@ -29,11 +29,11 @@ namespace UE4
 
 	int32_t UFunction::GetFunctionFlags() const
 	{
-		return (int32_t)this + UML::GetGameInfo()->defs->UFunction.FunctionFlags;
+		return UML::Memory::Read<int32_t>((byte*)this + UML::GetGameInfo()->defs->UFunction.FunctionFlags);
 	};
 
 	void* UFunction::GetFunction() const
 	{
-		return (void*)(this + UML::GetGameInfo()->defs->UFunction.Func);
+		return UML::Memory::Read<void*>((byte*)this + UML::GetGameInfo()->defs->UFunction.Func);
 	};
 };

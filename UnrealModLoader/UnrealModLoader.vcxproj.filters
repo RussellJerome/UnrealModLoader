@@ -12,6 +12,7 @@
     <ClCompile Include="UE4\UObject\Class.cpp" />
     <ClCompile Include="UE4\UObject\UnrealType.cpp" />
     <ClCompile Include="UE4\Engine\World.cpp" />
+    <ClCompile Include="Memory\EngineDefFinder.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="UnrealModLoader.h" />
@@ -48,5 +49,6 @@
     <ClInclude Include="UE4\Math\OrientedBox.h" />
     <ClInclude Include="UE4\Math\Plane.h" />
     <ClInclude Include="UE4\Math\TransformNonVectorized.h" />
+    <ClInclude Include="Memory\EngineDefFinder.h" />
   </ItemGroup>
 </Project>

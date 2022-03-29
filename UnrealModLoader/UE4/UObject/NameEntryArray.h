@@ -1,4 +1,5 @@
 #pragma once
+#include "../Memory/Memory.h"
 #include "../UnrealModLoader.h"
 
 #pragma warning( disable : 4200 )
@@ -42,7 +43,7 @@ private:
 	}
 	int GetNumElements() const
 	{
-		return (int)this + 0x8 + 0x4;
+		return UML::Memory::Read<int>((byte*)this + 0x8 + 0x4);
 	};
 	FNameEntry** Chunks[];
 };

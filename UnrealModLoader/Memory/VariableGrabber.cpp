@@ -24,8 +24,8 @@ namespace UML
 					auto Pattern = UML::Utility::FindPattern(varlocation.aob);
 					if (Pattern)
 					{
-						auto varOffset = *reinterpret_cast<uint32_t*>(Pattern + varlocation.FirstOpCodes);
-						auto var = (DWORD64)(Pattern + varlocation.TotalByteInstruction + varOffset);
+						auto varaddress = *reinterpret_cast<uint32_t*>(Pattern + varlocation.FirstOpCodes);
+						auto var = (DWORD64)(Pattern + varlocation.TotalByteInstruction + varaddress);
 						if (var != 0)
 						{
 							return (DWORD64)var;
