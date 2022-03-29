@@ -16,7 +16,7 @@ namespace UE4
 		bool WasRecentlyRendered(float Tolerance);
 		void UserConstructionScript();
 		void TearOff();
-		void SnapRootComponentTo(class AActor* InParentActor, const struct FName& InSocketName);
+		void SnapRootComponentTo(class AActor* InParentActor, const class FName& InSocketName);
 		void SetTickGroup(TEnumAsByte<ETickingGroup> NewTickGroup);
 		void SetTickableWhenPaused(bool bTickableWhenPaused);
 		void SetReplicates(bool bInReplicates);

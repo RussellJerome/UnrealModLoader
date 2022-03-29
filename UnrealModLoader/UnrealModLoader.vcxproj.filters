@@ -14,6 +14,8 @@
     <ClCompile Include="UE4\Engine\World.cpp" />
     <ClCompile Include="Memory\EngineDefFinder.cpp" />
     <ClCompile Include="UE4\GameFramework\Actor.cpp" />
+    <ClCompile Include="UE4\UMG\Components\Widget.cpp" />
+    <ClCompile Include="UE4\UMG\Components\PanelWidget.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="UnrealModLoader.h" />
@@ -54,5 +56,13 @@
     <ClInclude Include="UE4\GameFramework\Actor.h" />
     <ClInclude Include="UE4\Containers\EnumAsByte.h" />
     <ClInclude Include="UE4\Engine\EngineBaseTypes.h" />
+    <ClInclude Include="UE4\UMG\Components\Visual.h" />
+    <ClInclude Include="UE4\UMG\Components\Widget.h" />
+    <ClInclude Include="UE4\UMG\UMGBaseTypes.h" />
+    <ClInclude Include="UE4\SlateCore\Styling\SlateTypes.h" />
+    <ClInclude Include="UE4\Internationalization\Text.h" />
+    <ClInclude Include="UE4\UMG\Slate\WidgetTransform.h" />
+    <ClInclude Include="UE4\UMG\Components\PanelWidget.h" />
+    <ClInclude Include="UE4\UMG\Components\PanelSlot.h" />
   </ItemGroup>
 </Project>

@@ -158,6 +158,8 @@
     <ClCompile Include="ModLoader\ModLoader.cpp" />
     <ClCompile Include="UE4\Engine\World.cpp" />
     <ClCompile Include="UE4\GameFramework\Actor.cpp" />
+    <ClCompile Include="UE4\UMG\Components\PanelWidget.cpp" />
+    <ClCompile Include="UE4\UMG\Components\Widget.cpp" />
     <ClCompile Include="UE4\UObject\Class.cpp" />
     <ClCompile Include="UE4\UObject\Object.cpp" />
     <ClCompile Include="UE4\UObject\UnrealType.cpp" />
@@ -180,6 +182,7 @@
     <ClInclude Include="UE4\Engine\EngineBaseTypes.h" />
     <ClInclude Include="UE4\Engine\World.h" />
     <ClInclude Include="UE4\GameFramework\Actor.h" />
+    <ClInclude Include="UE4\Internationalization\Text.h" />
     <ClInclude Include="UE4\Math\Box.h" />
     <ClInclude Include="UE4\Math\Box2D.h" />
     <ClInclude Include="UE4\Math\Color.h" />
@@ -191,6 +194,13 @@
     <ClInclude Include="UE4\Math\Vector.h" />
     <ClInclude Include="UE4\Math\Vector2D.h" />
     <ClInclude Include="UE4\Math\Vector4.h" />
+    <ClInclude Include="UE4\SlateCore\Styling\SlateTypes.h" />
+    <ClInclude Include="UE4\UMG\Components\PanelSlot.h" />
+    <ClInclude Include="UE4\UMG\Components\PanelWidget.h" />
+    <ClInclude Include="UE4\UMG\Components\Visual.h" />
+    <ClInclude Include="UE4\UMG\Components\Widget.h" />
+    <ClInclude Include="UE4\UMG\Slate\WidgetTransform.h" />
+    <ClInclude Include="UE4\UMG\UMGBaseTypes.h" />
     <ClInclude Include="UE4\UObject\Class.h" />
     <ClInclude Include="UE4\UObject\CoreTypes.h" />
     <ClInclude Include="UE4\UObject\NameEntryArray.h" />

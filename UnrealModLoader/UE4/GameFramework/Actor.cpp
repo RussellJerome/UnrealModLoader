@@ -37,7 +37,7 @@ namespace UE4
 		struct
 		{
 			AActor* InParentActor;
-			struct FName InSocketName;
+			FName InSocketName;
 		}params;
 		params.InParentActor = InParentActor;
 		params.InSocketName = InSocketName;

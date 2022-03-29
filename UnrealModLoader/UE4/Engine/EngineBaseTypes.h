@@ -1593,7 +1593,7 @@ namespace UE4
 		OnlyTickPoseWhenRendered = 2,
 		EMeshComponentUpdateFlag_MAX = 3
 	};
-p
+
 	enum class EPhysBodyOp : uint8_t
 	{
 		PBO_None = 0,
