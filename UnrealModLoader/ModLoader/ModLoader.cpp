@@ -4,6 +4,10 @@
 #include "../UnrealModLoader.h"
 #include <iostream>
 #include "../UE4/Ue4.hpp"
+#include "UMG/Blueprint/UserWidget.h"
+#include "../UEGUI/UEGUI.h"
+#include "GameFramework/Actor.h"
+
 namespace ModLoader
 {
 	namespace Hooks
@@ -13,16 +17,41 @@ namespace ModLoader
 		{
 			LOG_INFO("AGameModeBase::InitGameState");
 			UE4::InitSDK();
+
+			
 			return origInitGameState(Ret);
 		}
 
-		PVOID(*origBeginPlay)(void*);
-		PVOID hookBeginPlay(void* Actor)
+		PVOID(*origBeginPlay)(UE4::AActor*);
+		PVOID hookBeginPlay(UE4::AActor* Actor)
 		{
+	/*		if (Actor->IsA(UE4::UObject::FindClass(UML::GetGameInfo()->BeginPlayOverwrite)))
+			{
+				LOG_INFO("AActor::BeginPlay");
+			}*/
 			//LOG_INFO("AActor::BeginPlay");
 			return origBeginPlay(Actor);
 		}
 	};
+
+
+	bool f1_pressed;
+	DWORD __stdcall UMLRenderThread(LPVOID)
+	{
+		while (true)
+		{
+			if (GetAsyncKeyState(VK_F1) != 0)
+				f1_pressed = true;
+			else if (f1_pressed)
+			{
+				f1_pressed = false;
+				auto UMLWidget = UEGUI::CreateUEWidget();
+			}
+			Sleep(1000 / 60);
+		}
+		return NULL;
+	}
+
 	void Init()
 	{
 		MinHook::Init();
@@ -30,6 +59,7 @@ namespace ModLoader
 		LOG_INFO("Loading Core Mods");
 		MinHook::Add(UML::GetGameInfo()->GameStateInit, &Hooks::hookInitGameState, &Hooks::origInitGameState, "AGameModeBase::InitGameState");
 		MinHook::Add(UML::GetGameInfo()->BeginPlay, &Hooks::hookBeginPlay, &Hooks::origBeginPlay, "AActor::BeginPlay");
+		CreateThread(0, 0, UMLRenderThread, 0, 0, 0);
 	}
 
 	void CleanUp()

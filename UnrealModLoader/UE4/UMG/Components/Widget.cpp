@@ -15,7 +15,7 @@ namespace UE4
 		params.InVisibility = InVisibility;
 		UObject::ProcessEvent(fn, &params);
 	}
-	void UWidget::SetToolTipText(const FText& InToolTipText)
+	/*void UWidget::SetToolTipText(const FText& InToolTipText)
 	{
 		static auto fn = UObject::FindObject<UFunction>("Function UMG.Widget.SetToolTipText");
 		struct
@@ -24,7 +24,7 @@ namespace UE4
 		}params;
 		params.InToolTipText = InToolTipText;
 		UObject::ProcessEvent(fn, &params);
-	}
+	}*/
 	void UWidget::SetToolTip(UWidget* Widget)
 	{
 		static auto fn = UObject::FindObject<UFunction>("Function UMG.Widget.SetToolTip");

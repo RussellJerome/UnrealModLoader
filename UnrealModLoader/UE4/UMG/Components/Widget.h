@@ -17,7 +17,7 @@ namespace UE4
 	public:
 		void SetVisibility(ESlateVisibility InVisibility);
 		//void SetUserFocus(class APlayerController* PlayerController);
-		void SetToolTipText(const struct FText& InToolTipText);
+		//void SetToolTipText(const struct FText& InToolTipText);
 		void SetToolTip(class UWidget* Widget);
 		void SetRenderTranslation(const struct FVector2D& Translation);
 		void SetRenderTransformPivot(const struct FVector2D& Pivot);

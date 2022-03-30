@@ -4,6 +4,7 @@
 #include "UObject/NameType.h"
 #include "Engine/World.h"
 #include "../Memory/EngineDefFinder.h"
+#include "Utility.h"
 #include <Windows.h>
 #include <Psapi.h>
 

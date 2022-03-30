@@ -6,6 +6,7 @@
 #include "UObject/NameType.h"
 #include "UObject/CoreTypes.h"
 #include "UObject/UnrealType.h"
+#include <iostream>
 
 namespace UML
 {
@@ -244,7 +245,7 @@ namespace UML
 			GetGameInfo()->defs->UStruct.Children = GetGameInfo()->defs->UStruct.SuperStruct;
 			while (HasChildrenNotBeenFound)
 			{
-				auto ChildObject = Memory::Read<UE4::UObject*>(VectorObject + GetGameInfo()->defs->UStruct.Children);
+				auto ChildObject = Memory::Read<UE4::UObject*>((byte*)VectorObject + GetGameInfo()->defs->UStruct.Children);
 				if (VectorFirstChildObject)
 				{
 					if (VectorFirstChildObject == ChildObject)
@@ -260,6 +261,7 @@ namespace UML
 				{
 					if (auto Class = ChildObject->GetClass())
 					{
+						std::cout << "Class" << std::endl;
 						if (Class->GetName() == "FloatProperty" || "Vector")
 						{
 							HasChildrenNotBeenFound = false;
@@ -298,6 +300,7 @@ namespace UML
 			{
 				return UStruct->GetPropertySize();
 			}
+			return 0;
 		}
 
 		bool FindUStructDefs()

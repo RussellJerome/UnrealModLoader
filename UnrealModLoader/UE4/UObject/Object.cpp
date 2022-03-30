@@ -16,7 +16,7 @@ namespace UE4
 
 	UClass* UObject::GetClass() const
 	{
-		return UML::Memory::Read<class UClass*>((byte*)this + UML::GetGameInfo()->defs->UObject.Class);
+		return UML::Memory::Read<UClass*>((byte*)this + UML::GetGameInfo()->defs->UObject.Class);
 	};
 
 	UObject* UObject::GetOuter() const
@@ -191,35 +191,50 @@ namespace UE4
 		return reinterpret_cast<UObject * (__fastcall*)(class UClass*, UObject*, const wchar_t*, const wchar_t*, unsigned int, void*, bool)>(UML::GetGameInfo()->StaticLoadObject)(uclass, InOuter, InName, Filename, LoadFlags, Sandbox, bAllowObjectReconciliation);
 	}
 
-	//UObject* UObject::StaticConstructObject_Internal(UClass* Class, UObject* InOuter, FName Name, unsigned int SetFlags, EInternalObjectFlags InternalSetFlags, UObject* Template, bool bCopyTransientsFromClassDefaults, void* InstanceGraph, bool bAssumeTemplateIsArchetype)
-	//{
-	//	if (UML::GetGameInfo()->StaticConstructObject_Internal)
-	//	{
-	//		if (UML::GetGameInfo()->IsUsingUpdatedStaticConstruct)
-	//		{
-	//			FStaticConstructObjectParameters StaticConstructObjectParameters;
-	//			StaticConstructObjectParameters.Class = Class;
-	//			StaticConstructObjectParameters.Outer = InOuter;
-	//			StaticConstructObjectParameters.Name = Name;
-	//			StaticConstructObjectParameters.SetFlags = SetFlags;
-	//			StaticConstructObjectParameters.InternalSetFlags = InternalSetFlags;
-	//			StaticConstructObjectParameters.Template = Template;
-	//			StaticConstructObjectParameters.bCopyTransientsFromClassDefaults = bCopyTransientsFromClassDefaults;
-	//			StaticConstructObjectParameters.InstanceGraph = InstanceGraph;
-	//			StaticConstructObjectParameters.bAssumeTemplateIsArchetype = bAssumeTemplateIsArchetype;
-	//			return reinterpret_cast<UObject * (__fastcall*)(const FStaticConstructObjectParameters*)>(UML::GetGameInfo()->StaticConstructObject_Internal)(&StaticConstructObjectParameters);
-	//		}
-	//		else
-	//		{
-	//			return reinterpret_cast<UObject * (__fastcall*)(UClass*, UObject*, FName, unsigned int, unsigned int, UObject*, bool, void*, bool)>(UML::GetGameInfo()->StaticConstructObject_Internal)(Class, InOuter, Name, SetFlags, InternalSetFlags, Template, bCopyTransientsFromClassDefaults, InstanceGraph, bAssumeTemplateIsArchetype);
-	//		}
-	//	}
-	//	else
-	//	{
-	//		//LOG_ERROR("StaticConstructObject_Internal Called But Not Found!");
-	//	}
-	//	return nullptr;
-	//}
+	// Defined above function because it isnt used anywhere else
+	struct FStaticConstructObjectParameters
+	{
+		const UClass* Class;
+		UObject* Outer;
+		FName Name;
+		unsigned int SetFlags = 0x00000000;
+		EInternalObjectFlags InternalSetFlags = EInternalObjectFlags::None;
+		bool bCopyTransientsFromClassDefaults = false;
+		bool bAssumeTemplateIsArchetype = false;
+		UObject* Template = nullptr;
+		void* InstanceGraph = nullptr;
+		void* ExternalPackage = nullptr;
+	};
+
+	UObject* UObject::StaticConstructObject_Internal(UClass* Class, UObject* InOuter, FName Name, unsigned int SetFlags, EInternalObjectFlags InternalSetFlags, UObject* Template, bool bCopyTransientsFromClassDefaults, void* InstanceGraph, bool bAssumeTemplateIsArchetype)
+	{
+		if (UML::GetGameInfo()->StaticConstructObject_Internal)
+		{
+			if (UML::GetGameInfo()->IsUsingUpdatedStaticConstruct)
+			{
+				FStaticConstructObjectParameters StaticConstructObjectParameters;
+				StaticConstructObjectParameters.Class = Class;
+				StaticConstructObjectParameters.Outer = InOuter;
+				StaticConstructObjectParameters.Name = Name;
+				StaticConstructObjectParameters.SetFlags = SetFlags;
+				StaticConstructObjectParameters.InternalSetFlags = InternalSetFlags;
+				StaticConstructObjectParameters.Template = Template;
+				StaticConstructObjectParameters.bCopyTransientsFromClassDefaults = bCopyTransientsFromClassDefaults;
+				StaticConstructObjectParameters.InstanceGraph = InstanceGraph;
+				StaticConstructObjectParameters.bAssumeTemplateIsArchetype = bAssumeTemplateIsArchetype;
+				return reinterpret_cast<UObject * (__fastcall*)(const FStaticConstructObjectParameters*)>(UML::GetGameInfo()->StaticConstructObject_Internal)(&StaticConstructObjectParameters);
+			}
+			else
+			{
+				return reinterpret_cast<UObject * (__fastcall*)(UClass*, UObject*, FName, unsigned int, unsigned int, UObject*, bool, void*, bool)>(UML::GetGameInfo()->StaticConstructObject_Internal)(Class, InOuter, Name, SetFlags, InternalSetFlags, Template, bCopyTransientsFromClassDefaults, InstanceGraph, bAssumeTemplateIsArchetype);
+			}
+		}
+		else
+		{
+			//LOG_ERROR("StaticConstructObject_Internal Called But Not Found!");
+		}
+		return nullptr;
+	}
 
 	bool UObject::CallFunctionByNameWithArguments(const wchar_t* Str, void* Ar, UE4::UObject* Executor, bool bForceCallWithNonExec)
 	{

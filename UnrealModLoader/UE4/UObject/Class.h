@@ -1,5 +1,7 @@
 #pragma once
 #include "Object.h"
+#include "UnrealType.h"
+#include "../Memory/Memory.h"
 
 namespace UE4
 {
@@ -64,4 +66,51 @@ namespace UE4
 			return ptr;
 		}
 	};
+
+	template<typename T>
+	bool SetVariable(UObject* Object, std::string Name, T Value)
+	{
+		UClass* ObjectClass = Object->GetClass();
+		if (UML::GetGameInfo()->bIsFProperty)
+		{
+			auto Children = (FField*)ObjectClass->GetChildren();
+			bool VarFound = false;
+			while (!VarFound)
+			{
+				if (!Children)
+					break;
+				if (Children->GetName() == Name)
+				{
+					VarFound = true;
+					auto varProperty = (UEProperty*)Children;
+					//*reinterpret_cast<T*>((byte*)Object + varProperty->GetOffset()) = Value;
+					UML::Memory::Write<T>((byte*)Object + varProperty->GetOffset(), Value);
+					return true;
+				}
+				Children = Children->GetNext();
+			}
+
+		}
+		else
+		{
+			auto Children = (UField*)ObjectClass->GetChildren();
+			bool VarFound = false;
+			while (!VarFound)
+			{
+				if (!Children)
+					break;
+				if (Children->GetName() == Name)
+				{
+					VarFound = true;
+					auto varProperty = (UEProperty*)Children;
+
+					//*reinterpret_cast<T*>((byte*)Object + varProperty->GetOffset()) = Value;
+					UML::Memory::Write<T>((byte*)Object + varProperty->GetOffset(), Value);
+					return true;
+				}
+				Children = Children->GetNext();
+			}
+		}
+		return false;
+	}
 };

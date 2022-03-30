@@ -1,7 +1,7 @@
 #include "FunctionGrabber.h"
 #include "Memory.h"
 #include "../Utilities/Utility.h"
-
+#include <iostream>
 namespace UML
 {
 	namespace Memory
@@ -42,7 +42,7 @@ namespace UML
 						auto Function = Utility::FindPattern(funcLocation.pattern);
 						if (Function != nullptr)
 						{
-							Function += 0x3;
+							Function += funcLocation.offsetToStart;
 							return (DWORD64)GetAddressPTR(Function, 0x1, 0x5);
 						}
 					}

@@ -17,6 +17,13 @@ namespace UE4
 		FTextData* Data;
 		char UnknownData[0x10];
 
+		FText(const wchar_t* Name) {
+
+			Data = new FTextData();
+			Data->Name = const_cast<wchar_t*>(Name);
+			Data->Length = std::wcslen(Name);
+		}
+
 		wchar_t* Get() const {
 			if (Data)
 				return Data->Name;

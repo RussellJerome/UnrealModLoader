@@ -6,6 +6,21 @@
 
 namespace UE4
 {
+	enum EInternalObjectFlags
+	{
+		None = 0,
+		ReachableInCluster = 1 << 23,
+		ClusterRoot = 1 << 24,
+		Native = 1 << 25,
+		Async = 1 << 26,
+		AsyncLoading = 1 << 27,
+		Unreachable = 1 << 28,
+		PendingKill = 1 << 29,
+		RootSet = 1 << 30,
+		GarbageCollectionKeepFlags = Native | Async | AsyncLoading,
+		AllFlags = ReachableInCluster | ClusterRoot | Native | Async | AsyncLoading | Unreachable | PendingKill | RootSet,
+	};
+
 	class UObject
 	{
 	public:
@@ -188,7 +203,7 @@ namespace UE4
 
 		static UObject* StaticLoadObject(class UClass* uclass, UObject* InOuter, const wchar_t* InName, const wchar_t* Filename, unsigned int LoadFlags, void* Sandbox, bool bAllowObjectReconciliation);
 
-		//static class UObject* StaticConstructObject_Internal(class UClass* Class, class UObject* InOuter, class FName Name, unsigned int SetFlags, EInternalObjectFlags InternalSetFlags, class UObject* Template, bool bCopyTransientsFromClassDefaults, void* InstanceGraph, bool bAssumeTemplateIsArchetype);
+		static class UObject* StaticConstructObject_Internal(class UClass* Class, class UObject* InOuter, class FName Name, unsigned int SetFlags, EInternalObjectFlags InternalSetFlags, class UObject* Template, bool bCopyTransientsFromClassDefaults, void* InstanceGraph, bool bAssumeTemplateIsArchetype);
 
 		bool CallFunctionByNameWithArguments(const wchar_t* Str, void* Ar, UE4::UObject* Executor, bool bForceCallWithNonExec);
 

@@ -16,6 +16,12 @@
     <ClCompile Include="UE4\GameFramework\Actor.cpp" />
     <ClCompile Include="UE4\UMG\Components\Widget.cpp" />
     <ClCompile Include="UE4\UMG\Components\PanelWidget.cpp" />
+    <ClCompile Include="UE4\UMG\Blueprint\UserWidget.cpp" />
+    <ClCompile Include="UE4\UMG\Animation\WidgetAnimation.cpp" />
+    <ClCompile Include="UE4\UMG\Components\ContentWidget.cpp" />
+    <ClCompile Include="UE4\UMG\Components\Border.cpp" />
+    <ClCompile Include="UEGUI\UEGUI.cpp" />
+    <ClCompile Include="UEGUI\UEWidget.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="UnrealModLoader.h" />
@@ -64,5 +70,15 @@
     <ClInclude Include="UE4\UMG\Slate\WidgetTransform.h" />
     <ClInclude Include="UE4\UMG\Components\PanelWidget.h" />
     <ClInclude Include="UE4\UMG\Components\PanelSlot.h" />
+    <ClInclude Include="UE4\UMG\Blueprint\UserWidget.h" />
+    <ClInclude Include="UE4\SlateCore\Layout\Margin.h" />
+    <ClInclude Include="UE4\SlateCore\Styling\SlateColor.h" />
+    <ClInclude Include="UE4\UMG\Slate\Anchors.h" />
+    <ClInclude Include="UE4\UMG\Animation\WidgetAnimation.h" />
+    <ClInclude Include="UE4\UMG\Components\ContentWidget.h" />
+    <ClInclude Include="UE4\UMG\Components\Border.h" />
+    <ClInclude Include="UEGUI\UEGUI.h" />
+    <ClInclude Include="UEGUI\UEWidget.h" />
+    <ClInclude Include="UE4\UMG\Blueprint\WidgetTree.h" />
   </ItemGroup>
 </Project>
