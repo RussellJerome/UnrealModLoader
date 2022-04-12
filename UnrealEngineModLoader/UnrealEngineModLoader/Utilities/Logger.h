@@ -2,6 +2,7 @@
 #include <windows.h>
 #include <vector>
 #include <string>
+#include <mutex>
 
 #include "../UMLDefs.h"
 
@@ -22,6 +23,8 @@ private:
 	template <typename ...Args>
 	static void LogMsg(MsgType type, const std::string& format, Args&& ...args)
 	{
+		std::lock_guard guard(mtx);
+		
 		HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 
 		fprintf(LOG_STREAM, "[");
@@ -109,5 +112,6 @@ public:
 	}
 
 private:
+	static std::mutex mtx;
 	static std::vector<std::string> LogArray;
 };
