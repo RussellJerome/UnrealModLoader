@@ -3,7 +3,7 @@
 #include <windows.h>
 #include <process.h>
 #include <string>
-#include "../../UnrealEngineModLoader/INI/INI.h"
+#include "INI/INI.h"
 
 std::string GetModuleFilePath(HMODULE hModule)
 {
