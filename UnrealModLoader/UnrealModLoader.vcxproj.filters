@@ -22,6 +22,7 @@
     <ClCompile Include="UE4\UMG\Components\Border.cpp" />
     <ClCompile Include="UEGUI\UEGUI.cpp" />
     <ClCompile Include="UEGUI\UEWidget.cpp" />
+    <ClCompile Include="ModLoader\HookManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="UnrealModLoader.h" />
@@ -80,5 +81,6 @@
     <ClInclude Include="UEGUI\UEGUI.h" />
     <ClInclude Include="UEGUI\UEWidget.h" />
     <ClInclude Include="UE4\UMG\Blueprint\WidgetTree.h" />
+    <ClInclude Include="ModLoader\HookManager.h" />
   </ItemGroup>
 </Project>

@@ -5,7 +5,7 @@
 #include "Utilities/Utility.h"
 #include "Memory/VariableGrabber.h"
 #include "Memory/FunctionGrabber.h"
-#include "ModLoader/ModLoader.h"
+#include "ModLoader/HookManager.h"
 #include "INI/INI.h"
 
 namespace UML
@@ -285,7 +285,7 @@ namespace UML
                     LOG_ERROR("SpawnActorFTrans NOT FOUND!");
      
                 //CallFunctionByNameWithArguments AOBS
-                auto CallFunctionByNameWithArguments_Grabber = new Memory::FunctionGrabber("8B ? E8 ? ? ? ? ? 0A E8 FF ? EB 9E ? 8B", 0x2);
+                auto CallFunctionByNameWithArguments_Grabber = new Memory::FunctionGrabber("8B ? E8 ? ? ? ? ? 0A ? FF ? EB 9E ? 8B", 0x2);
                 CallFunctionByNameWithArguments_Grabber->addAlternativeAob("49 8B D4 E8 ? ? ? ? 44 0A F8 FF C3 EB 9A", 0x3);
                 GetGameInfo()->CallFunctionByNameWithArguments = CallFunctionByNameWithArguments_Grabber->ripFunction();
                 if(GetGameInfo()->CallFunctionByNameWithArguments)
@@ -301,6 +301,11 @@ namespace UML
                 else
                     LOG_ERROR("ProcessEvent NOT FOUND!");
 
+                /*
+                TODO
+                ====
+                LETS STOP USING THIS, IT IS SO OUTDATED AND DOESNT EVEN WORK HALF THE DAMN TIME
+                */
                 //CreateDefaultObject AOBS
                 auto CreateDefaultObject_Grabber = new Memory::FunctionGrabber("4C 8B DC 57 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 84 24 ? ? ? ? 48 83 B9 ? ? ? ? ? 48 8B F9 ");
                 CreateDefaultObject_Grabber->addAlternativeAob("4C 8B DC 55 53 49 8D AB ? ? ? ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 48 83 B9 ? ? ? ? ? 48 8B D9 0F 85");
@@ -347,7 +352,7 @@ namespace UML
                 if (GetGameInfo()->StaticConstructObject_Internal == 0)
                 {
                     GetGameInfo()->IsUsingUpdatedStaticConstruct = true;
-                    StaticConstructObject_Internal_Grabber->addAlternativeAob("E8 ? ? ? ? 45 8B 47 70", 0x1);
+                    StaticConstructObject_Internal_Grabber->addAlternativeAob("? E8 ? ? ? ? 45 8B 47 70", 0x1);
                     StaticConstructObject_Internal_Grabber->addAlternativeAob("89 6C 24 38 48 89 74 24 ? E8", 0x9);
                     GetGameInfo()->StaticConstructObject_Internal = StaticConstructObject_Internal_Grabber->ripFunction();
                     if(GetGameInfo()->StaticConstructObject_Internal != 0)
@@ -358,8 +363,18 @@ namespace UML
                 else
                     LOG_INFO("StaticConstructObject_Internal 0x%p", (void*)GetGameInfo()->StaticConstructObject_Internal);
             }
+
+            //UWorldTick AOBS
+            auto UWorldTick_Grabber = new Memory::FunctionGrabber("BA ? ? ? ? E8 ? ? ? ? 80 3D ? ? ? ? ? 75 2D", 0x5);
+            UWorldTick_Grabber->addAlternativeAob("49 8B 8E ? ? ? ? E8 ? ? ? ? 48 8D 8D", 0x7);
+            GetGameInfo()->UWorldTick = UWorldTick_Grabber->ripFunction();
+            if (GetGameInfo()->UWorldTick != 0)
+                LOG_INFO("UWorld::Tick 0x%p", (void*)GetGameInfo()->UWorldTick);
+            else
+                LOG_ERROR("UWorld::Tick NOT FOUND!");
+
             LOG_INFO("Setup %s", gamename.c_str());
-            ModLoader::Init();
+            HookManager::Init();
         }
         else
         {
@@ -378,7 +393,7 @@ namespace UML
 
     void CleanUp()
     {
-        ModLoader::CleanUp();
+        HookManager::CleanUp();
     }
 };
 

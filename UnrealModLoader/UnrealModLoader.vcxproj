@@ -155,6 +155,7 @@
     <ClCompile Include="Memory\FunctionGrabber.cpp" />
     <ClCompile Include="Memory\Memory.cpp" />
     <ClCompile Include="Memory\VariableGrabber.cpp" />
+    <ClCompile Include="ModLoader\HookManager.cpp" />
     <ClCompile Include="ModLoader\ModLoader.cpp" />
     <ClCompile Include="UE4\Engine\World.cpp" />
     <ClCompile Include="UE4\GameFramework\Actor.cpp" />
@@ -181,6 +182,7 @@
     <ClInclude Include="Memory\Memory.h" />
     <ClInclude Include="Memory\VariableGrabber.h" />
     <ClInclude Include="MinHook\include\MinHook.h" />
+    <ClInclude Include="ModLoader\HookManager.h" />
     <ClInclude Include="ModLoader\ModLoader.h" />
     <ClInclude Include="UE4\Containers\Array.h" />
     <ClInclude Include="UE4\Containers\EnumAsByte.h" />

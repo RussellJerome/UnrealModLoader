@@ -70,6 +70,7 @@ public:
 	DWORD64 ProcessEvent = 0x0;
 	DWORD64 CreateDefaultObject = 0x0;
 	DWORD64 ProcessInternals = 0x0;
+	DWORD64 UWorldTick = 0x0;
 
 	bool IsUsingUpdatedStaticConstruct = false;
 	DWORD64 StaticConstructObject_Internal = 0x0;
