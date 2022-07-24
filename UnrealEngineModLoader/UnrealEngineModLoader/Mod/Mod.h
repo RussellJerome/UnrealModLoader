@@ -3,8 +3,8 @@
 #include "Utilities/Logger.h"
 #include "GameInfo/GameInfo.h"
 #include "Utilities/Globals.h"
-#include "../LoaderUI.h"
-#include "Ue4.hpp"
+#include "LoaderUI.h"
+#include "UE4/Ue4.hpp"
 
 class LOADER_API Mod
 {

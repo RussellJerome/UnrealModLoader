@@ -3,11 +3,11 @@
 #include "Utilities/Logger.h"
 #include <string>
 #include <filesystem>
-#include "INI.h"
+#include "INI/INI.h"
 #include "Utilities/Pattern.h"
 #include "Utilities/Version.h"
-#include "../Hooks.h"
-#include "../UE4/Ue4.hpp"
+#include "Hooks.h"
+#include "UE4/Ue4.hpp"
 GameProfile GameProfile::SelectedGameProfile;
 
 DWORD StringToDWord(std::string str)
