@@ -11,6 +11,173 @@
 namespace UML
 {
     class GameInfo* gameInfo;
+    /*
+    TODO
+    ====
+    USE MULTIPLE ALTERNATIVES
+    */
+    void SetupGVariables()
+    {
+        if (GetGameInfo()->UsesFNamePool)
+        {
+            auto FNamePoolGrabber = new Memory::VariableGrabber("74 09 48 8D 15 ? ? ? ? EB 16", 5, 9);
+            auto FNamePoolVar = FNamePoolGrabber->ripVariable();
+            if (FNamePoolVar != 0)
+            {
+                GetGameInfo()->GName = FNamePoolVar;
+                LOG_INFO("FoundNamePool: 0x%p", GetGameInfo()->GName);
+            }
+            else
+            {
+                LOG_ERROR("FoundNamePool Could Not Be Found!");
+            }
+        }
+        else
+        {
+            auto GNameGrabber = new Memory::VariableGrabber("E8 ? ? ? ? 48 8B C3 48 89 1D ? ? ? ? 48 8B 5C 24", 11, 15);
+            auto GNameVar = GNameGrabber->ripVariable();
+            if (GNameVar != 0)
+            {
+                GetGameInfo()->GName = GNameVar;
+                LOG_INFO("GName: 0x%p", GetGameInfo()->GName);
+            }
+            else
+            {
+                LOG_ERROR("GName Could Not Be Found!");
+            }
+        }
+        auto GObjectGrabber = new Memory::VariableGrabber("8B 46 10 3B 46 3C 75 0F 48 8B D6 48 8D 0D ? ? ? ? E8", 14, 18);
+        auto GObjectVar = GObjectGrabber->ripVariable();
+        if (GObjectVar != 0)
+        {
+            GetGameInfo()->GObject = GObjectVar;
+            LOG_INFO("GObject: 0x%p", GetGameInfo()->GObject);
+        }
+        else
+        {
+            LOG_ERROR("GObject Could Not Be Found!");
+        }
+        auto GWorldGrabber = Memory::VariableGrabber("0F 2E ? 74 ? 48 8B 1D ? ? ? ? 48 85 DB 74", 8, 12);
+        auto GWorldVar = GWorldGrabber.ripVariable();
+        if (GWorldVar != 0)
+        {
+            GetGameInfo()->GWorld = GWorldVar;
+            LOG_INFO("GWorld: 0x%p", GetGameInfo()->GWorld);
+        }
+        else
+        {
+            LOG_ERROR("GWorld Could Not Be Found!");
+        }
+    }
+
+    void SetupUEFunctions()
+    {
+        //GameStateInit AOBS
+        auto GameStateInit_Grabber = new Memory::FunctionGrabber("40 53 48 83 EC 20 48 8B 41 10 48 8B D9 48 8B 91");
+        GetGameInfo()->GameStateInit = GameStateInit_Grabber->ripFunction();
+        if (GetGameInfo()->GameStateInit != 0)
+            LOG_INFO("GameStateInit: 0x%p", (void*)GetGameInfo()->GameStateInit);
+        else
+            LOG_ERROR("GameStateInit NOT FOUND!");
+
+        //Beginplay AOBS
+        auto BeginPlay_Grabber = new Memory::FunctionGrabber("48 8B D9 E8 ?? ?? ?? ?? F6 83 ?? ?? ?? ?? ?? 74 12 48 8B 03", 0x3);
+        GetGameInfo()->BeginPlay = BeginPlay_Grabber->ripFunction();
+        if (GetGameInfo()->BeginPlay != 0)
+            LOG_INFO("AActor::BeginPlay: 0x%p", (void*)GetGameInfo()->BeginPlay);
+        else
+            LOG_ERROR("AActor::BeginPlay NOT FOUND!");
+
+        //StaticLoadObject AOBS
+        auto StaticLoadObject_Grabber = new Memory::FunctionGrabber("89 64 24 ? 48 8B C8 E8 ? ? ? ? 41 BE ? ? ? ? EB 05 E8", 0x7);
+        StaticLoadObject_Grabber->addAlternativeAob("C7 44 24 ? ? ? ? ? E8 ? ? ? ? 48 8B 8D ? ? ? ? 48 85 C9 74 05 E8 ? ? ? ? 45 33 C9 ? 89 74 24", 0x8);
+        StaticLoadObject_Grabber->addAlternativeAob("89 6C 24 20 48 8B C8 E8 ? ? ? ? 48 8B 4C 24 ? 48 8B F0 48 85 C9 74 05", 0x7);
+        StaticLoadObject_Grabber->addAlternativeAob("48 8B C8 89 5C 24 20 E8 ? ? ? ? 48", 0x7);
+        GetGameInfo()->StaticLoadObject = StaticLoadObject_Grabber->ripFunction();
+        if (GetGameInfo()->StaticLoadObject != 0)
+            LOG_INFO("StaticLoadObject: 0x%p", (void*)GetGameInfo()->StaticLoadObject);
+        else
+            LOG_ERROR("StaticLoadObject NOT FOUND!");
+
+        //SpawnActorFTrans AOBS
+        auto SpawnActorFTrans_Grabber = new Memory::FunctionGrabber("4C 8B C6 48 8B C8 48 8B D3 E8 ? ? ? ? 48 8B 5C 24 ? 48 8B 74 24", 0x9);
+        SpawnActorFTrans_Grabber->addAlternativeAob("4C 8B CE 4C 8D 44 24 ? 48 8B D7 48 8B CB E8 ? ? ? ? 48 8B 4C 24 ? 48 33 CC", 0xE);
+        GetGameInfo()->SpawnActorFTrans = SpawnActorFTrans_Grabber->ripFunction();
+        if (GetGameInfo()->SpawnActorFTrans != 0)
+            LOG_INFO("UWorld::SpawnActor: 0x%p", (void*)GetGameInfo()->SpawnActorFTrans);
+        else
+            LOG_ERROR("SpawnActorFTrans NOT FOUND!");
+
+        //CallFunctionByNameWithArguments AOBS
+        auto CallFunctionByNameWithArguments_Grabber = new Memory::FunctionGrabber("8B ? E8 ? ? ? ? ? 0A ? FF ? EB 9E ? 8B", 0x2);
+        CallFunctionByNameWithArguments_Grabber->addAlternativeAob("49 8B D4 E8 ? ? ? ? 44 0A F8 FF C3 EB 9A", 0x3);
+        GetGameInfo()->CallFunctionByNameWithArguments = CallFunctionByNameWithArguments_Grabber->ripFunction();
+        if (GetGameInfo()->CallFunctionByNameWithArguments)
+            LOG_INFO("CallFunctionByNameWithArguments: 0x%p", (void*)GetGameInfo()->CallFunctionByNameWithArguments);
+        else
+            LOG_ERROR("CallFunctionByNameWithArguments NOT FOUND!");
+
+        //Process AOBS
+        auto ProcessEvent_Grabber = new Memory::FunctionGrabber("75 0E ? ? ? 48 ? ? 48 ? ? E8 ? ? ? ? 48 8B ? 24 ? 48 8B ? 24 38 48 8B ? 24 40", 0xB);
+        GetGameInfo()->ProcessEvent = ProcessEvent_Grabber->ripFunction();
+        if (GetGameInfo()->ProcessEvent != 0)
+            LOG_INFO("UObject::ProcessEvent: 0x%p", (void*)GetGameInfo()->ProcessEvent);
+        else
+            LOG_ERROR("ProcessEvent NOT FOUND!");
+    }
+
+    void SetupProcessInternalFunction()
+    {
+        if (GetGameInfo()->UsesFNamePool || GetGameInfo()->IsUsing4_22)
+        {
+            auto ProcessInternals_Grabber = new Memory::FunctionGrabber("41 F6 C7 02 74 ? 4C 8B C7 48 8B ? ? 8B ? E8", 0xF);
+            GetGameInfo()->ProcessInternals = ProcessInternals_Grabber->ripFunction();
+            if (GetGameInfo()->ProcessInternals != 0)
+                LOG_INFO("ProcessInternalFunction: 0x%p", (void*)GetGameInfo()->ProcessInternals);
+            else
+                LOG_ERROR("ProcessInternalFunction COULD NOT BE FOUND!");
+        }
+    }
+
+    void SetupStaticConstructObject_Internal()
+    {
+        if (GetGameInfo()->EngineVersion->Minor >= 26)
+        {
+            GetGameInfo()->IsUsingUpdatedStaticConstruct = true;
+        }
+        auto StaticConstructObject_Internal_Grabber = new Memory::FunctionGrabber("48 8B 84 24 ?? ?? 00 00 48 89 44 24 ?? C7 44 24 ?? 00 00 00 00 E8 ?? ?? ?? ?? 48 8B 5C 24", 0x15);
+        StaticConstructObject_Internal_Grabber->addAlternativeAob("48 8B C8 89 7C 24 ?? E8 ?? ?? ?? ?? 48 8B 5C 24 ?? 48 83 C4 ?? 5F C3", 0x7);
+        StaticConstructObject_Internal_Grabber->addAlternativeAob("? E8 ? ? ? ? 45 8B 47 70", 0x1);
+        StaticConstructObject_Internal_Grabber->addAlternativeAob("89 6C 24 38 48 89 74 24 ? E8", 0x9);
+        GetGameInfo()->StaticConstructObject_Internal = StaticConstructObject_Internal_Grabber->ripFunction();
+        if (GetGameInfo()->StaticConstructObject_Internal != 0)
+            LOG_INFO("StaticConstructObject_Internal 0x%p", (void*)GetGameInfo()->StaticConstructObject_Internal);
+        else
+            LOG_WARNING("StaticConstructObject_Internal Not Found! This will prevent Mods using the ModObjectInstance from working properly.");
+    }
+
+    void SetupExternalFunctions()
+    {
+        //UWorldTick AOBS
+        auto UWorldTick_Grabber = new Memory::FunctionGrabber("BA ? ? ? ? E8 ? ? ? ? 80 3D ? ? ? ? ? 75 2D", 0x5);
+        UWorldTick_Grabber->addAlternativeAob("49 8B 8E ? ? ? ? E8 ? ? ? ? 48 8D 8D", 0x7);
+        GetGameInfo()->UWorldTick = UWorldTick_Grabber->ripFunction();
+        if (GetGameInfo()->UWorldTick != 0)
+            LOG_INFO("UWorld::Tick 0x%p", (void*)GetGameInfo()->UWorldTick);
+        else
+            LOG_ERROR("UWorld::Tick NOT FOUND!");
+
+        //MoutPak AOBS
+        auto MountPak_Grabber = new Memory::FunctionGrabber("C6 44 24 ? ? E8 ? ? ? ? 84 C0 74 03 41 FF C5", 0x5);
+        MountPak_Grabber->addAlternativeAob("48 8B 4C 24 ? E8 ? ? ? ? 48 8B 4C 24 ? 84 C0", 0x5);
+        MountPak_Grabber->addAlternativeAob("48 89 ? 24 ? ? ? ? E8 ? ? ? ? 44 0F ? E8 84 C0 ", 0x8);
+        MountPak_Grabber->addAlternativeAob("49 8B CD E8 ? ? ? ? 84 C0 74 03 41 FF C4 ", 0x3);
+        GetGameInfo()->MountPak = MountPak_Grabber->ripFunction();
+        if (GetGameInfo()->MountPak != 0)
+            LOG_INFO("FPakPlatformFile::Mount 0x%p", (void*)GetGameInfo()->MountPak);
+        else
+            LOG_ERROR("FPakPlatformFile::Mount NOT FOUND!");
+    }
 
     void StartUML()
     {
@@ -46,7 +213,35 @@ namespace UML
             FreeConsole();
             AllocConsole();
             auto file = freopen("CON", "w", LOG_STREAM);
-            LOG_INFO("Created by ~Russell.J Release V %s", LoaderVersion);
+            LOG_INFO("Created by ~Russell.J Release V %s", LoaderVersion.c_str());
+        }
+
+        /*
+        NOTE
+        ====
+        CODE GRABS THE GAMES ENGINE VERSION
+        */
+        auto EngineVersionGrabber = Memory::VariableGrabber("C7 03 04 00 ?? 00 66 89 4B 04 48 3B F8 74 ?? 48", 2);
+        EngineVersionGrabber.addAlternativeAob("C7 05 ?? ?? ?? ?? 04 00 ?? 00 66 89 ?? ?? ?? ?? ?? C7 05", 6);
+        EngineVersionGrabber.addAlternativeAob("C7 05 ?? ?? ?? ?? 04 00 ?? 00 66 89 ?? ?? ?? ?? ?? 89", 6);
+        EngineVersionGrabber.addAlternativeAob("41 C7 ?? 04 00 ?? 00 ?? ?? 00 00 00 66 41 89", 3);
+        EngineVersionGrabber.addAlternativeAob("41 C7 ?? 04 00 18 00 66 41 89 ?? 04", 3);
+        EngineVersionGrabber.addAlternativeAob("41 C7 04 24 04 00 ?? 00 66 ?? 89 ?? 24", 4);
+        EngineVersionGrabber.addAlternativeAob("41 C7 04 24 04 00 ?? 00 B9 ?? 00 00 00", 4);
+        EngineVersionGrabber.addAlternativeAob("C7 05 ?? ?? ?? ?? 04 00 ?? 00 89 05 ?? ?? ?? ?? E8", 6);
+        EngineVersionGrabber.addAlternativeAob("C7 05 ?? ?? ?? ?? 04 00 ?? 00 66 89 ?? ?? ?? ?? ?? 89 05", 6);
+        EngineVersionGrabber.addAlternativeAob("C7 46 20 04 00 ?? 00 66 44 89 76 24 44 89 76 28 48 39 C7", 3);
+        EngineVersionGrabber.addAlternativeAob("C7 03 04 00 ?? 00 66 44 89 63 04 C7 43 08 C1 5C 08 80 E8", 2);
+        auto EngineVersion = EngineVersionGrabber.ripVariable();
+
+        if (EngineVersion != 0)
+        {
+            GetGameInfo()->EngineVersion = (FEngineVersion*)EngineVersion;
+            LOG_INFO("Engine Version: %i.%i", GetGameInfo()->EngineVersion->Major, GetGameInfo()->EngineVersion->Minor);
+        }
+        else
+        {
+            LOG_ERROR("EngineVersion Could Not Be Found!");
         }
 
         //Load and read game profile.
@@ -104,62 +299,9 @@ namespace UML
             }
             else
             {
-                //If the GInfo isnt defined, use default AOBs to find them.
-                /*
-                TODO
-                ====
-                USE MULTIPLE ALTERNATIVES
-                */
-                if (GetGameInfo()->UsesFNamePool)
-                {
-                    auto FNamePoolGrabber = new Memory::VariableGrabber("74 09 48 8D 15 ? ? ? ? EB 16", 5, 9);
-                    auto FNamePoolVar = FNamePoolGrabber->ripVariable();
-                    if (FNamePoolVar != 0)
-                    {
-                        GetGameInfo()->GName = FNamePoolVar;
-                        LOG_INFO("FoundNamePool: 0x%p", GetGameInfo()->GName);
-                    }
-                    else
-                    {
-                        LOG_ERROR("FoundNamePool Could Not Be Found!");
-                    }
-                }
-                else
-                {
-                    auto GNameGrabber = new Memory::VariableGrabber("E8 ? ? ? ? 48 8B C3 48 89 1D ? ? ? ? 48 8B 5C 24", 11, 15);
-                    auto GNameVar = GNameGrabber->ripVariable();
-                    if (GNameVar != 0)
-                    {
-                        GetGameInfo()->GName = GNameVar;
-                        LOG_INFO("GName: 0x%p", GetGameInfo()->GName);
-                    }
-                    else
-                    {
-                        LOG_ERROR("GName Could Not Be Found!");
-                    }
-                }
-                auto GObjectGrabber = new Memory::VariableGrabber("8B 46 10 3B 46 3C 75 0F 48 8B D6 48 8D 0D ? ? ? ? E8", 14, 18);
-                auto GObjectVar = GObjectGrabber->ripVariable();
-                if (GObjectVar != 0)
-                {
-                    GetGameInfo()->GObject = GObjectVar;
-                    LOG_INFO("GObject: 0x%p", GetGameInfo()->GObject);
-                }
-                else
-                {
-                    LOG_ERROR("GObject Could Not Be Found!");
-                }
-                auto GWorldGrabber = Memory::VariableGrabber("0F 2E ? 74 ? 48 8B 1D ? ? ? ? 48 85 DB 74", 8, 12);
-                auto GWorldVar = GWorldGrabber.ripVariable();
-                if (GWorldVar != 0)
-                {
-                    GetGameInfo()->GWorld = GWorldVar;
-                    LOG_INFO("GWorld: 0x%p", GetGameInfo()->GWorld);
-                }
-                else
-                {
-                    LOG_ERROR("GWorld Could Not Be Found!");
-                }
+                //World on system which can auto detect if not define.
+                //RESTRUCTURE
+                SetupGVariables();
             }
 
             /*
@@ -248,75 +390,11 @@ namespace UML
             }
             else
             {
-                //GameStateInit AOBS
-                auto GameStateInit_Grabber = new Memory::FunctionGrabber("40 53 48 83 EC 20 48 8B 41 10 48 8B D9 48 8B 91");
-                GetGameInfo()->GameStateInit = GameStateInit_Grabber->ripFunction();
-                if (GetGameInfo()->GameStateInit != 0)
-                    LOG_INFO("GameStateInit: 0x%p", (void*)GetGameInfo()->GameStateInit);
-                else
-                    LOG_ERROR("GameStateInit NOT FOUND!");
-
-                //Beginplay AOBS
-                auto BeginPlay_Grabber = new Memory::FunctionGrabber("48 8B D9 E8 ?? ?? ?? ?? F6 83 ?? ?? ?? ?? ?? 74 12 48 8B 03", 0x3);
-                GetGameInfo()->BeginPlay = BeginPlay_Grabber->ripFunction();
-                if (GetGameInfo()->BeginPlay != 0)
-                    LOG_INFO("AActor::BeginPlay: 0x%p", (void*)GetGameInfo()->BeginPlay);
-                else
-                    LOG_ERROR("AActor::BeginPlay NOT FOUND!");
-
-                //StaticLoadObject AOBS
-                auto StaticLoadObject_Grabber = new Memory::FunctionGrabber("89 64 24 ? 48 8B C8 E8 ? ? ? ? 41 BE ? ? ? ? EB 05 E8", 0x7);
-                StaticLoadObject_Grabber->addAlternativeAob("C7 44 24 ? ? ? ? ? E8 ? ? ? ? 48 8B 8D ? ? ? ? 48 85 C9 74 05 E8 ? ? ? ? 45 33 C9 ? 89 74 24", 0x8);
-                StaticLoadObject_Grabber->addAlternativeAob("89 6C 24 20 48 8B C8 E8 ? ? ? ? 48 8B 4C 24 ? 48 8B F0 48 85 C9 74 05", 0x7);
-                StaticLoadObject_Grabber->addAlternativeAob("48 8B C8 89 5C 24 20 E8 ? ? ? ? 48", 0x7);
-                GetGameInfo()->StaticLoadObject = StaticLoadObject_Grabber->ripFunction();
-                if (GetGameInfo()->StaticLoadObject != 0)
-                    LOG_INFO("StaticLoadObject: 0x%p", (void*)GetGameInfo()->StaticLoadObject);
-                else
-                    LOG_ERROR("StaticLoadObject NOT FOUND!");
-
-                //SpawnActorFTrans AOBS
-                auto SpawnActorFTrans_Grabber = new Memory::FunctionGrabber("4C 8B C6 48 8B C8 48 8B D3 E8 ? ? ? ? 48 8B 5C 24 ? 48 8B 74 24", 0x9);
-                SpawnActorFTrans_Grabber->addAlternativeAob("4C 8B CE 4C 8D 44 24 ? 48 8B D7 48 8B CB E8 ? ? ? ? 48 8B 4C 24 ? 48 33 CC", 0xE);
-                GetGameInfo()->SpawnActorFTrans = SpawnActorFTrans_Grabber->ripFunction();
-                if (GetGameInfo()->SpawnActorFTrans != 0)
-                    LOG_INFO("UWorld::SpawnActor: 0x%p", (void*)GetGameInfo()->SpawnActorFTrans);
-                else
-                    LOG_ERROR("SpawnActorFTrans NOT FOUND!");
-     
-                //CallFunctionByNameWithArguments AOBS
-                auto CallFunctionByNameWithArguments_Grabber = new Memory::FunctionGrabber("8B ? E8 ? ? ? ? ? 0A ? FF ? EB 9E ? 8B", 0x2);
-                CallFunctionByNameWithArguments_Grabber->addAlternativeAob("49 8B D4 E8 ? ? ? ? 44 0A F8 FF C3 EB 9A", 0x3);
-                GetGameInfo()->CallFunctionByNameWithArguments = CallFunctionByNameWithArguments_Grabber->ripFunction();
-                if(GetGameInfo()->CallFunctionByNameWithArguments)
-                    LOG_INFO("CallFunctionByNameWithArguments: 0x%p", (void*)GetGameInfo()->CallFunctionByNameWithArguments);
-                else
-                    LOG_ERROR("CallFunctionByNameWithArguments NOT FOUND!");
-
-                //Process AOBS
-                auto ProcessEvent_Grabber = new Memory::FunctionGrabber("75 0E ? ? ? 48 ? ? 48 ? ? E8 ? ? ? ? 48 8B ? 24 ? 48 8B ? 24 38 48 8B ? 24 40", 0xB);
-                GetGameInfo()->ProcessEvent = ProcessEvent_Grabber->ripFunction();
-                if (GetGameInfo()->ProcessEvent != 0)
-                    LOG_INFO("UObject::ProcessEvent: 0x%p", (void*)GetGameInfo()->ProcessEvent);
-                else
-                    LOG_ERROR("ProcessEvent NOT FOUND!");
-
-                /*
-                TODO
-                ====
-                LETS STOP USING THIS, IT IS SO OUTDATED AND DOESNT EVEN WORK HALF THE DAMN TIME
-                */
-                //CreateDefaultObject AOBS
-                auto CreateDefaultObject_Grabber = new Memory::FunctionGrabber("4C 8B DC 57 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 84 24 ? ? ? ? 48 83 B9 ? ? ? ? ? 48 8B F9 ");
-                CreateDefaultObject_Grabber->addAlternativeAob("4C 8B DC 55 53 49 8D AB ? ? ? ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 48 83 B9 ? ? ? ? ? 48 8B D9 0F 85");
-                CreateDefaultObject_Grabber->addAlternativeAob("4C 8B DC 53 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 84 24 ? ? ? ? 48 83 B9");
-                CreateDefaultObject_Grabber->addAlternativeAob("4C 8B DC ?? ?? ?? ?? ?? ? ? ? ? ?? ?? ?? ? ? ? ? ?? ?? ?? ? ? ? ? ?? ?? ?? 48 ?? ?? ? ? ? ? ?? ?? ?? ? ? ? ? ? ?? ?? ?? ?? ?? ? ? ? ? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ? ? ? ? ?? 8B ?? ? ? ? ? ?? ?? ?? ?? ?? ?? 8B ?? ?? ?? ?? ?? ?? ? ? ? ? ?? ?? ?? ? ? ? ? ?? ?? ?? ?? ?? ?? ? ? ? ? ?? ?? ?? ?? ?? ? ? ? ? ?? ?? ? ? ? ? ?? ?? ?? 48");
-                GetGameInfo()->CreateDefaultObject = CreateDefaultObject_Grabber->ripFunction();
-                if (GetGameInfo()->CreateDefaultObject != 0)
-                    LOG_INFO("UClass::CreateDefualtObject: 0x%p", (void*)GetGameInfo()->CreateDefaultObject);
-                else
-                    LOG_ERROR("CreateDefualtObject NOT FOUND!, Isn't that big of a issue, mostly depreciated");
+                //CleanUp
+                SetupUEFunctions();
             }
+
+
             // Loads Process Internal Function if defined in the game profile
             if (GameInfo.select("ProcessInternalFunction"))
             {
@@ -326,15 +404,8 @@ namespace UML
             }
             else
             {
-                if (GetGameInfo()->UsesFNamePool || GetGameInfo()->IsUsing4_22)
-                {
-                    auto ProcessInternals_Grabber = new Memory::FunctionGrabber("41 F6 C7 02 74 ? 4C 8B C7 48 8B ? ? 8B ? E8", 0xF);
-                    GetGameInfo()->ProcessInternals = ProcessInternals_Grabber->ripFunction();
-                    if (GetGameInfo()->ProcessInternals != 0)
-                        LOG_INFO("ProcessInternalFunction: 0x%p", (void*)GetGameInfo()->ProcessInternals);
-                    else
-                        LOG_ERROR("ProcessInternalFunction COULD NOT BE FOUND!");
-                }
+                //CleanUp
+                SetupProcessInternalFunction();
             }
 
             //Loads StaticConstructObejct_InternalInfo is present in the game profile
@@ -346,40 +417,59 @@ namespace UML
             }
             else
             {
-                auto StaticConstructObject_Internal_Grabber = new Memory::FunctionGrabber("48 8B 84 24 ?? ?? 00 00 48 89 44 24 ?? C7 44 24 ?? 00 00 00 00 E8 ?? ?? ?? ?? 48 8B 5C 24", 0x15);
-                StaticConstructObject_Internal_Grabber->addAlternativeAob("48 8B C8 89 7C 24 ?? E8 ?? ?? ?? ?? 48 8B 5C 24 ?? 48 83 C4 ?? 5F C3", 0x7);
-                GetGameInfo()->StaticConstructObject_Internal = StaticConstructObject_Internal_Grabber->ripFunction();
-                if (GetGameInfo()->StaticConstructObject_Internal == 0)
-                {
-                    GetGameInfo()->IsUsingUpdatedStaticConstruct = true;
-                    StaticConstructObject_Internal_Grabber->addAlternativeAob("? E8 ? ? ? ? 45 8B 47 70", 0x1);
-                    StaticConstructObject_Internal_Grabber->addAlternativeAob("89 6C 24 38 48 89 74 24 ? E8", 0x9);
-                    GetGameInfo()->StaticConstructObject_Internal = StaticConstructObject_Internal_Grabber->ripFunction();
-                    if(GetGameInfo()->StaticConstructObject_Internal != 0)
-                        LOG_INFO("StaticConstructObject_Internal 0x%p", (void*)GetGameInfo()->StaticConstructObject_Internal);
-                    else
-                        LOG_WARNING("StaticConstructObject_Internal Not Found! This will prevent Mods using the ModObjectInstance from working properly.");
-                }
-                else
-                    LOG_INFO("StaticConstructObject_Internal 0x%p", (void*)GetGameInfo()->StaticConstructObject_Internal);
+                //CleanUp
+                SetupStaticConstructObject_Internal();
             }
 
-            //UWorldTick AOBS
-            auto UWorldTick_Grabber = new Memory::FunctionGrabber("BA ? ? ? ? E8 ? ? ? ? 80 3D ? ? ? ? ? 75 2D", 0x5);
-            UWorldTick_Grabber->addAlternativeAob("49 8B 8E ? ? ? ? E8 ? ? ? ? 48 8D 8D", 0x7);
-            GetGameInfo()->UWorldTick = UWorldTick_Grabber->ripFunction();
-            if (GetGameInfo()->UWorldTick != 0)
-                LOG_INFO("UWorld::Tick 0x%p", (void*)GetGameInfo()->UWorldTick);
-            else
-                LOG_ERROR("UWorld::Tick NOT FOUND!");
-
-            LOG_INFO("Setup %s", gamename.c_str());
-            HookManager::Init();
+            SetupExternalFunctions();
         }
         else
         {
-            LOG_ERROR("Profile %s Not Detected!", Profile.c_str());
+            LOG_INFO("Profile %s Was Not Detected", gamename.c_str());
+            
+            //Check if the game is on UE4 and not UE5
+            if (GetGameInfo()->EngineVersion->Major == 4)
+            {
+                //Setup Name and Object settings for 4.19 and lower
+                if (GetGameInfo()->EngineVersion->Minor <= 19)
+                {
+                    GetGameInfo()->UsesFNamePool = false;
+                    GetGameInfo()->IsUsingFChunkedFixedUObjectArray = false;
+                }
+                //Setup Object settings for 4.20 and higher
+                else if (GetGameInfo()->EngineVersion->Minor >= 20)
+                {
+                    GetGameInfo()->IsUsingFChunkedFixedUObjectArray = true;
+                }
+                //Check if game uses weird 4.22 name system
+                if(GetGameInfo()->EngineVersion->Minor == 22)
+                {
+                    GetGameInfo()->IsUsing4_22 = true;
+                }
+                //Setup FName settings for 4.23 and higher
+                else if (GetGameInfo()->EngineVersion->Minor >= 23)
+                {
+                    GetGameInfo()->UsesFNamePool = true;
+                }
+
+                //Find GVariable Address's
+                SetupGVariables();
+
+                //Find Default UE Functions
+                SetupUEFunctions();
+
+                //Find ProcessInternal Function
+                SetupProcessInternalFunction();
+
+                //Find StaticConstructObject_Internal
+                SetupStaticConstructObject_Internal();
+
+                //Find External Functions
+                SetupExternalFunctions();
+            }
         }
+        LOG_INFO("Setup %s", gamename.c_str());
+        HookManager::Init();
     }
 
     class GameInfo* GetGameInfo()

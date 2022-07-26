@@ -25,9 +25,26 @@ namespace UML
 			}
 
 			/*
+			* Ensures at least one aob is set for the class.
+			*/
+			VariableGrabber(const char* aob, int offset)
+			{
+				VariableType = 1;
+				VariableInfo info;
+				info.aob = aob;
+				info.Offset = offset;
+				variableLocations.push_back(info);
+			}
+
+			/*
 			* Allows you to add alternative AOBs to help prevent failure.
 			*/
 			void addAlternativeAob(const char* aob, int firstOpCodes, int totalByteInstruction);
+
+			/*
+			* Allows you to add alternative AOBs to help prevent failure.
+			*/
+			void addAlternativeAob(const char* aob, int offset);
 
 			/*
 			* Loops through all the AOBs provided and attempts to rip the address from memory.
@@ -43,7 +60,15 @@ namespace UML
 				const char* aob;
 				int FirstOpCodes;
 				int TotalByteInstruction;
+				int Offset;
 			};
+
+			/*
+			* Int which tells us what kind of variable to extract.
+			* 0 is default ripping
+			* 1 is offset based
+			*/
+			int VariableType = 0;
 
 			/*
 			* Array that holds all the AOB information.

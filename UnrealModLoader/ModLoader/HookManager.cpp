@@ -3,6 +3,8 @@
 #include "MinHook.h"
 #include "../UnrealModLoader.h"
 #include "ModLoader.h"
+#include <iostream>
+#include "../Memory/Memory.h"
 
 namespace HookManager
 {
@@ -12,6 +14,7 @@ namespace HookManager
 	THIS IS WHERE WE WILL HOOK ARE NEEDED UE4 FUNCTIONS.
 	THE MODLOADER CODE WILL BE HANDLED IN THEIR RESPECTED FUNCTIONS;
 	*/
+
 	namespace HookedFunctions
 	{
 		PVOID(*origInitGameState)(void*);
@@ -42,7 +45,7 @@ namespace HookManager
 		LOG_INFO("MinHook Initialized");
 		MinHook::Add(UML::GetGameInfo()->GameStateInit, &HookedFunctions::hookInitGameState, &HookedFunctions::origInitGameState, "AGameModeBase::InitGameState");
 		MinHook::Add(UML::GetGameInfo()->BeginPlay, &HookedFunctions::hookBeginPlay, &HookedFunctions::origBeginPlay, "AActor::BeginPlay");
-		MinHook::Add(UML::GetGameInfo()->UWorldTick, &HookedFunctions::hookUWorldTick, &HookedFunctions::origUWorldTick, "UWorld::Tick");
+		//MinHook::Add(UML::GetGameInfo()->UWorldTick, &HookedFunctions::hookUWorldTick, &HookedFunctions::origUWorldTick, "UWorld::Tick");
 	}
 
 	void CleanUp()

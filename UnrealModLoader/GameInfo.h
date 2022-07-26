@@ -32,6 +32,17 @@ struct Offsets {
 	} Property;
 };
 
+class FEngineVersion
+{
+public:
+
+	/** Major version number. */
+	uint16_t Major;
+
+	/** Minor version number. */
+	uint16_t Minor;
+};
+
 class GameInfo
 {
 public:
@@ -54,6 +65,8 @@ public:
 	bool bIsFProperty = false;
 	std::string BeginPlayOverwrite = "Class Engine.PlayerController";
 
+	FEngineVersion* EngineVersion;
+
 	//Handles GInfo
 	bool IsGInfoPatterns = false;
 	DWORD64 GName = 0x0;
@@ -71,6 +84,8 @@ public:
 	DWORD64 CreateDefaultObject = 0x0;
 	DWORD64 ProcessInternals = 0x0;
 	DWORD64 UWorldTick = 0x0;
+	DWORD64 MountPak = 0x0;
+	DWORD64 UnMountPak = 0x0;
 
 	bool IsUsingUpdatedStaticConstruct = false;
 	DWORD64 StaticConstructObject_Internal = 0x0;

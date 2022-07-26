@@ -209,4 +209,14 @@ namespace UE4
 
 		void ExecuteUbergraph(int EntryPoint);
 	};
+
+	class UPackage : public UObject
+	{
+	public:
+		static UClass* StaticClass()
+		{
+			static auto ptr = UObject::FindClass("Class CoreUObject.Package");
+			return ptr;
+		}
+	};
 };

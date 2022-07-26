@@ -83,7 +83,6 @@ namespace UE4
 				{
 					VarFound = true;
 					auto varProperty = (UEProperty*)Children;
-					//*reinterpret_cast<T*>((byte*)Object + varProperty->GetOffset()) = Value;
 					UML::Memory::Write<T>((byte*)Object + varProperty->GetOffset(), Value);
 					return true;
 				}
@@ -104,7 +103,6 @@ namespace UE4
 					VarFound = true;
 					auto varProperty = (UEProperty*)Children;
 
-					//*reinterpret_cast<T*>((byte*)Object + varProperty->GetOffset()) = Value;
 					UML::Memory::Write<T>((byte*)Object + varProperty->GetOffset(), Value);
 					return true;
 				}
