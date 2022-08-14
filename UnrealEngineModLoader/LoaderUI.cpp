@@ -217,6 +217,8 @@ void ShowCoreMods()
 				}
 			}
 
+			Global::GetGlobals()->CoreMods[i]->DrawImGui();
+
 			ImGui::TreePop();
 		}
 	}
@@ -403,7 +405,6 @@ void LoaderUI::LoaderD3D11Present(IDXGISwapChain* pSwapChain, UINT SyncInterval,
 		style->TabRounding = 0.0f;
 		style->WindowRounding = 4.0f;
 		DrawImGui();
-		Global::GetGlobals()->eventSystem.dispatchEvent("DrawImGui");
 	}
 
 	ImGui::Render();
