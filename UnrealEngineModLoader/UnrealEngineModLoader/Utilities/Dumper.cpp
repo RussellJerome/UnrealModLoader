@@ -1,6 +1,6 @@
 #include "Dumper.h"
 #include <windows.h>
-#include "../UE4/Ue4.hpp"
+#include "UE4/Ue4.hpp"
 #include "Globals.h"
 
 Dumper* Dumper::DumpRef;

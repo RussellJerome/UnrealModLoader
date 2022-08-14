@@ -22,6 +22,9 @@
     <Filter Include="UnrealModLoader\Mod">
       <UniqueIdentifier>{31c4735e-1d2d-4355-95df-b9c75892f6af}</UniqueIdentifier>
     </Filter>
+    <Filter Include="INI">
+      <UniqueIdentifier>{cdb593e4-f03a-4910-a0c7-67c554f563a2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="UnrealEngineModLoader\dllmain.cpp">
@@ -145,5 +148,8 @@
       <Filter>UnrealModLoader\Utilities</Filter>
     </ClInclude>
     <ClInclude Include="UMLDefs.h" />
+    <ClInclude Include="INI\INI.h">
+      <Filter>INI</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

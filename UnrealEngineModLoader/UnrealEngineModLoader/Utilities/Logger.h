@@ -3,7 +3,7 @@
 #include <vector>
 #include <string>
 
-#include "../UMLDefs.h"
+#include "UMLDefs.h"
 
 #define APP_NAME "UnrealModLoader"
 #define LOG_STREAM stdout
@@ -99,13 +99,16 @@ public:
 	static bool DumpLog()
 	{
 		FILE* Log = NULL;
-		fopen_s(&Log, "UML-Log.txt", "w+");
+		if (fopen_s(&Log, "UML-Log.txt", "w+"))
+			return false;
+
 		for (size_t i = 0; i < LogArray.size(); i++)
 		{
 			auto currentstring = LogArray[i];
 			fprintf(Log, "%s\n", currentstring.c_str());
 		}
 		fclose(Log);
+		return true;
 	}
 
 private:

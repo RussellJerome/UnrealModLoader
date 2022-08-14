@@ -1,4 +1,4 @@
-#include "../UE4/Ue4.hpp"
+#include "UE4/Ue4.hpp"
 #include "Utilities/Logger.h"
 namespace ClassDefFinder
 {
