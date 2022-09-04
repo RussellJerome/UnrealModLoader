@@ -21,157 +21,167 @@ using System.IO;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Windows.Interop;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using Newtonsoft.Json;
+using UnrealModLauncher.Utilities.Commands;
 
 namespace UnrealModLauncher
 {
-    [DataContract]
-    public class GameInfoList
+    public class BaseModel : INotifyPropertyChanged
     {
-        [DataMember]
-        public List<GameInfo> Games { get; set; }
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected void OnPropertyChanged([CallerMemberName] string name = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
     }
 
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
-        public static readonly string _applicationDataPath = System.AppDomain.CurrentDomain.BaseDirectory;
-        private static readonly ObservableCollection<GameInfo> _games = new ObservableCollection<GameInfo>();
-        private readonly string gamesListPath;
-        public static ReadOnlyObservableCollection<GameInfo> Games;
         public MainWindow()
         {
             InitializeComponent();
 
-            try
+            DataContext = new MainWindowModel(this);
+        }
+
+        public class MainWindowModel : BaseModel
+        {
+            private MainWindow _view;
+
+            private string documentPath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "UnrealModLauncher");
+
+            #region Commands
+            public IAsyncCommand AddGameCommand { get; private set; }
+            public IAsyncCommand<GameInfo> RemoveGameCommand { get; private set; }
+            public IAsyncCommand<GameInfo> EditGameCommand { get; private set; }
+            public IAsyncCommand<GameInfo> LaunchGameCommand { get; private set; }
+            #endregion
+
+            private ObservableCollection<GameInfo> _gameList;
+            public ObservableCollection<GameInfo> GameList
             {
-                //if (!Directory.Exists(_applicationDataPath)) Directory.CreateDirectory(_applicationDataPath);
-                gamesListPath = $@"{_applicationDataPath}GameList.xml";
-                Games = new ReadOnlyObservableCollection<GameInfo>(_games);
-
-
-                if (File.Exists(gamesListPath))
+                get { return _gameList; }
+                set
                 {
-                    var games = Serializer.FromFile<GameInfoList>(gamesListPath).Games;
-                    _games.Clear();
-                    foreach (var game in games)
+                    _gameList = value;
+                    OnPropertyChanged("GameList");
+                }
+            }
+
+
+            public MainWindowModel(MainWindow view)
+            {
+                _view = view;
+
+                AddGameCommand = new AsyncCommand(AddGame);
+                RemoveGameCommand = new AsyncCommand<GameInfo>(RemoveGame);
+                EditGameCommand = new AsyncCommand<GameInfo>(EditGame);
+                LaunchGameCommand = new AsyncCommand<GameInfo>(LaunchGame);
+
+                GameList = new ObservableCollection<GameInfo>();
+
+                Task.Run(async () =>
+                {
+                    await Refresh();
+                }).ConfigureAwait(false);
+            }
+
+            public async Task Refresh()
+            {
+                await LoadGames();
+            }
+
+            private async Task LoadGames()
+            {
+                if (!Directory.Exists(documentPath))
+                {
+                    Directory.CreateDirectory(documentPath);
+
+                    return;
+                }
+
+                if (!File.Exists(System.IO.Path.Combine(documentPath, "games.json")))
+                {
+                    return;
+                }
+
+                using (StreamReader sr = new StreamReader(System.IO.Path.Combine(documentPath, "games.json")))
+                {
+                    GameList = new ObservableCollection<GameInfo>(
+                        JsonConvert.DeserializeObject<IEnumerable<GameInfo>>(
+                            await sr.ReadToEndAsync()
+                        )
+                    );
+
+                    OnPropertyChanged("GameList");
+                }
+            }
+
+            private async Task SaveGames()
+            {
+                using (StreamWriter sw = new StreamWriter(System.IO.Path.Combine(documentPath, "games.json")))
+                {
+                    await sw.WriteAsync(JsonConvert.SerializeObject(GameList));
+                }
+            }
+
+            private async Task AddGame()
+            {
+                OpenFileDialog fileDlg = new OpenFileDialog();
+                fileDlg.Title = "Select Game Executable";
+                fileDlg.Filter = "Game Executable (*.exe)|*.exe";
+                
+                if (fileDlg.ShowDialog() == true)
+                {
+                    if (!string.IsNullOrEmpty(fileDlg.FileName))
                     {
-                        AddGameProfileToList(game);
+                        GameInfo gameInfo = GameInfo.Create();
+                        gameInfo.GameName = System.IO.Path.GetFileName(fileDlg.FileName).Replace(".exe", "");
+                        gameInfo.GamePath = fileDlg.FileName;
+
+                        GameDetailsWindow gameDetailsDlg = new GameDetailsWindow(gameInfo);
+
+                        if (gameDetailsDlg.ShowDialog() == true)
+                        {
+                            GameList.Add(gameInfo);
+
+                            await SaveGames();
+                        }
                     }
                 }
             }
-            catch (Exception ex)
+
+            private async Task RemoveGame(GameInfo gameInfo)
             {
-                Debug.WriteLine(ex.Message);
-                // TODO: Make Error Worky
+                GameList.Remove(gameInfo);
+
+                await SaveGames();
+            }
+
+            private async Task EditGame(GameInfo gameInfo)
+            {
+                GameDetailsWindow gameDetailsDlg = new GameDetailsWindow(gameInfo);
+
+                if (gameDetailsDlg.ShowDialog() == true)
+                {
+                    await SaveGames();
+
+                    GameList = new ObservableCollection<GameInfo>(GameList);
+                }
+            }
+
+            private async Task LaunchGame(GameInfo gameInfo)
+            {
+                await Task.Run(() =>
+                {
+                    Process GameProcess = ProcessManager.StartProcess(gameInfo.GamePath, gameInfo.Arguments);
+                    string ModLoaderPath = System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "UnrealModLoader.dll");
+                    ProcessManager.InjectDll(GameProcess, ModLoaderPath);
+                });
             }
         }
-
-        void button_Click(object sender, RoutedEventArgs e)
-        {
-            Button CurrentButton = (sender as Button);
-            GameInfo Game = _games[(int)CurrentButton.Tag];
-            Process GameProcess = ProcessManager.StartProcess(Game.GamePath, Game.Arguments);
-            string ModLoaderPath = $@"{_applicationDataPath}UnrealModLoader.dll";
-            ProcessManager.InjectDll(GameProcess, ModLoaderPath);
-        }
-
-        //If you get 'dllimport unknown'-, then add 'using System.Runtime.InteropServices;'
-        [DllImport("gdi32.dll", EntryPoint = "DeleteObject")]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool DeleteObject([In] IntPtr hObject);
-
-        public ImageSource ImageSourceFromBitmap(Bitmap bmp)
-        {
-            var handle = bmp.GetHbitmap();
-            try
-            {
-                return Imaging.CreateBitmapSourceFromHBitmap(handle, IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
-            }
-            finally { DeleteObject(handle); }
-        }
-
-        private void AddGameProfileToList(GameInfo game)
-        {
-            Icon icon = System.Drawing.Icon.ExtractAssociatedIcon(game.GamePath);
-            var img = ImageSourceFromBitmap(icon.ToBitmap());
-
-            Button button = new Button();
-            button.HorizontalContentAlignment = HorizontalAlignment.Left;
-
-            StackPanel GameInfoBox = new StackPanel
-            {
-                Orientation = Orientation.Horizontal
-            };
-
-            button.Content = GameInfoBox;
-
-            var GameInfoImage = new System.Windows.Controls.Image
-            {
-                Source = img,
-                Height = 50,
-                Width = 50
-            };
-
-            var spacer1 = new Separator()
-            {
-                Width = 10,
-                Background = new SolidColorBrush(Colors.Transparent)
-            };
-
-            var LableTest = new Label
-            {
-                Content = string.Format(game.GameName),
-                VerticalAlignment = VerticalAlignment.Center
-            };
-
-            GameInfoBox.Children.Add(GameInfoImage);
-            GameInfoBox.Children.Add(spacer1);
-            GameInfoBox.Children.Add(LableTest);
-
-            button.Tag = _games.Count;
-            button.Click += new RoutedEventHandler(button_Click);
-
-            this.GameSelectionPanel.Children.Add(button);
-
-            _games.Add(game);
-        }
-
-        private void AddGame(object sender, RoutedEventArgs e)
-        {
-            OpenFileDialog selectExecutableDiaglog = new OpenFileDialog();
-            selectExecutableDiaglog.Title = "Select Game Executable";
-            selectExecutableDiaglog.Filter = "Game Executable (*.exe)|*.exe";
-            selectExecutableDiaglog.ShowDialog();
-            if(selectExecutableDiaglog.FileName != "")
-            {
-                string SelectedExecutable = selectExecutableDiaglog.FileName;
-
-                GameInfo SelectedGame = new GameInfo();
-
-                var gameNamestr = System.IO.Path.GetFileName(SelectedExecutable);
-                gameNamestr = gameNamestr.Substring(0, gameNamestr.Length - 4);
-
-                SelectedGame.GameName = gameNamestr;
-                SelectedGame.GamePath = SelectedExecutable;
-
-                GameDetailsWindow gameDetails = new GameDetailsWindow(SelectedGame);
-                gameDetails.ShowDialog();
-
-                AddGameProfileToList(SelectedGame);
-
-                var games = _games.ToList();
-                
-                Serializer.ToFile(new GameInfoList() { Games = games }, gamesListPath);
-            }
-        }
-
-        //private void Button_Click(object sender, RoutedEventArgs e)
-        //{
-        //    Process GameProcess = ProcessManager.StartProcess("E:\\Games\\SteamLibary\\steamapps\\common\\UNDEFEATED\\UNDEFEATED\\Binaries\\Win64\\UNDEFEATED-Win64-Shipping.exe");
-        //    ProcessManager.InjectDll(GameProcess, "C:\\Users\\rcjer\\Documents\\GitHub\\UnrealModLoader\\x64\\Debug\\UnrealModLoader.dll");
-
-        //}
     }
 }

@@ -19,24 +19,24 @@ namespace UnrealModLauncher
     /// </summary>
     public partial class GameDetailsWindow : Window
     {
-        private GameInfo gameInfo;
-        public GameDetailsWindow(object game)
+        private GameInfo GameInfo;
+        public GameDetailsWindow(GameInfo gameInfo)
         {
             InitializeComponent();
-            gameInfo = (GameInfo)game;
+            GameInfo = gameInfo;
+
             GameShortName.Text = gameInfo.GameName;
             GamePath.Text = gameInfo.GamePath;
             Arguments.Text = gameInfo.Arguments;
-            bAutoInject.IsChecked = gameInfo.AutoInject;
         }
 
         private void ApplyChanges(object sender, RoutedEventArgs e)
         {
-            gameInfo.GameName = GameShortName.Text;
-            gameInfo.GamePath = GamePath.Text;
-            gameInfo.Arguments = Arguments.Text;
-            gameInfo.AutoInject = (bool)bAutoInject.IsChecked;
+            GameInfo.GameName = GameShortName.Text;
+            GameInfo.GamePath = GamePath.Text;
+            GameInfo.Arguments = Arguments.Text;
 
+            DialogResult = true;
             Close();
         }
 

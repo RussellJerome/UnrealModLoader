@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="GameDetailsWindow" Height="150" Width="400">
     <Grid>
-        <StackPanel>
+        <StackPanel Margin="5">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="76*"/>
@@ -17,23 +17,20 @@
                     <RowDefinition></RowDefinition>
                     <RowDefinition></RowDefinition>
                     <RowDefinition></RowDefinition>
-                    <RowDefinition></RowDefinition>
                 </Grid.RowDefinitions>
                 <Label Grid.Column="0" Grid.Row="0" VerticalAlignment="Center">Name:</Label>
                 <Label Grid.Column="0" Grid.Row="1" VerticalAlignment="Center">Path:</Label>
                 <Label Grid.Column="0" Grid.Row="2" VerticalAlignment="Center">Arguments:</Label>
-                <Label Grid.Column="0" Grid.Row="3" VerticalAlignment="Center">AutoInject:</Label>
 
                 <TextBox x:Name="GameShortName" Grid.Column="1" Grid.Row="0" VerticalAlignment="Center">Game Short Name</TextBox>
                 <TextBox x:Name="GamePath" Grid.Column="1" Grid.Row="1" VerticalAlignment="Center">Game Path</TextBox>
                 <TextBox x:Name="Arguments" Grid.Column="1" Grid.Row="2" VerticalAlignment="Center"></TextBox>
-                <CheckBox x:Name="bAutoInject" Grid.Column="1" Grid.Row="3" VerticalAlignment="Center"></CheckBox>
             </Grid>
         </StackPanel>
         <StackPanel Orientation="Vertical" VerticalAlignment="Bottom">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="5">
                 <Button Click="ApplyChanges">Apply</Button>
-                <Button Click="ExitDetails">Cancel</Button>
+                <Button Click="ExitDetails" Margin="5,0,0,0">Cancel</Button>
             </StackPanel>
         </StackPanel>
     </Grid>
