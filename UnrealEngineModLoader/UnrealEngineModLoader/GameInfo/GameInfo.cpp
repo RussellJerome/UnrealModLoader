@@ -309,7 +309,10 @@ void SetupProfile(std::string Path)
 			GameProfile::SelectedGameProfile.SpawnActorFTrans = (DWORD64)MEM::GetAddressPTR(SpawnActorFTrans, 0x1, 0x5);
 			Log::Info("UWorld::SpawnActor: 0x%p", (void*)GameProfile::SelectedGameProfile.SpawnActorFTrans);
 
-			auto CallFunctionByNameWithArguments = Pattern::Find("8B ? E8 ? ? ? ? ? 0A ? FF ? EB 9E ? 8B");
+			auto CallFunctionByNameWithArguments = Pattern::Find("8B ? E8 ? ? ? ? ? 0A ? FF ? EB ? ? 8B");
+			if (CallFunctionByNameWithArguments == nullptr)
+				CallFunctionByNameWithArguments = Pattern::Find("8B ? E8 ? ? ? ? ? 0A ? FF ? EB ? ? 8D");
+			
 			if (CallFunctionByNameWithArguments != nullptr)
 			{
 				CallFunctionByNameWithArguments += 0x2;
