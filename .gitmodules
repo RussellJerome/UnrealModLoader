@@ -1,0 +1,9 @@
+[submodule "vendor/imgui"]
+	path = vendor/imgui
+	url = git@github.com:ocornut/imgui.git
+[submodule "vendor/MinHook"]
+	path = vendor/MinHook
+	url = https://github.com/TsudaKageyu/minhook
+[submodule "vendor/FeatherIni"]
+	path = vendor/FeatherIni
+	url = git@github.com:c-ridgway/cpp-feather-ini-parser.git

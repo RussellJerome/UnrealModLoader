@@ -7,9 +7,9 @@
 
 namespace UE4
 {
-DWORD *FName::GNames = nullptr;
-FUObjectArray *UObject::GObjects = nullptr;
-UWorld **UWorld::GWorld = nullptr;
+LOADER_API DWORD *FName::GNames = nullptr;
+LOADER_API FUObjectArray *UObject::GObjects = nullptr;
+LOADER_API UWorld **UWorld::GWorld = nullptr;
 } // namespace UE4
 
 #ifdef _MSC_VER

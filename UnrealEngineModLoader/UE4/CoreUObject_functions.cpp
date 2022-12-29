@@ -13,7 +13,7 @@ namespace UE4
 // UObject Functions
 //---------------------------------------------------------------------------
 
-std::string UObject::GetName() const
+LOADER_API std::string UObject::GetName() const
 {
     auto Name = *reinterpret_cast<FName *>((byte *)this + GameProfile::SelectedGameProfile.defs.UObject.Name);
     std::string name(Name.GetName());
@@ -31,7 +31,7 @@ std::string UObject::GetName() const
     return name.substr(pos + 1);
 }
 
-std::string UObject::GetFullName() const
+LOADER_API std::string UObject::GetFullName() const
 {
     std::string name;
     auto Class = GetClass();
@@ -52,22 +52,22 @@ std::string UObject::GetFullName() const
     return name;
 }
 
-int32_t UObject::GetIndex() const
+LOADER_API int32_t UObject::GetIndex() const
 {
     return Read<int32_t>((byte *)this + GameProfile::SelectedGameProfile.defs.UObject.Index);
 };
 
-UClass *UObject::GetClass() const
+LOADER_API UClass *UObject::GetClass() const
 {
     return Read<class UClass *>((byte *)this + GameProfile::SelectedGameProfile.defs.UObject.Class);
 };
 
-UObject *UObject::GetOuter() const
+LOADER_API UObject *UObject::GetOuter() const
 {
     return Read<UObject *>((byte *)this + GameProfile::SelectedGameProfile.defs.UObject.Outer);
 };
 
-bool UObject::IsA(UClass *cmp) const
+LOADER_API bool UObject::IsA(UClass *cmp) const
 {
     for (auto super = GetClass(); super; super = static_cast<UClass *>(super->GetSuperField()))
     {
@@ -80,7 +80,7 @@ bool UObject::IsA(UClass *cmp) const
     return false;
 }
 
-void UObject::ExecuteUbergraph(int EntryPoint)
+LOADER_API void UObject::ExecuteUbergraph(int EntryPoint)
 {
     static auto fn = UObject::FindObject<UFunction>("Function CoreUObject.Object.ExecuteUbergraph");
 
@@ -94,7 +94,7 @@ void UObject::ExecuteUbergraph(int EntryPoint)
     // fn->FunctionFlags = flags;
 }
 
-bool UObject::DoesObjectContainFunction(std::string Function)
+LOADER_API bool UObject::DoesObjectContainFunction(std::string Function)
 {
     if (IsChunkedArray())
     {
@@ -141,7 +141,7 @@ bool UObject::DoesObjectContainFunction(std::string Function)
     return false;
 }
 
-class UFunction *UObject::GetFunction(std::string Function)
+LOADER_API class UFunction *UObject::GetFunction(std::string Function)
 {
     if (IsChunkedArray())
     {
@@ -188,15 +188,15 @@ class UFunction *UObject::GetFunction(std::string Function)
     return nullptr;
 }
 
-void UObject::ProcessEvent(class UFunction *function, void *parms)
+LOADER_API void UObject::ProcessEvent(class UFunction *function, void *parms)
 {
     return reinterpret_cast<void (*)(UObject *, class UFunction *, void *)>(
         GameProfile::SelectedGameProfile.ProcessEvent)(this, function, parms);
 }
 
-UObject *UObject::StaticLoadObject(class UClass *uclass, UObject *InOuter, const wchar_t *InName,
-                                   const wchar_t *Filename, unsigned int LoadFlags, void *Sandbox,
-                                   bool bAllowObjectReconciliation)
+LOADER_API UObject *UObject::StaticLoadObject(class UClass *uclass, UObject *InOuter, const wchar_t *InName,
+                                              const wchar_t *Filename, unsigned int LoadFlags, void *Sandbox,
+                                              bool bAllowObjectReconciliation)
 {
     return reinterpret_cast<UObject *(__fastcall *)(class UClass *, UObject *, const wchar_t *, const wchar_t *,
                                                     unsigned int, void *, bool)>(
@@ -204,10 +204,11 @@ UObject *UObject::StaticLoadObject(class UClass *uclass, UObject *InOuter, const
                                                            bAllowObjectReconciliation);
 }
 
-UObject *UObject::StaticConstructObject_Internal(UClass *Class, UObject *InOuter, FName Name, unsigned int SetFlags,
-                                                 EInternalObjectFlags InternalSetFlags, UObject *Template,
-                                                 bool bCopyTransientsFromClassDefaults, void *InstanceGraph,
-                                                 bool bAssumeTemplateIsArchetype)
+LOADER_API UObject *UObject::StaticConstructObject_Internal(UClass *Class, UObject *InOuter, FName Name,
+                                                            unsigned int SetFlags,
+                                                            EInternalObjectFlags InternalSetFlags, UObject *Template,
+                                                            bool bCopyTransientsFromClassDefaults, void *InstanceGraph,
+                                                            bool bAssumeTemplateIsArchetype)
 {
     if (GameProfile::SelectedGameProfile.StaticConstructObject_Internal)
     {
@@ -242,8 +243,8 @@ UObject *UObject::StaticConstructObject_Internal(UClass *Class, UObject *InOuter
     return nullptr;
 }
 
-bool UObject::CallFunctionByNameWithArguments(const wchar_t *Str, void *Ar, UE4::UObject *Executor,
-                                              bool bForceCallWithNonExec)
+LOADER_API bool UObject::CallFunctionByNameWithArguments(const wchar_t *Str, void *Ar, UE4::UObject *Executor,
+                                                         bool bForceCallWithNonExec)
 {
     return reinterpret_cast<bool (*)(UE4::UObject *, const wchar_t *, void *, UE4::UObject *, bool)>(
         GameProfile::SelectedGameProfile.CallFunctionByNameWithArguments)(this, Str, Ar, Executor,
@@ -254,7 +255,7 @@ bool UObject::CallFunctionByNameWithArguments(const wchar_t *Str, void *Ar, UE4:
 // UField Functions
 //---------------------------------------------------------------------------
 
-UField *UField::GetNext() const
+LOADER_API UField *UField::GetNext() const
 {
     return Read<UField *>((byte *)this + GameProfile::SelectedGameProfile.defs.UField.Next);
 };
@@ -263,7 +264,7 @@ UField *UField::GetNext() const
 // UClass Functions
 //---------------------------------------------------------------------------
 
-UClass *UClass::LoadClassFromString(const wchar_t *InName, bool bAllowObjectReconciliation)
+LOADER_API UClass *UClass::LoadClassFromString(const wchar_t *InName, bool bAllowObjectReconciliation)
 {
     return (UClass *)UObject::StaticLoadObject(UClass::StaticClass(), nullptr, InName, nullptr, 0, nullptr,
                                                bAllowObjectReconciliation);
@@ -273,17 +274,17 @@ UClass *UClass::LoadClassFromString(const wchar_t *InName, bool bAllowObjectReco
 // UStruct Functions
 //---------------------------------------------------------------------------
 
-UStruct *UStruct::GetSuperField() const
+LOADER_API UStruct *UStruct::GetSuperField() const
 {
     return Read<UStruct *>((byte *)this + GameProfile::SelectedGameProfile.defs.UStruct.SuperStruct);
 };
 
-UField *UStruct::GetChildren() const
+LOADER_API UField *UStruct::GetChildren() const
 {
     return Read<UField *>((byte *)this + GameProfile::SelectedGameProfile.defs.UStruct.Children);
 };
 
-int32_t UStruct::GetPropertySize() const
+LOADER_API int32_t UStruct::GetPropertySize() const
 {
     return Read<int32_t>((byte *)this + GameProfile::SelectedGameProfile.defs.UStruct.PropertiesSize);
 };
@@ -292,11 +293,11 @@ int32_t UStruct::GetPropertySize() const
 // UFunction Functions
 //---------------------------------------------------------------------------
 
-int32_t UFunction::GetFunctionFlags() const
+LOADER_API int32_t UFunction::GetFunctionFlags() const
 {
     return Read<int32_t>((byte *)this + GameProfile::SelectedGameProfile.defs.UFunction.FunctionFlags);
 };
-void *UFunction::GetFunction() const
+LOADER_API void *UFunction::GetFunction() const
 {
     return Read<void *>((byte *)this + GameProfile::SelectedGameProfile.defs.UFunction.Func);
 };
@@ -305,7 +306,7 @@ void *UFunction::GetFunction() const
 // UEProperty Functions
 //---------------------------------------------------------------------------
 
-int32_t UEProperty::GetArrayDim() const
+LOADER_API int32_t UEProperty::GetArrayDim() const
 {
     return Read<int32_t>((byte *)this + GameProfile::SelectedGameProfile.defs.Property.ArrayDim);
 };
@@ -316,7 +317,7 @@ int32_t UEProperty::GetElementSize() const
 };
 */
 
-int32_t UEProperty::GetOffset() const
+LOADER_API int32_t UEProperty::GetOffset() const
 {
     return Read<int32_t>((byte *)this + GameProfile::SelectedGameProfile.defs.Property.Offset);
 };
@@ -325,12 +326,12 @@ int32_t UEProperty::GetOffset() const
 // FField Functions
 //---------------------------------------------------------------------------
 
-FField *FField::GetNext() const
+LOADER_API FField *FField::GetNext() const
 {
     return Read<class FField *>((byte *)this + GameProfile::SelectedGameProfile.defs.FField.Next);
 };
 
-std::string FField::GetName() const
+LOADER_API std::string FField::GetName() const
 {
     auto Name = *reinterpret_cast<FName *>((byte *)this + GameProfile::SelectedGameProfile.defs.FField.Name);
     if (UE4::FName::GetFNamePool().IsValidIndex(Name.ComparisonIndex))
@@ -344,7 +345,7 @@ std::string FField::GetName() const
 // UWorld Functions
 //---------------------------------------------------------------------------
 
-AActor *UWorld::SpawnActor(UClass *uclass, const FTransform *transform, const FActorSpawnParameters *params)
+LOADER_API AActor *UWorld::SpawnActor(UClass *uclass, const FTransform *transform, const FActorSpawnParameters *params)
 {
     return reinterpret_cast<AActor *(*)(UWorld *, UClass *, const FTransform *, const FActorSpawnParameters *)>(
         GameProfile::SelectedGameProfile.SpawnActorFTrans)(this, uclass, transform, params);
@@ -354,7 +355,7 @@ AActor *UWorld::SpawnActor(UClass *uclass, const FTransform *transform, const FA
 // Actor Functions
 //---------------------------------------------------------------------------
 
-FTransform AActor::GetTransform()
+LOADER_API FTransform AActor::GetTransform()
 {
     static auto fn = UObject::FindObject<UFunction>("Function Engine.Actor.GetTransform");
     struct
@@ -365,7 +366,7 @@ FTransform AActor::GetTransform()
     return params.ReturnValue;
 }
 
-FRotator AActor::GetActorRotation()
+LOADER_API FRotator AActor::GetActorRotation()
 {
     static auto fn = UObject::FindObject<UFunction>("Function Engine.Actor.K2_GetActorRotation");
     struct
@@ -376,7 +377,7 @@ FRotator AActor::GetActorRotation()
     return params.ReturnValue;
 }
 
-FVector AActor::GetActorLocation()
+LOADER_API FVector AActor::GetActorLocation()
 {
     static auto fn = UObject::FindObject<UFunction>("Function Engine.Actor.K2_GetActorLocation");
     struct
@@ -387,7 +388,7 @@ FVector AActor::GetActorLocation()
     return params.ReturnValue;
 }
 
-FVector AActor::GetActorScale3D()
+LOADER_API FVector AActor::GetActorScale3D()
 {
     static auto fn = UObject::FindObject<UFunction>("Function Engine.Actor.GetActorScale3D");
     struct
@@ -402,7 +403,7 @@ FVector AActor::GetActorScale3D()
 // GameplayStatics Functions
 //---------------------------------------------------------------------------
 
-class AActor *UGameplayStatics::BeginDeferredActorSpawnFromClass(
+LOADER_API class AActor *UGameplayStatics::BeginDeferredActorSpawnFromClass(
     class UClass *ActorClass, const struct FTransform &SpawnTransform,
     ESpawnActorCollisionHandlingMethod CollisionHandlingOverride, class AActor *Owner)
 {
@@ -426,7 +427,7 @@ class AActor *UGameplayStatics::BeginDeferredActorSpawnFromClass(
     return params.ReturnValue;
 }
 
-class FString UGameplayStatics::GetCurrentLevelName(bool bRemovePrefixString)
+LOADER_API class FString UGameplayStatics::GetCurrentLevelName(bool bRemovePrefixString)
 {
     static auto fn = UObject::FindObject<UFunction>("Function Engine.GameplayStatics.GetCurrentLevelName");
     // auto GameplayStatics = (UE4::UGameplayStatics*)UE4::UGameplayStatics::StaticClass()->CreateDefaultObject();
@@ -444,7 +445,7 @@ class FString UGameplayStatics::GetCurrentLevelName(bool bRemovePrefixString)
     return params.ReturnValue;
 }
 
-class AGameState *UGameplayStatics::GetGameState()
+LOADER_API class AGameState *UGameplayStatics::GetGameState()
 {
     static auto fn = UObject::FindObject<UFunction>("Function Engine.GameplayStatics.GetGameState");
     auto GameplayStatics = (UE4::UGameplayStatics *)UE4::UGameplayStatics::StaticClass()->CreateDefaultObject();
@@ -458,7 +459,7 @@ class AGameState *UGameplayStatics::GetGameState()
     return params.ReturnValue;
 }
 
-class AGameMode *UGameplayStatics::GetGameMode()
+LOADER_API class AGameMode *UGameplayStatics::GetGameMode()
 {
     static auto fn = UObject::FindObject<UFunction>("Function Engine.GameplayStatics.GetGameMode");
     auto GameplayStatics = (UE4::UGameplayStatics *)UE4::UGameplayStatics::StaticClass()->CreateDefaultObject();
@@ -472,7 +473,7 @@ class AGameMode *UGameplayStatics::GetGameMode()
     return params.ReturnValue;
 }
 
-class UGameInstance *UGameplayStatics::GetGameInstance()
+LOADER_API class UGameInstance *UGameplayStatics::GetGameInstance()
 {
     static auto fn = UObject::FindObject<UFunction>("Function Engine.GameplayStatics.GetGameInstance");
     auto GameplayStatics = (UE4::UGameplayStatics *)UE4::UGameplayStatics::StaticClass()->CreateDefaultObject();
@@ -486,7 +487,7 @@ class UGameInstance *UGameplayStatics::GetGameInstance()
     return params.ReturnValue;
 }
 
-class APawn *UGameplayStatics::GetPlayerPawn(int PlayerIndex)
+LOADER_API class APawn *UGameplayStatics::GetPlayerPawn(int PlayerIndex)
 {
     static auto fn = UObject::FindObject<UFunction>("Function Engine.GameplayStatics.GetPlayerPawn");
     auto GameplayStatics = (UE4::UGameplayStatics *)UE4::UGameplayStatics::StaticClass()->CreateDefaultObject();
@@ -502,7 +503,7 @@ class APawn *UGameplayStatics::GetPlayerPawn(int PlayerIndex)
     return params.ReturnValue;
 }
 
-class APlayerController *UGameplayStatics::GetPlayerController(int PlayerIndex)
+LOADER_API class APlayerController *UGameplayStatics::GetPlayerController(int PlayerIndex)
 {
     static auto fn = UObject::FindObject<UFunction>("Function Engine.GameplayStatics.GetPlayerController");
     auto GameplayStatics = (UE4::UGameplayStatics *)UE4::UGameplayStatics::StaticClass()->CreateDefaultObject();
@@ -519,7 +520,8 @@ class APlayerController *UGameplayStatics::GetPlayerController(int PlayerIndex)
     return params.ReturnValue;
 }
 
-void UGameplayStatics::ExecuteConsoleCommand(const class FString &Command, class APlayerController *SpecificPlayer)
+LOADER_API void UGameplayStatics::ExecuteConsoleCommand(const class FString &Command,
+                                                        class APlayerController *SpecificPlayer)
 {
     static auto fn = UObject::FindObject<UFunction>("Function Engine.KismetSystemLibrary.ExecuteConsoleCommand");
     auto GameplayStatics = (UE4::UGameplayStatics *)UE4::UGameplayStatics::StaticClass()->CreateDefaultObject();
