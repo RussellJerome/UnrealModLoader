@@ -2,11 +2,12 @@
 
 class Dumper
 {
-public:
-	bool DumpObjectArray();
-	bool DumpEngineInfo();
-	bool DumpWorldActors();
-	static Dumper* GetDumper();
-private:
-	static Dumper* DumpRef;
+  public:
+    bool DumpObjectArray();
+    bool DumpEngineInfo();
+    bool DumpWorldActors();
+    static Dumper *GetDumper();
+
+  private:
+    static Dumper *DumpRef;
 };

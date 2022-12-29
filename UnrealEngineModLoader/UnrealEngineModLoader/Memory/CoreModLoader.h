@@ -2,7 +2,7 @@
 #include <string>
 namespace CoreModLoader
 {
-	void InjectDLL(std::string path);
+void InjectDLL(std::string path);
 
-	void LoadCoreMods();
-};
+void LoadCoreMods();
+}; // namespace CoreModLoader

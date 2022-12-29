@@ -1,12 +1,12 @@
 #include "Globals.h"
 
-Global* Global::glb = nullptr;
+Global *Global::glb = nullptr;
 
-Global* Global::GetGlobals()
+Global *Global::GetGlobals()
 {
-	if (!glb)
-	{
-		glb = new Global();
-	}
-	return glb;
+    if (!glb)
+    {
+        glb = new Global();
+    }
+    return glb;
 }

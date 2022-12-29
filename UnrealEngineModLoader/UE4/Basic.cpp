@@ -1,5 +1,5 @@
 #ifdef _MSC_VER
-	#pragma pack(push, 0x8)
+#pragma pack(push, 0x8)
 #endif
 
 #include "Basic.hpp"
@@ -7,11 +7,11 @@
 
 namespace UE4
 {
-DWORD* FName::GNames = nullptr;
-FUObjectArray* UObject::GObjects = nullptr;
-UWorld** UWorld::GWorld = nullptr;
-}
+DWORD *FName::GNames = nullptr;
+FUObjectArray *UObject::GObjects = nullptr;
+UWorld **UWorld::GWorld = nullptr;
+} // namespace UE4
 
 #ifdef _MSC_VER
-	#pragma pack(pop)
+#pragma pack(pop)
 #endif
