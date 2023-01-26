@@ -6,8 +6,8 @@
 #endif
 
 #include <GameInfo/GameInfo.h>
+#include <Log/Log.h>
 #include <Memory/mem.h>
-#include <Utilities/Logger.h>
 #include <iostream>
 #include <string>
 #include <unordered_map>

@@ -36,7 +36,7 @@ PVOID hookProcessFunction(UE4::UObject *obj, UE4::FFrame *Frame, void *const Res
             auto msg = Frame->GetInputParams<PrintStringParams>()->Message;
             if (msg.IsValid())
             {
-                Log::Print("%s", msg.ToString().c_str());
+                LOG_INFO("{}", msg.ToString().c_str());
             }
         }
         if (Frame->Node->GetName() == "GetPersistentObject")
@@ -71,11 +71,11 @@ PVOID hookProcessFunction(UE4::UObject *obj, UE4::FFrame *Frame, void *const Res
 PVOID (*origInitGameState)(void *);
 PVOID hookInitGameState(void *Ret)
 {
-    Log::Info("GameStateHook");
+    LOG_INFO("GameStateHook");
     if (GameStateClassInitNotRan)
     {
         UE4::InitSDK();
-        Log::Info("Engine Classes Loaded");
+        LOG_INFO("Engine Classes Loaded");
         if (Global::GetGlobals()->CoreMods.size() > 0)
         {
             for (size_t i = 0; i < Global::GetGlobals()->CoreMods.size(); i++)
@@ -83,12 +83,12 @@ PVOID hookInitGameState(void *Ret)
                 auto CurrentCoreMod = Global::GetGlobals()->CoreMods[i];
                 if (CurrentCoreMod->IsFinishedCreating)
                 {
-                    Log::Info("InitializeMod Called For %s", CurrentCoreMod->ModName.c_str());
+                    LOG_INFO("InitializeMod Called For {}", CurrentCoreMod->ModName.c_str());
                     CurrentCoreMod->InitializeMod();
                 }
                 else
                 {
-                    Log::Error("Mod %s wasnt setup in time"), CurrentCoreMod->ModName;
+                    LOG_ERROR("Mod {} wasnt setup in time"), CurrentCoreMod->ModName;
                 }
             }
         }
@@ -97,11 +97,11 @@ PVOID hookInitGameState(void *Ret)
         UE4::FActorSpawnParameters spawnParams = UE4::FActorSpawnParameters::FActorSpawnParameters();
         if (GameProfile::SelectedGameProfile.StaticLoadObject)
         {
-            Log::Info("StaticLoadObject Found");
+            LOG_INFO("StaticLoadObject Found");
         }
         else
         {
-            Log::Error("StaticLoadObject Not Found");
+            LOG_ERROR("StaticLoadObject Not Found");
         }
         GameStateClassInitNotRan = false;
     }
@@ -177,8 +177,8 @@ PVOID hookInitGameState(void *Ret)
                                                  &HookedFunctions::hookProcessFunction,
                                                  &HookedFunctions::origProcessFunction, "ProcessBlueprintFunctions");
                                 else
-                                    Log::Warn("ProcessBlueprintFunctions could not be located! Mod Loader "
-                                              "Functionality Will be Limited!");
+                                    LOG_WARN("ProcessBlueprintFunctions could not be located! Mod Loader "
+                                             "Functionality Will be Limited!");
                             }
 
                             for (size_t i = 0; i < Global::GetGlobals()->ModInfoList.size(); i++)
@@ -232,20 +232,20 @@ PVOID hookInitGameState(void *Ret)
                                 }
                             }
                             ModActor->CallFunctionByNameWithArguments(L"PreBeginPlay", nullptr, NULL, true);
-                            Log::Info("Sucessfully Loaded %s", str.c_str());
+                            LOG_INFO("Sucessfully Loaded {}", str.c_str());
                         }
                     }
                     else
                     {
-                        Log::Info("Could not locate ModActor for %s", str.c_str());
+                        LOG_INFO("Could not locate ModActor for {}", str.c_str());
                     }
                 }
             }
         }
-        Log::Info("Finished Spawning PakMods");
+        LOG_INFO("Finished Spawning PakMods");
         Global::GetGlobals()->eventSystem.dispatchEvent("InitGameState");
     }
-    Log::Info("Returning to GameState --------------------------------------------------------");
+    LOG_INFO("Returning to GameState --------------------------------------------------------");
     return origInitGameState(Ret);
 }
 
@@ -256,7 +256,7 @@ PVOID hookBeginPlay(UE4::AActor *Actor)
     {
         if (Actor->IsA(UE4::ACustomClass::StaticClass(GameProfile::SelectedGameProfile.BeginPlayOverwrite)))
         {
-            Log::Info("Beginplay Called");
+            LOG_INFO("Beginplay Called");
             for (int i = 0; i < Global::GetGlobals()->ModInfoList.size(); i++)
             {
                 UE4::AActor *CurrentModActor = Global::GetGlobals()->ModInfoList[i].CurrentModActor;
@@ -289,12 +289,12 @@ PVOID hookBeginPlay(UE4::AActor *Actor)
 DWORD __stdcall InitHooks(LPVOID)
 {
     MinHook::Init();
-    Log::Info("MinHook Setup");
-    Log::Info("Loading Core Mods");
+    LOG_INFO("MinHook Setup");
+    LOG_INFO("Loading Core Mods");
     CoreModLoader::LoadCoreMods();
     Sleep(10);
     PakLoader::ScanLoadedPaks();
-    Log::Info("ScanLoadedPaks Setup");
+    LOG_INFO("ScanLoadedPaks Setup");
     MinHook::Add(GameProfile::SelectedGameProfile.GameStateInit, &HookedFunctions::hookInitGameState,
                  &HookedFunctions::origInitGameState, "AGameModeBase::InitGameState");
     MinHook::Add(GameProfile::SelectedGameProfile.BeginPlay, &HookedFunctions::hookBeginPlay,
@@ -309,7 +309,7 @@ DWORD __stdcall InitHooks(LPVOID)
 
 void SetupHooks()
 {
-    Log::Info("Setting Up Loader");
+    LOG_INFO("Setting Up Loader");
     CreateThread(0, 0, InitHooks, 0, 0, 0);
 }
 }; // namespace Hooks

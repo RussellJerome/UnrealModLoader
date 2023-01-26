@@ -1,8 +1,8 @@
 #include "LoaderUI.h"
+#include "Log/Log.h"
 #include "Memory/mem.h"
 #include "Utilities/Dumper.h"
 #include "Utilities/Globals.h"
-#include "Utilities/Logger.h"
 #include "Utilities/MinHook.h"
 #include "Utilities/Version.h"
 
@@ -254,7 +254,7 @@ void ShowTools()
     ImGui::Spacing();
     ImGui::Separator();
     ImGui::Text("Execute Console Command");
-    ImGui::InputText("", Command, IM_ARRAYSIZE(Command));
+    ImGui::InputText("Command", Command, IM_ARRAYSIZE(Command));
     if (ImGui::Button("Execute"))
     {
         std::string strCommand(Command);
@@ -302,11 +302,11 @@ void LoaderUI::LoaderD3D11Present(IDXGISwapChain *pSwapChain, UINT SyncInterval,
                 pSwapChain->GetDevice(__uuidof(LoaderUI::GetUI()->pDevice), (void **)&LoaderUI::GetUI()->pDevice)))
         {
             LoaderUI::GetUI()->pDevice->GetImmediateContext(&LoaderUI::GetUI()->pContext);
-            Log::Info("D3D11Device Initialized");
+            LOG_INFO("D3D11Device Initialized");
         }
         else
         {
-            Log::Error("Failed to initialize D3D11Device");
+            LOG_ERROR("Failed to initialize D3D11Device");
         }
 
         ID3D11Texture2D *pRenderTargetTexture = NULL;
@@ -315,11 +315,11 @@ void LoaderUI::LoaderD3D11Present(IDXGISwapChain *pSwapChain, UINT SyncInterval,
                                                                          &LoaderUI::GetUI()->pRenderTargetView)))
         {
             pRenderTargetTexture->Release();
-            Log::Info("D3D11RenderTargetView Initialized");
+            LOG_INFO("D3D11RenderTargetView Initialized");
         }
         else
         {
-            Log::Error("Failed to initialize D3D11RenderTargetView");
+            LOG_ERROR("Failed to initialize D3D11RenderTargetView");
         }
 
         ImGui::CreateContext();
@@ -434,7 +434,7 @@ HRESULT __stdcall hookD3D11Present(IDXGISwapChain *pSwapChain, UINT SyncInterval
 
 DWORD __stdcall InitDX11Hook(LPVOID)
 {
-    Log::Info("Setting up D3D11Present hook");
+    LOG_INFO("Setting up D3D11Present hook");
 
     HMODULE hDXGIDLL = 0;
     do
@@ -498,7 +498,7 @@ DWORD __stdcall InitDX11Hook(LPVOID)
                                              &scd, &pSwapChain, &LoaderUI::GetUI()->pDevice, &obtainedLevel,
                                              &LoaderUI::GetUI()->pContext)))
     {
-        Log::Error("Failed to create D3D device and swapchain");
+        LOG_ERROR("Failed to create D3D device and swapchain");
         return NULL;
     }
 
@@ -542,6 +542,6 @@ DWORD __stdcall LogicThread(LPVOID)
 
 void LoaderUI::CreateUILogicThread()
 {
-    Log::Info("CreateUILogicThread Called");
+    LOG_INFO("CreateUILogicThread Called");
     CreateThread(0, 0, LogicThread, 0, 0, 0);
 }

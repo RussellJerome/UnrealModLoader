@@ -1,9 +1,9 @@
 #pragma once
 #include <GameInfo/GameInfo.h>
+#include <Log/Log.h>
 #include <Shared/LoaderUI.h>
 #include <UE4/Ue4.hpp>
 #include <Utilities/Globals.h>
-#include <Utilities/Logger.h>
 #include <string>
 
 class LOADER_API Mod

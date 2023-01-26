@@ -75,11 +75,11 @@ void Mod::CompleteModCreation()
 {
     IsFinishedCreating = true;
     Global::GetGlobals()->AddToCoreMods(ModRef);
-    Log::Info("Core Mod Created: %s", ModName.c_str());
+    LOG_INFO("Core Mod Created: {}", ModName.c_str());
     if (ModLoaderVersion != MODLOADER_VERSION)
     {
-        Log::Warn("Mod: %s was created with a different version of the Unreal Mod Loader. This mod may be unstable.",
-                  ModName.c_str());
+        LOG_WARN("Mod: {} was created with a different version of the Unreal Mod Loader. This mod may be unstable.",
+                 ModName.c_str());
     }
 }
 

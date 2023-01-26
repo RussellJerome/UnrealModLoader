@@ -28,7 +28,7 @@ bool Dumper::DumpObjectArray()
                 if (obj != nullptr)
                     fprintf(Log, "[%06i] %-100s 0x%p\n", obj->GetIndex(), obj->GetFullName().c_str(), obj);
             }
-            Log::SetupMessage("Done!", "Object Dump Complete!");
+            LOG_INFO("Done!", "Object Dump Complete!");
         }
         else
         {
@@ -38,9 +38,9 @@ bool Dumper::DumpObjectArray()
                 if (obj != nullptr)
                     fprintf(Log, "[%06i] %-100s 0x%p\n", obj->GetIndex(), obj->GetFullName().c_str(), obj);
             }
-            Log::SetupMessage("Done!", "Object Dump Complete!");
+            LOG_INFO("Done!", "Object Dump Complete!");
         }
-        Log::Info("Object Dump Complete!");
+        LOG_INFO("Object Dump Complete!");
         fclose(Log);
         return true;
     }
@@ -71,8 +71,8 @@ bool Dumper::DumpEngineInfo()
             GameProfile::SelectedGameProfile.defs.UFunction.FunctionFlags,
             GameProfile::SelectedGameProfile.defs.UFunction.Func);
     fclose(Log);
-    Log::SetupMessage("Done!", "Engine Info Dump Complete!");
-    Log::Info("Engine Info Dump Complete!");
+    LOG_INFO("Done!", "Engine Info Dump Complete!");
+    LOG_INFO("Engine Info Dump Complete!");
     return true;
 }
 
@@ -100,7 +100,7 @@ bool Dumper::DumpWorldActors()
             fprintf(Log, "\n");
         }
     }
-    Log::SetupMessage("Done!", "World Actors Dump Complete!");
+    LOG_INFO("Done!", "World Actors Dump Complete!");
     fclose(Log);
     return true;
 }

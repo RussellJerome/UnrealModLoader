@@ -7,3 +7,6 @@
 [submodule "vendor/FeatherIni"]
 	path = vendor/FeatherIni
 	url = git@github.com:c-ridgway/cpp-feather-ini-parser.git
+[submodule "vendor/spdlog"]
+	path = vendor/spdlog
+	url = https://github.com/gabime/spdlog

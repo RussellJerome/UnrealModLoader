@@ -238,7 +238,7 @@ LOADER_API UObject *UObject::StaticConstructObject_Internal(UClass *Class, UObje
     }
     else
     {
-        Log::Error("StaticConstructObject_Internal Called But Not Found!");
+        LOG_ERROR("StaticConstructObject_Internal Called But Not Found!");
     }
     return nullptr;
 }

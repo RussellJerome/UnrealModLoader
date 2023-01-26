@@ -1,5 +1,4 @@
 #include "CoreModLoader.h"
-#include "Utilities/Logger.h"
 #include <filesystem>
 #include <process.h>
 #include <windows.h>

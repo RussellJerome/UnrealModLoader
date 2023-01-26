@@ -21,10 +21,14 @@ target_include_directories(ImGui PUBLIC "imgui" "imgui/backends")
 
 # ======== MinHook ========
 
-set(BUILD_SHARED_LIBS true)
+set(BUILD_SHARED_LIBS OFF)
 add_subdirectory("MinHook")
 
 # ======== FeatherIni ========
 
 add_library(FeatherIni INTERFACE)
 target_include_directories(FeatherIni INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/FeatherIni")
+
+# ======= SpdLog =========
+
+add_subdirectory("spdlog")
