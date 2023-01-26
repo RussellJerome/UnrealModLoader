@@ -1,8 +1,8 @@
 #pragma once
-#include <optional>
-#include <variant>
-#include <string>
 #include <cstdint>
+#include <optional>
+#include <string>
+#include <variant>
 
 namespace GameSettings
 {
@@ -109,7 +109,6 @@ struct StaticConstructObject_InternalInfo
 {
     bool IsUsingUpdatedStaticConstruct = false;
     std::string StaticConstructObject_InternalFunction = "";
-
 };
 
 struct GameSettings
@@ -126,7 +125,8 @@ struct GameSettings
     bool IsDefaultObjectArrayed = false;
     // If you get any Direct X errors such as resizing, enable this to delay the hook and prevent most issues.
     bool DelayGUISpawn = false;
-    // Overwrites the BeginPlay hook which calls PostBeginPlay and PostLoaderStart. To use PlayerController default leave empty.
+    // Overwrites the BeginPlay hook which calls PostBeginPlay and PostLoaderStart. To use PlayerController default
+    // leave empty.
     std::optional<std::string> BeginPlayOverwrite = {};
 
     std::optional<GInfo> GInfoSettings = {};
@@ -142,4 +142,4 @@ struct GameSettings
     static GameSettings GetBakedSettings();
 };
 
-}
+} // namespace GameSettings

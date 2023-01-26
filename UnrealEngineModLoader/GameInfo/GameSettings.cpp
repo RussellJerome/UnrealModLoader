@@ -2,10 +2,10 @@
 
 GameSettings::GameSettings GameSettings::GameSettings::GetBakedSettings()
 {
-	GameSettings Settings = {};
+    GameSettings Settings = {};
 
-	Settings.IsUsingFChunkedFixedUObjectArray = true;
-	Settings.UsesFNamePool = true;
+    Settings.IsUsingFChunkedFixedUObjectArray = true;
+    Settings.UsesFNamePool = true;
 
-	return Settings;
+    return Settings;
 }

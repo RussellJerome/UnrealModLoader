@@ -18,7 +18,7 @@ bool FindUObjectIndexDefs(UE4::UObject *CoreUObject, UE4::UObject *UEObject)
             }
         }
     }
-    LOG_INFO("UObject Index Def located at: 0x%p", GameProfile::SelectedGameProfile.defs.UObject.Index);
+    LOG_INFO("UObject Index Def located at: 0x{:x}", GameProfile::SelectedGameProfile.defs.UObject.Index);
     return true;
 };
 
@@ -63,7 +63,7 @@ bool FindUObjectNameDefs(UE4::UObject *CoreUObject)
                 GameProfile::SelectedGameProfile.defs.UObject.Name + 0x8;
         }
     }
-    LOG_INFO("UObject Name Def located at: 0x%p", GameProfile::SelectedGameProfile.defs.UObject.Name);
+    LOG_INFO("UObject Name Def located at: 0x{:x}", GameProfile::SelectedGameProfile.defs.UObject.Name);
     return true;
 }
 
@@ -110,7 +110,7 @@ bool FindUObjectClassDefs(UE4::UObject *CoreUObject)
                 GameProfile::SelectedGameProfile.defs.UObject.Class + 0x8;
         }
     }
-    LOG_INFO("UObject Class Def located at: 0x%p", GameProfile::SelectedGameProfile.defs.UObject.Class);
+    LOG_INFO("UObject Class Def located at: 0x{:x}", GameProfile::SelectedGameProfile.defs.UObject.Class);
     return true;
 }
 
@@ -141,7 +141,7 @@ bool FindUObjectOuterDefs(UE4::UObject *CoreUObject)
                 GameProfile::SelectedGameProfile.defs.UObject.Outer + 0x8;
         }
     }
-    LOG_INFO("UObject Outer Def located at: 0x%p", GameProfile::SelectedGameProfile.defs.UObject.Outer);
+    LOG_INFO("UObject Outer Def located at: 0x{:x}", GameProfile::SelectedGameProfile.defs.UObject.Outer);
     return true;
 }
 
@@ -181,7 +181,7 @@ bool FindUFieldNextDef()
             GameProfile::SelectedGameProfile.defs.UField.Next = GameProfile::SelectedGameProfile.defs.UField.Next + 0x8;
         }
     }
-    LOG_INFO("UField Next Def located at: 0x%p", GameProfile::SelectedGameProfile.defs.UField.Next);
+    LOG_INFO("UField Next Def located at: 0x{:x}", GameProfile::SelectedGameProfile.defs.UField.Next);
     return true;
 }
 
@@ -204,7 +204,7 @@ bool FindUFieldNextDef()
 //			GameProfile::SelectedGameProfile.defs.UField.Next = GameProfile::SelectedGameProfile.defs.UField.Next + 0x8;
 //		}
 //	}
-//	LOG_INFO("UField Next Def located at: 0x%p", GameProfile::SelectedGameProfile.defs.UField.Next);
+//	LOG_INFO("UField Next Def located at: 0x{:x}", GameProfile::SelectedGameProfile.defs.UField.Next);
 //	return true;
 // }
 
@@ -244,7 +244,7 @@ bool FindUStructSuperFieldDef()
                 GameProfile::SelectedGameProfile.defs.UStruct.SuperStruct + 0x8;
         }
     }
-    LOG_INFO("UStruct SuperField Def located at: 0x%p", GameProfile::SelectedGameProfile.defs.UStruct.SuperStruct);
+    LOG_INFO("UStruct SuperField Def located at: 0x{:x}", GameProfile::SelectedGameProfile.defs.UStruct.SuperStruct);
     return true;
 }
 
@@ -292,7 +292,7 @@ bool FindUStructChildrenDef()
             }
         }
     }
-    LOG_INFO("UStruct Children Def located at: 0x%p", GameProfile::SelectedGameProfile.defs.UStruct.Children);
+    LOG_INFO("UStruct Children Def located at: 0x{:x}", GameProfile::SelectedGameProfile.defs.UStruct.Children);
     return true;
 }
 
@@ -305,7 +305,7 @@ bool FindUStructPropertySizeDef()
         GameProfile::SelectedGameProfile.defs.UStruct.PropertiesSize =
             GameProfile::SelectedGameProfile.defs.UStruct.PropertiesSize + 0x4;
     }
-    LOG_INFO("UStruct PropertySize Def located at: 0x%p", GameProfile::SelectedGameProfile.defs.UStruct.PropertiesSize);
+    LOG_INFO("UStruct PropertySize Def located at: 0x{:x}", GameProfile::SelectedGameProfile.defs.UStruct.PropertiesSize);
     return true;
 }
 
@@ -323,7 +323,7 @@ bool FindUStructDefs()
     if (FindUStructSuperFieldDef() && FindUStructChildrenDef() && FindUStructPropertySizeDef())
     {
         GameProfile::SelectedGameProfile.defs.UStruct.OverallUStructSize = GetOverallUStructSize();
-        LOG_INFO("UStruct Size: %i", GameProfile::SelectedGameProfile.defs.UStruct.OverallUStructSize);
+        LOG_INFO("UStruct Size: {}", GameProfile::SelectedGameProfile.defs.UStruct.OverallUStructSize);
         LOG_INFO("UStruct Defined");
         return true;
     }
@@ -355,7 +355,7 @@ bool FindUFunctionFunctionFlagsDef()
                 GameProfile::SelectedGameProfile.defs.UFunction.FunctionFlags + 0x4;
         }
     }
-    LOG_INFO("UFunction FunctionFlags Def located at: 0x%p",
+    LOG_INFO("UFunction FunctionFlags Def located at: 0x{:x}",
              GameProfile::SelectedGameProfile.defs.UFunction.FunctionFlags);
     return true;
 }
@@ -366,7 +366,7 @@ bool FindUFunctionFunc()
     if (UFunction)
     {
         GameProfile::SelectedGameProfile.defs.UFunction.Func = UFunction->GetPropertySize() - 0x8;
-        LOG_INFO("UFunction Func: 0x%p", GameProfile::SelectedGameProfile.defs.UFunction.Func);
+        LOG_INFO("UFunction Func: 0x{:x}", GameProfile::SelectedGameProfile.defs.UFunction.Func);
         return true;
     }
     return false;
@@ -408,7 +408,7 @@ bool FindFField()
             GameProfile::SelectedGameProfile.defs.FField.Name = GameProfile::SelectedGameProfile.defs.FField.Name + 0x8;
         }
     }
-    LOG_INFO("FField Name Def located at: 0x%p", GameProfile::SelectedGameProfile.defs.FField.Name);
+    LOG_INFO("FField Name Def located at: 0x{:x}", GameProfile::SelectedGameProfile.defs.FField.Name);
     while (!NextFound)
     {
         // 9 times out of 10, its right behind the Name, so we do that check to save possible issues
@@ -431,7 +431,7 @@ bool FindFField()
             GameProfile::SelectedGameProfile.defs.FField.Next = GameProfile::SelectedGameProfile.defs.FField.Next + 0x8;
         }
     }
-    LOG_INFO("FField Next Def located at: 0x%p", GameProfile::SelectedGameProfile.defs.FField.Next);
+    LOG_INFO("FField Next Def located at: 0x{:x}", GameProfile::SelectedGameProfile.defs.FField.Next);
     return true;
 }
 
@@ -457,7 +457,7 @@ bool FindUEPropertyDefs()
                     GameProfile::SelectedGameProfile.defs.Property.ArrayDim + 0x8;
             }
         }
-        LOG_INFO("FProperty Array Dim Def located at: 0x%p", GameProfile::SelectedGameProfile.defs.Property.ArrayDim);
+        LOG_INFO("FProperty Array Dim Def located at: 0x{:x}", GameProfile::SelectedGameProfile.defs.Property.ArrayDim);
 
         auto FieldChildY = FieldChild->GetNext();
         auto FieldChildZ = FieldChildY->GetNext();
@@ -476,7 +476,7 @@ bool FindUEPropertyDefs()
                     GameProfile::SelectedGameProfile.defs.Property.Offset + 0x4;
             }
         }
-        LOG_INFO("FProperty Offset Def located at: 0x%p", GameProfile::SelectedGameProfile.defs.Property.Offset);
+        LOG_INFO("FProperty Offset Def located at: 0x{:x}", GameProfile::SelectedGameProfile.defs.Property.Offset);
     }
     else
     {
@@ -495,7 +495,7 @@ bool FindUEPropertyDefs()
                     GameProfile::SelectedGameProfile.defs.Property.ArrayDim + 0x8;
             }
         }
-        LOG_INFO("UProperty Array Dim Def located at: 0x%p", GameProfile::SelectedGameProfile.defs.Property.ArrayDim);
+        LOG_INFO("UProperty Array Dim Def located at: 0x{:x}", GameProfile::SelectedGameProfile.defs.Property.ArrayDim);
         auto FieldChildY = FieldChild->GetNext();
         auto FieldChildZ = FieldChildY->GetNext();
         GameProfile::SelectedGameProfile.defs.Property.Offset =
@@ -513,7 +513,7 @@ bool FindUEPropertyDefs()
                     GameProfile::SelectedGameProfile.defs.Property.Offset + 0x4;
             }
         }
-        LOG_INFO("UProperty Offset Def located at: 0x%p", GameProfile::SelectedGameProfile.defs.Property.Offset);
+        LOG_INFO("UProperty Offset Def located at: 0x{:x}", GameProfile::SelectedGameProfile.defs.Property.Offset);
     }
     return true;
 }

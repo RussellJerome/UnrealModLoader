@@ -18,15 +18,15 @@ template <typename T> static void Add(DWORD_PTR pTarget, LPVOID pDetour, T **ppO
 {
     if (MH_CreateHook((LPVOID)pTarget, pDetour, reinterpret_cast<LPVOID *>(ppOriginal)) != MH_OK)
     {
-        LOG_ERROR("Failed to create hook: %s", displayName.c_str());
+        LOG_ERROR("Failed to create hook: {}", displayName.c_str());
         return;
     }
 
     if (MH_EnableHook((LPVOID)pTarget) != MH_OK)
     {
-        LOG_ERROR("Failed to enable hook: %s", displayName.c_str());
+        LOG_ERROR("Failed to enable hook: {}", displayName.c_str());
         return;
     }
-    LOG_INFO("Added hook: %s", displayName.c_str());
+    LOG_INFO("Added hook: {}", displayName.c_str());
 }
 } // namespace MinHook
