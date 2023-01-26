@@ -419,6 +419,10 @@ void GameProfile::CreateGameProfile()
                 GameProfile::SelectedGameProfile.ProcessInternals = (ProcessAddy + 20 + ProcessAddyOffset);
                 LOG_INFO("ProcessInternalFunction: 0x{:x}", (void *)GameProfile::SelectedGameProfile.ProcessInternals);
             }
+            else
+            {
+                LOG_ERROR("ProcessInternalFunction not found! BPFUNCTION will not work!");
+            }
         }
     }
 

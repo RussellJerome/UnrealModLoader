@@ -16,15 +16,19 @@ static void Init()
 
 template <typename T> static void Add(DWORD_PTR pTarget, LPVOID pDetour, T **ppOriginal, std::string displayName = "")
 {
-    if (MH_CreateHook((LPVOID)pTarget, pDetour, reinterpret_cast<LPVOID *>(ppOriginal)) != MH_OK)
+    MH_STATUS Result = MH_CreateHook((LPVOID)pTarget, pDetour, reinterpret_cast<LPVOID *>(ppOriginal));
+    if (Result != MH_OK)
     {
-        LOG_ERROR("Failed to create hook: {}", displayName.c_str());
+        LOG_ERROR("Failed to create hook: {}, addr: 0x{:x}, reason: {}", displayName.c_str(), pTarget,
+                  MH_StatusToString(Result));
         return;
     }
 
-    if (MH_EnableHook((LPVOID)pTarget) != MH_OK)
+    Result = MH_EnableHook((LPVOID)pTarget);
+    if (Result != MH_OK)
     {
-        LOG_ERROR("Failed to enable hook: {}", displayName.c_str());
+        LOG_ERROR("Failed to enable hook: {}, addr: 0x{:x}, reason: {}", displayName.c_str(), pTarget,
+                  MH_StatusToString(Result));
         return;
     }
     LOG_INFO("Added hook: {}", displayName.c_str());

@@ -121,6 +121,23 @@ PVOID hookInitGameState(void *Ret)
     }
     if (GameProfile::SelectedGameProfile.StaticLoadObject)
     {
+
+        if (GameProfile::SelectedGameProfile.ProcessInternals)
+        {
+            if (GameProfile::SelectedGameProfile.ProcessInternals)
+            {
+                MinHook::Add(GameProfile::SelectedGameProfile.ProcessInternals, &HookedFunctions::hookProcessFunction,
+                             &HookedFunctions::origProcessFunction, "ProcessBlueprintFunctions");
+                LOG_INFO("ProcessBlueprintFunctions hooked!");
+            }
+            else
+            {
+                LOG_WARN("ProcessBlueprintFunctions could not be located! Mod Loader "
+                         "Functionality Will be Limited!");
+            }
+        }
+
+        LOG_INFO("StaticLoadObject thing");
         UE4::FTransform transform;
         transform.Translation = UE4::FVector(0, 0, 0);
         transform.Rotation = UE4::FQuat(0, 0, 0, 0);
@@ -172,13 +189,6 @@ PVOID hookInitGameState(void *Ret)
                                     }
                                 }
                                 bIsProcessInternalsHooked = true;
-                                if (GameProfile::SelectedGameProfile.ProcessInternals)
-                                    MinHook::Add(GameProfile::SelectedGameProfile.ProcessInternals,
-                                                 &HookedFunctions::hookProcessFunction,
-                                                 &HookedFunctions::origProcessFunction, "ProcessBlueprintFunctions");
-                                else
-                                    LOG_WARN("ProcessBlueprintFunctions could not be located! Mod Loader "
-                                             "Functionality Will be Limited!");
                             }
 
                             for (size_t i = 0; i < Global::GetGlobals()->ModInfoList.size(); i++)
