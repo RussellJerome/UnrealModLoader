@@ -1,7 +1,7 @@
 #pragma once
 #include "Basic.hpp"
 #include "CoreUObject_classes.hpp"
-#include "Utilities//Pattern.h"
+#include "Memory/Pattern.h"
 #include "Utilities/EngineDefFinder.h"
 #include <Psapi.h>
 #include <Windows.h>

@@ -1,7 +1,7 @@
 #include "GameInfo.h"
 #include "GameSettings.h"
 #include "Log/Log.h"
-#include "Utilities/Pattern.h"
+#include "Memory/Pattern.h"
 #include "Utilities/Version.h"
 #include <INI.h>
 #include <Shared/Hooks.h>
@@ -45,16 +45,16 @@ void GameProfile::CreateGameProfile()
         {
             GameSettings::GInfoPatterns GInfoPatterns = std::get<GameSettings::GInfoPatterns>(GInfoSettings.Info);
 
-            auto GName = (DWORD64)Pattern::Find(GInfoPatterns.GName.c_str());
+            auto GName = (DWORD64)Pattern(GInfoPatterns.GName).Get(0).Get<uint8_t>();
             auto GNamesOffset = *reinterpret_cast<uint32_t *>(GName + GInfoPatterns.GNameFirstOpCodes);
             GameProfile::SelectedGameProfile.GName = GName + GInfoPatterns.GNameTotalByteInstruction + GNamesOffset;
 
-            auto GObject = (DWORD64)Pattern::Find(GInfoPatterns.GObject.c_str());
+            auto GObject = (DWORD64)Pattern(GInfoPatterns.GObject).Get(0).Get<uint8_t>();
             auto GObjectOffset = *reinterpret_cast<uint32_t *>(GObject + GInfoPatterns.GObjectFirstOpCodes);
             GameProfile::SelectedGameProfile.GObject =
                 GObject + GInfoPatterns.GobjectTotalByteInstruction + GObjectOffset;
 
-            auto GWorld = (DWORD64)Pattern::Find(GInfoPatterns.GWorld.c_str());
+            auto GWorld = (DWORD64)Pattern(GInfoPatterns.GWorld).Get(0).Get<uint8_t>();
             auto GWorldOffset = *reinterpret_cast<uint32_t *>(GWorld + GInfoPatterns.GWorldFirstOpCodes);
             GameProfile::SelectedGameProfile.GWorld = GWorld + GInfoPatterns.GWorldTotalByteInstruction + GWorldOffset;
 
@@ -75,7 +75,7 @@ void GameProfile::CreateGameProfile()
     {
         if (GameProfile::SelectedGameProfile.UsesFNamePool)
         {
-            auto FPoolPat = Pattern::Find("74 09 48 8D 15 ? ? ? ? EB 16");
+            auto FPoolPat = Pattern("74 09 48 8D 15 ? ? ? ? EB 16").Get(0).Get<uint8_t>();
             if (FPoolPat != nullptr)
             {
                 auto FPoolPatoffset = *reinterpret_cast<uint32_t *>(FPoolPat + 5);
@@ -89,7 +89,7 @@ void GameProfile::CreateGameProfile()
         }
         else
         {
-            auto GNamePat = Pattern::Find("E8 ? ? ? ? 48 8B C3 48 89 1D ? ? ? ? 48 8B 5C 24");
+            auto GNamePat = Pattern("E8 ? ? ? ? 48 8B C3 48 89 1D ? ? ? ? 48 8B 5C 24").Get(0).Get<uint8_t>();
             if (GNamePat != nullptr)
             {
                 auto GNamesAddress = *reinterpret_cast<uint32_t *>(GNamePat + 11);
@@ -102,7 +102,7 @@ void GameProfile::CreateGameProfile()
             }
         }
 
-        auto GObjectPat = Pattern::Find("8B 46 10 3B 46 3C 75 0F 48 8B D6 48 8D 0D ? ? ? ? E8");
+        auto GObjectPat = Pattern("8B 46 10 3B 46 3C 75 0F 48 8B D6 48 8D 0D ? ? ? ? E8").Get(0).Get<uint8_t>();
         if (GObjectPat != nullptr)
         {
             auto GObjectOffset = *reinterpret_cast<uint32_t *>(GObjectPat + 14);
@@ -114,7 +114,7 @@ void GameProfile::CreateGameProfile()
             LOG_ERROR("GObject Could Not Be Found!");
         }
 
-        auto GWorldPat = Pattern::Find("0F 2E ? 74 ? 48 8B 1D ? ? ? ? 48 85 DB 74");
+        auto GWorldPat = Pattern("0F 2E ? 74 ? 48 8B 1D ? ? ? ? 48 85 DB 74").Get(0).Get<uint8_t>();
         if (GWorldPat != nullptr)
         {
             auto GWorldAddress = *reinterpret_cast<uint32_t *>(GWorldPat + 8);
@@ -194,18 +194,19 @@ void GameProfile::CreateGameProfile()
                 std::get<GameSettings::FunctionInfoPatterns>(FunctionInfoSettings.Info);
 
             GameProfile::SelectedGameProfile.GameStateInit =
-                (DWORD64)Pattern::Find(FunctionInfoPatterns.GameStateInit.c_str());
-            GameProfile::SelectedGameProfile.BeginPlay = (DWORD64)Pattern::Find(FunctionInfoPatterns.BeginPlay.c_str());
+                (DWORD64)Pattern(FunctionInfoPatterns.GameStateInit).Get(0).Get<uint8_t>();
+            GameProfile::SelectedGameProfile.BeginPlay =
+                (DWORD64)Pattern(FunctionInfoPatterns.BeginPlay).Get(0).Get<uint8_t>();
             GameProfile::SelectedGameProfile.StaticLoadObject =
-                (DWORD64)Pattern::Find(FunctionInfoPatterns.StaticLoadObject.c_str());
+                (DWORD64)Pattern(FunctionInfoPatterns.StaticLoadObject).Get(0).Get<uint8_t>();
             GameProfile::SelectedGameProfile.SpawnActorFTrans =
-                (DWORD64)Pattern::Find(FunctionInfoPatterns.SpawnActorFTrans.c_str());
+                (DWORD64)Pattern(FunctionInfoPatterns.SpawnActorFTrans).Get(0).Get<uint8_t>();
             GameProfile::SelectedGameProfile.CallFunctionByNameWithArguments =
-                (DWORD64)Pattern::Find(FunctionInfoPatterns.CallFunctionByNameWithArguments.c_str());
+                (DWORD64)Pattern(FunctionInfoPatterns.CallFunctionByNameWithArguments).Get(0).Get<uint8_t>();
             GameProfile::SelectedGameProfile.ProcessEvent =
-                (DWORD64)Pattern::Find(FunctionInfoPatterns.ProcessEvent.c_str());
+                (DWORD64)Pattern(FunctionInfoPatterns.ProcessEvent).Get(0).Get<uint8_t>();
             GameProfile::SelectedGameProfile.CreateDefaultObject =
-                (DWORD64)Pattern::Find(FunctionInfoPatterns.CreateDefaultObject.c_str());
+                (DWORD64)Pattern(FunctionInfoPatterns.CreateDefaultObject).Get(0).Get<uint8_t>();
 
             LOG_INFO("Function Patterns Set!");
         }
@@ -234,15 +235,14 @@ void GameProfile::CreateGameProfile()
     else
     {
         GameProfile::SelectedGameProfile.GameStateInit =
-            (DWORD64)Pattern::Find("40 53 48 83 EC 20 48 8B 41 10 48 8B D9 48 8B 91");
+            (DWORD64)Pattern("40 53 48 83 EC 20 48 8B 41 10 48 8B D9 48 8B 91").Get(0).Get<uint8_t>();
         LOG_INFO("GameStateInit: 0x{:x}", (void *)GameProfile::SelectedGameProfile.GameStateInit);
         if (!GameProfile::SelectedGameProfile.GameStateInit)
         {
             LOG_ERROR("GameStateInit NOT FOUND!");
         }
 
-        auto BeginPlay = Pattern::Find("48 8B D9 E8 ?? ?? ?? ?? F6 83 ?? ?? ?? ?? ?? 74 12 48 8B 03");
-        BeginPlay += 0x3;
+        auto BeginPlay = Pattern("48 8B D9 E8 ? ? ? ? F6 83 ? ? ? ? ? 74 12 48 8B 03").Get(0).Get<uint8_t>(3);
         if (BeginPlay != nullptr)
         {
             GameProfile::SelectedGameProfile.BeginPlay = (DWORD64)MEM::GetAddressPTR(BeginPlay, 0x1, 0x5);
@@ -253,30 +253,34 @@ void GameProfile::CreateGameProfile()
             LOG_ERROR("AActor::BeginPlay NOT FOUND!");
         }
 
-        auto StaticLoadObject = Pattern::Find("89 64 24 ? 48 8B C8 E8 ? ? ? ? 41 BE ? ? ? ? EB 05 E8"); // Sig 1
+        auto StaticLoadObject =
+            Pattern("89 64 24 ? 48 8B C8 E8 ? ? ? ? 41 BE ? ? ? ? EB 05 E8").Get(0).Get<uint8_t>(); // Sig 1
         if (StaticLoadObject != nullptr)
         {
             StaticLoadObject += 0x7;
         }
         else
         {
-            StaticLoadObject = Pattern::Find(
-                "C7 44 24 ? ? ? ? ? E8 ? ? ? ? 48 8B 8D ? ? ? ? 48 85 C9 74 05 E8 ? ? ? ? 45 33 C9 ? 89 74 24");
+            StaticLoadObject =
+                Pattern("C7 44 24 ? ? ? ? ? E8 ? ? ? ? 48 8B 8D ? ? ? ? 48 85 C9 74 05 E8 ? ? ? ? 45 33 C9 ? 89 74 24")
+                    .Get(0)
+                    .Get<uint8_t>();
             if (StaticLoadObject != nullptr)
             {
                 StaticLoadObject += 0x8;
             }
             else
             {
-                StaticLoadObject =
-                    Pattern::Find("89 6C 24 20 48 8B C8 E8 ? ? ? ? 48 8B 4C 24 ? 48 8B F0 48 85 C9 74 05");
+                StaticLoadObject = Pattern("89 6C 24 20 48 8B C8 E8 ? ? ? ? 48 8B 4C 24 ? 48 8B F0 48 85 C9 74 05")
+                                       .Get(0)
+                                       .Get<uint8_t>();
                 if (StaticLoadObject != nullptr)
                 {
                     StaticLoadObject += 0x7;
                 }
                 else
                 {
-                    if (StaticLoadObject = Pattern::Find("48 8B C8 89 5C 24 20 E8 ? ? ? ? 48"))
+                    if (StaticLoadObject = Pattern("48 8B C8 89 5C 24 20 E8 ? ? ? ? 48").Get(0).Get<uint8_t>())
                     {
                         StaticLoadObject += 0x7;
                     }
@@ -291,15 +295,17 @@ void GameProfile::CreateGameProfile()
 
         LOG_INFO("StaticLoadObject: 0x{:x}", (void *)GameProfile::SelectedGameProfile.StaticLoadObject);
 
-        auto SpawnActorFTrans = Pattern::Find("4C 8B C6 48 8B C8 48 8B D3 E8 ? ? ? ? 48 8B 5C 24 ? 48 8B 74 24");
+        auto SpawnActorFTrans =
+            Pattern("4C 8B C6 48 8B C8 48 8B D3 E8 ? ? ? ? 48 8B 5C 24 ? 48 8B 74 24").Get(0).Get<uint8_t>();
         if (SpawnActorFTrans != nullptr)
         {
             SpawnActorFTrans += 0x9;
         }
         else
         {
-            SpawnActorFTrans =
-                Pattern::Find("4C 8B CE 4C 8D 44 24 ? 48 8B D7 48 8B CB E8 ? ? ? ? 48 8B 4C 24 ? 48 33 CC");
+            SpawnActorFTrans = Pattern("4C 8B CE 4C 8D 44 24 ? 48 8B D7 48 8B CB E8 ? ? ? ? 48 8B 4C 24 ? 48 33 CC")
+                                   .Get(0)
+                                   .Get<uint8_t>();
             if (SpawnActorFTrans != nullptr)
             {
                 SpawnActorFTrans += 0xE;
@@ -313,7 +319,7 @@ void GameProfile::CreateGameProfile()
         GameProfile::SelectedGameProfile.SpawnActorFTrans = (DWORD64)MEM::GetAddressPTR(SpawnActorFTrans, 0x1, 0x5);
         LOG_INFO("UWorld::SpawnActor: 0x{:x}", (void *)GameProfile::SelectedGameProfile.SpawnActorFTrans);
 
-        auto CallFunctionByNameWithArguments = Pattern::Find("8B ? E8 ? ? ? ? ? 0A ? FF ? EB 9E ? 8B");
+        auto CallFunctionByNameWithArguments = Pattern("8B ? E8 ? ? ? ? ? 0A ? FF ? EB 9E ? 8B").Get(0).Get<uint8_t>();
         if (CallFunctionByNameWithArguments != nullptr)
         {
             CallFunctionByNameWithArguments += 0x2;
@@ -322,7 +328,7 @@ void GameProfile::CreateGameProfile()
         }
         else
         {
-            CallFunctionByNameWithArguments = Pattern::Find("49 8B D4 E8 ? ? ? ? 44 0A F8 FF C3 EB 9A");
+            CallFunctionByNameWithArguments = Pattern("49 8B D4 E8 ? ? ? ? 44 0A F8 FF C3 EB 9A").Get(0).Get<uint8_t>();
             if (CallFunctionByNameWithArguments != nullptr)
             {
                 CallFunctionByNameWithArguments += 0x3;
@@ -332,14 +338,18 @@ void GameProfile::CreateGameProfile()
             else
             {
                 // todo: dirty workaround, allow for more granular pattern specification
-                CallFunctionByNameWithArguments = Pattern::Find(
-                    "41 57 41 56 41 55 41 54 56 57 55 53 48 81 EC ? ? ? ? 44 0F 29 BC 24 ? ? ? ? 44 0F 29 B4 24 ? ? ? "
-                    "? 44 0F 29 "
-                    "AC 24 ? ? ? ? 44 0F 29 A4 24 ? ? ? ? 44 0F 29 9C 24 ? ? ? ? 44 0F 29 94 24 ? ? ? ? 44 0F 29 8C 24 "
-                    "? ? ? ? 44 "
-                    "0F 29 84 24 ? ? ? ? 0F 29 BC 24 ? ? ? ? 0F 29 B4 24 ? ? ? ? 48 8B 8C 24 ? ? ? ? 48 8B 94 24 ? ? ? "
-                    "? 48 8B 84 "
-                    "24 ? ? ? ? 4C 8B 40 18 0F 28 3D");
+                CallFunctionByNameWithArguments = Pattern("41 57 41 56 41 55 41 54 56 57 55 53 48 81 EC ? ? ? ? 44 0F "
+                                                          "29 BC 24 ? ? ? ? 44 0F 29 B4 24 ? ? ? "
+                                                          "? 44 0F 29 "
+                                                          "AC 24 ? ? ? ? 44 0F 29 A4 24 ? ? ? ? 44 0F 29 9C 24 ? ? ? ? "
+                                                          "44 0F 29 94 24 ? ? ? ? 44 0F 29 8C 24 "
+                                                          "? ? ? ? 44 "
+                                                          "0F 29 84 24 ? ? ? ? 0F 29 BC 24 ? ? ? ? 0F 29 B4 24 ? ? ? ? "
+                                                          "48 8B 8C 24 ? ? ? ? 48 8B 94 24 ? ? ? "
+                                                          "? 48 8B 84 "
+                                                          "24 ? ? ? ? 4C 8B 40 18 0F 28 3D")
+                                                      .Get(0)
+                                                      .Get<uint8_t>();
                 GameProfile::SelectedGameProfile.CallFunctionByNameWithArguments =
                     (DWORD64)CallFunctionByNameWithArguments;
 
@@ -352,8 +362,9 @@ void GameProfile::CreateGameProfile()
         LOG_INFO("CallFunctionByNameWithArguments: 0x{:x}",
                  (void *)GameProfile::SelectedGameProfile.CallFunctionByNameWithArguments);
 
-        auto ProcessEvent =
-            Pattern::Find("75 0E ? ? ? 48 ? ? 48 ? ? E8 ? ? ? ? 48 8B ? 24 ? 48 8B ? 24 38 48 8B ? 24 40");
+        auto ProcessEvent = Pattern("75 0E ? ? ? 48 ? ? 48 ? ? E8 ? ? ? ? 48 8B ? 24 ? 48 8B ? 24 38 48 8B ? 24 40")
+                                .Get(0)
+                                .Get<uint8_t>();
         ProcessEvent += 0xB;
         if (ProcessEvent != nullptr)
         {
@@ -366,28 +377,38 @@ void GameProfile::CreateGameProfile()
         }
 
         GameProfile::SelectedGameProfile.CreateDefaultObject =
-            (DWORD64)Pattern::Find("4C 8B DC 57 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 84 24 ? ? ? ? 48 "
-                                   "83 B9 ? ? ? ? ? 48 8B F9 ");
+            (DWORD64)Pattern("4C 8B DC 57 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 84 24 ? ? ? ? 48 "
+                             "83 B9 ? ? ? ? ? 48 8B F9 ")
+                .Get(0)
+                .Get<uint8_t>();
         if (!GameProfile::SelectedGameProfile.CreateDefaultObject)
         {
             // FallBack 1
             GameProfile::SelectedGameProfile.CreateDefaultObject =
-                (DWORD64)Pattern::Find("4C 8B DC 55 53 49 8D AB ? ? ? ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 "
-                                       "48 89 85 ? ? ? ? 48 83 B9 ? ? ? ? ? 48 8B D9 0F 85");
+                (DWORD64)Pattern("4C 8B DC 55 53 49 8D AB ? ? ? ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 "
+                                 "48 89 85 ? ? ? ? 48 83 B9 ? ? ? ? ? 48 8B D9 0F 85")
+                    .Get(0)
+                    .Get<uint8_t>();
             if (!GameProfile::SelectedGameProfile.CreateDefaultObject)
             {
                 // FallBack 2
-                GameProfile::SelectedGameProfile.CreateDefaultObject = (DWORD64)Pattern::Find(
-                    "4C 8B DC 53 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 84 24 ? ? ? ? 48 83 B9");
+                GameProfile::SelectedGameProfile.CreateDefaultObject =
+                    (DWORD64)Pattern(
+                        "4C 8B DC 53 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 84 24 ? ? ? ? 48 83 B9")
+                        .Get(0)
+                        .Get<uint8_t>();
                 if (!GameProfile::SelectedGameProfile.CreateDefaultObject)
                 {
                     // Final FallBack
-                    GameProfile::SelectedGameProfile.CreateDefaultObject = (DWORD64)Pattern::Find(
-                        "4C 8B DC ?? ?? ?? ?? ?? ? ? ? ? ?? ?? ?? ? ? ? ? ?? ?? ?? ? ? ? ? ?? ?? ?? 48 ?? ?? ? ? ? "
-                        "? ?? ?? ?? ? ? ? ? ? ?? ?? ?? ?? ?? ? ? ? ? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? "
-                        "?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ? ? ? ? ?? 8B ?? ? ? ? ? ?? ?? ?? ?? ?? ?? 8B ?? ?? ?? "
-                        "?? ?? ?? ? ? ? ? ?? ?? ?? ? ? ? ? ?? ?? ?? ?? ?? ?? ? ? ? ? ?? ?? ?? ?? ?? ? ? ? ? ?? ?? "
-                        "? ? ? ? ?? ?? ?? 48");
+                    GameProfile::SelectedGameProfile.CreateDefaultObject =
+                        (DWORD64)Pattern(
+                            "4C 8B DC ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? 48 ? ? ? ? ? "
+                            "? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? "
+                            "? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? 8B ? ? ? ? ? ? ? ? ? ? ? 8B ? ? ? "
+                            "? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? "
+                            "? ? ? ? ? ? ? 48")
+                            .Get(0)
+                            .Get<uint8_t>();
                     if (!GameProfile::SelectedGameProfile.CreateDefaultObject)
                     {
                         GameProfile::SelectedGameProfile.bIsDefaultObjectArrayed = true;
@@ -405,14 +426,14 @@ void GameProfile::CreateGameProfile()
             *Settings.ProcessInternalFunctionSettings;
 
         GameProfile::SelectedGameProfile.ProcessInternals =
-            (DWORD64)Pattern::Find(ProcessInternalFunctionSettings.ProcessInternal.c_str());
+            (DWORD64)Pattern(ProcessInternalFunctionSettings.ProcessInternal).Get(0).Get<uint8_t>();
         LOG_INFO("ProcessInternalFunction: 0x{:x}", (void *)GameProfile::SelectedGameProfile.ProcessInternals);
     }
     else
     {
         if (GameProfile::SelectedGameProfile.UsesFNamePool || GameProfile::SelectedGameProfile.IsUsing4_22)
         {
-            DWORD64 ProcessAddy = (DWORD64)Pattern::Find("41 F6 C7 02 74 ? 4C 8B C7 48 8B ? ? 8B ? E8");
+            DWORD64 ProcessAddy = (DWORD64)Pattern("41 F6 C7 02 74 ? 4C 8B C7 48 8B ? ? 8B ? E8").Get(0).Get<uint8_t>();
             if (ProcessAddy)
             {
                 auto ProcessAddyOffset = *reinterpret_cast<uint32_t *>(ProcessAddy + 16);
@@ -433,20 +454,22 @@ void GameProfile::CreateGameProfile()
 
         GameProfile::SelectedGameProfile.IsUsingUpdatedStaticConstruct =
             StaticConstructObject_InternalInfoSettings.IsUsingUpdatedStaticConstruct;
-        GameProfile::SelectedGameProfile.StaticConstructObject_Internal = (DWORD64)Pattern::Find(
-            StaticConstructObject_InternalInfoSettings.StaticConstructObject_InternalFunction.c_str());
+        GameProfile::SelectedGameProfile.StaticConstructObject_Internal =
+            (DWORD64)Pattern(StaticConstructObject_InternalInfoSettings.StaticConstructObject_InternalFunction)
+                .Get(0)
+                .Get<uint8_t>();
     }
     else
     {
         auto StaticConstructObject_Internal =
-            Pattern::Find("48 8B 84 24 ?? ?? 00 00 48 89 44 24 ?? C7 44 24 ?? 00 00 00 00 E8"); // Sig 1
+            Pattern("48 8B 84 24 ? ? 00 00 48 89 44 24 ? C7 44 24 ? 00 00 00 00 E8").Get(0).Get<uint8_t>(); // Sig 1
         if (StaticConstructObject_Internal != nullptr)
         {
             StaticConstructObject_Internal += 0x15;
         }
         else
         {
-            StaticConstructObject_Internal = Pattern::Find("48 8B C8 89 7C 24 ?? E8");
+            StaticConstructObject_Internal = Pattern("48 8B C8 89 7C 24 ? E8").Get(0).Get<uint8_t>();
             if (StaticConstructObject_Internal != nullptr)
             {
                 StaticConstructObject_Internal += 0x7;
@@ -454,10 +477,10 @@ void GameProfile::CreateGameProfile()
             else
             {
                 GameProfile::SelectedGameProfile.IsUsingUpdatedStaticConstruct = true;
-                StaticConstructObject_Internal = Pattern::Find("E8 ? ? ? ? 45 8B 47 70");
+                StaticConstructObject_Internal = Pattern("E8 ? ? ? ? 45 8B 47 70").Get(0).Get<uint8_t>();
                 if (!StaticConstructObject_Internal)
                 {
-                    StaticConstructObject_Internal = Pattern::Find("89 6C 24 38 48 89 74 24 ? E8");
+                    StaticConstructObject_Internal = Pattern("89 6C 24 38 48 89 74 24 ? E8").Get(0).Get<uint8_t>();
                     if (StaticConstructObject_Internal != nullptr)
                     {
                         StaticConstructObject_Internal += 0x9;

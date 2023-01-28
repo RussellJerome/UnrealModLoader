@@ -31,30 +31,6 @@ PVOID hookProcessFunction(UE4::UObject *obj, UE4::FFrame *Frame, void *const Res
     PVOID ret = nullptr;
     if (!GameStateClassInitNotRan)
     {
-        if (Frame->Node->GetName() == "PrintToModLoader")
-        {
-            auto msg = Frame->GetInputParams<PrintStringParams>()->Message;
-            if (msg.IsValid())
-            {
-                LOG_INFO("{}", msg.ToString().c_str());
-            }
-        }
-        if (Frame->Node->GetName() == "GetPersistentObject")
-        {
-            auto ModName = Frame->GetInputParams<GetPersistentObject>()->ModName;
-            for (size_t i = 0; i < Global::GetGlobals()->ModInfoList.size(); i++)
-            {
-                auto ModInfo = Global::GetGlobals()->ModInfoList[i];
-                if (ModName.c_str() == ModInfo.ModName)
-                {
-                    if (ModInfo.PersistentObject)
-                    {
-                        UE4::SetVariable<UE4::UObject *>(obj, "GetPersistentObjectReturnValue",
-                                                         ModInfo.PersistentObject);
-                    }
-                }
-            }
-        }
         for (size_t i = 0; i < Global::GetGlobals()->GetBPFunctionWrappers().size(); i++)
         {
             if (Frame->Node->GetName() == Global::GetGlobals()->GetBPFunctionWrappers()[i].FunctionName)
