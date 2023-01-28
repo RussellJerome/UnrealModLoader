@@ -48,7 +48,7 @@ class PatternMatch
 class Pattern
 {
   public:
-    Pattern(std::string &Pattern) : Pattern(Pattern.c_str(), Pattern.size())
+    Pattern(const std::string &Pattern) : Pattern(Pattern.c_str(), Pattern.size())
     {
     }
 

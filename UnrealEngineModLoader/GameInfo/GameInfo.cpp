@@ -9,6 +9,7 @@
 #include <filesystem>
 #include <iostream>
 #include <string>
+#include <tuple>
 
 GameProfile GameProfile::SelectedGameProfile;
 
@@ -253,119 +254,97 @@ void GameProfile::CreateGameProfile()
             LOG_ERROR("AActor::BeginPlay NOT FOUND!");
         }
 
-        auto StaticLoadObject =
-            Pattern("89 64 24 ? 48 8B C8 E8 ? ? ? ? 41 BE ? ? ? ? EB 05 E8").Get(0).Get<uint8_t>(); // Sig 1
-        if (StaticLoadObject != nullptr)
+        std::tuple<std::string, uint8_t> StaticLoadObjectPatterns[] = {
+            {"89 64 24 ? 48 8B C8 E8 ? ? ? ? 41 BE ? ? ? ? EB 05 E8", 0x7},
+            {"C7 44 24 ? ? ? ? ? E8 ? ? ? ? 48 8B 8D ? ? ? ? 48 85 C9 74 05 E8 ? ? ? ? 45 33 C9 ? 89 74 24", 0x8},
+            {"89 6C 24 20 48 8B C8 E8 ? ? ? ? 48 8B 4C 24 ? 48 8B F0 48 85 C9 74 05", 0x7},
+            {"48 8B C8 89 5C 24 20 E8 ? ? ? ? 48", 0x7}};
+
+        for (const auto [PatternString, Offset] : StaticLoadObjectPatterns)
         {
-            StaticLoadObject += 0x7;
-        }
-        else
-        {
-            StaticLoadObject =
-                Pattern("C7 44 24 ? ? ? ? ? E8 ? ? ? ? 48 8B 8D ? ? ? ? 48 85 C9 74 05 E8 ? ? ? ? 45 33 C9 ? 89 74 24")
-                    .Get(0)
-                    .Get<uint8_t>();
-            if (StaticLoadObject != nullptr)
+            auto Found = Pattern(PatternString).Get(0).Get<uint8_t>(Offset);
+            if (Found != nullptr)
             {
-                StaticLoadObject += 0x8;
-            }
-            else
-            {
-                StaticLoadObject = Pattern("89 6C 24 20 48 8B C8 E8 ? ? ? ? 48 8B 4C 24 ? 48 8B F0 48 85 C9 74 05")
-                                       .Get(0)
-                                       .Get<uint8_t>();
-                if (StaticLoadObject != nullptr)
-                {
-                    StaticLoadObject += 0x7;
-                }
-                else
-                {
-                    if (StaticLoadObject = Pattern("48 8B C8 89 5C 24 20 E8 ? ? ? ? 48").Get(0).Get<uint8_t>())
-                    {
-                        StaticLoadObject += 0x7;
-                    }
-                    else
-                    {
-                        LOG_ERROR("StaticLoadObject NOT FOUND!");
-                    }
-                }
+                GameProfile::SelectedGameProfile.StaticLoadObject = (DWORD64)MEM::GetAddressPTR(Found, 0x1, 0x5);
+                break;
             }
         }
-        GameProfile::SelectedGameProfile.StaticLoadObject = (DWORD64)MEM::GetAddressPTR(StaticLoadObject, 0x1, 0x5);
+
+        if (GameProfile::SelectedGameProfile.StaticLoadObject == 0)
+        {
+            LOG_ERROR("StaticLoadObject NOT FOUND!");
+        }
 
         LOG_INFO("StaticLoadObject: 0x{:x}", (void *)GameProfile::SelectedGameProfile.StaticLoadObject);
 
-        auto SpawnActorFTrans =
-            Pattern("4C 8B C6 48 8B C8 48 8B D3 E8 ? ? ? ? 48 8B 5C 24 ? 48 8B 74 24").Get(0).Get<uint8_t>();
-        if (SpawnActorFTrans != nullptr)
+        std::tuple<std::string, uint8_t> SpawnActorFTransPatterns[] = {
+            {"4C 8B C6 48 8B C8 48 8B D3 E8 ? ? ? ? 48 8B 5C 24 ? 48 8B 74 24", 0x9},
+            {"4C 8B CE 4C 8D 44 24 ? 48 8B D7 48 8B CB E8 ? ? ? ? 48 8B 4C 24 ? 48 33 CC", 0xE}};
+
+        for (const auto [PatternString, Offset] : SpawnActorFTransPatterns)
         {
-            SpawnActorFTrans += 0x9;
-        }
-        else
-        {
-            SpawnActorFTrans = Pattern("4C 8B CE 4C 8D 44 24 ? 48 8B D7 48 8B CB E8 ? ? ? ? 48 8B 4C 24 ? 48 33 CC")
-                                   .Get(0)
-                                   .Get<uint8_t>();
-            if (SpawnActorFTrans != nullptr)
+            auto Found = Pattern(PatternString).Get(0).Get<uint8_t>(Offset);
+            if (Found != nullptr)
             {
-                SpawnActorFTrans += 0xE;
-            }
-            else
-            {
-                LOG_ERROR("SpawnActorFTrans NOT FOUND!");
+                GameProfile::SelectedGameProfile.SpawnActorFTrans = (DWORD64)MEM::GetAddressPTR(Found, 0x1, 0x5);
+                break;
             }
         }
 
-        GameProfile::SelectedGameProfile.SpawnActorFTrans = (DWORD64)MEM::GetAddressPTR(SpawnActorFTrans, 0x1, 0x5);
+        if (GameProfile::SelectedGameProfile.SpawnActorFTrans == 0)
+        {
+            LOG_ERROR("SpawnActorFTrans NOT FOUND!");
+        }
+
         LOG_INFO("UWorld::SpawnActor: 0x{:x}", (void *)GameProfile::SelectedGameProfile.SpawnActorFTrans);
 
-        auto CallFunctionByNameWithArguments = Pattern("8B ? E8 ? ? ? ? ? 0A ? FF ? EB 9E ? 8B").Get(0).Get<uint8_t>();
-        if (CallFunctionByNameWithArguments != nullptr)
-        {
-            CallFunctionByNameWithArguments += 0x2;
-            GameProfile::SelectedGameProfile.CallFunctionByNameWithArguments =
-                (DWORD64)MEM::GetAddressPTR(CallFunctionByNameWithArguments, 0x1, 0x5);
-        }
-        else
-        {
-            CallFunctionByNameWithArguments = Pattern("49 8B D4 E8 ? ? ? ? 44 0A F8 FF C3 EB 9A").Get(0).Get<uint8_t>();
-            if (CallFunctionByNameWithArguments != nullptr)
-            {
-                CallFunctionByNameWithArguments += 0x3;
-                GameProfile::SelectedGameProfile.CallFunctionByNameWithArguments =
-                    (DWORD64)MEM::GetAddressPTR(CallFunctionByNameWithArguments, 0x1, 0x5);
-            }
-            else
-            {
-                // todo: dirty workaround, allow for more granular pattern specification
-                CallFunctionByNameWithArguments = Pattern("41 57 41 56 41 55 41 54 56 57 55 53 48 81 EC ? ? ? ? 44 0F "
-                                                          "29 BC 24 ? ? ? ? 44 0F 29 B4 24 ? ? ? "
-                                                          "? 44 0F 29 "
-                                                          "AC 24 ? ? ? ? 44 0F 29 A4 24 ? ? ? ? 44 0F 29 9C 24 ? ? ? ? "
-                                                          "44 0F 29 94 24 ? ? ? ? 44 0F 29 8C 24 "
-                                                          "? ? ? ? 44 "
-                                                          "0F 29 84 24 ? ? ? ? 0F 29 BC 24 ? ? ? ? 0F 29 B4 24 ? ? ? ? "
-                                                          "48 8B 8C 24 ? ? ? ? 48 8B 94 24 ? ? ? "
-                                                          "? 48 8B 84 "
-                                                          "24 ? ? ? ? 4C 8B 40 18 0F 28 3D")
-                                                      .Get(0)
-                                                      .Get<uint8_t>();
-                GameProfile::SelectedGameProfile.CallFunctionByNameWithArguments =
-                    (DWORD64)CallFunctionByNameWithArguments;
+        std::tuple<std::string, uint8_t> CallFunctionByNameWithArgumentsPatterns[] = {
+            {"8B ? E8 ? ? ? ? ? 0A ? FF ? EB 9E ? 8B", 0x2},
+            {"49 8B D4 E8 ? ? ? ? 44 0A F8 FF C3 EB 9A", 0x3},
+            {"41 57 41 56 41 55 41 54 56 57 55 53 48 81 EC ? ? ? ? 44 0F "
+             "29 BC 24 ? ? ? ? 44 0F 29 B4 24 ? ? ? "
+             "? 44 0F 29 "
+             "AC 24 ? ? ? ? 44 0F 29 A4 24 ? ? ? ? 44 0F 29 9C 24 ? ? ? ? "
+             "44 0F 29 94 24 ? ? ? ? 44 0F 29 8C 24 "
+             "? ? ? ? 44 "
+             "0F 29 84 24 ? ? ? ? 0F 29 BC 24 ? ? ? ? 0F 29 B4 24 ? ? ? ? "
+             "48 8B 8C 24 ? ? ? ? 48 8B 94 24 ? ? ? "
+             "? 48 8B 84 "
+             "24 ? ? ? ? 4C 8B 40 18 0F 28 3D",
+             0x0}};
 
-                if (CallFunctionByNameWithArguments == nullptr)
+        // todo: this is a dirty workaround
+        for (int i = 0; i < 3; i++)
+        {
+            const auto [PatternString, Offset] = CallFunctionByNameWithArgumentsPatterns[i];
+
+            auto Found = Pattern(PatternString).Get(0).Get<uint8_t>(Offset);
+            if (Found != nullptr)
+            {
+                if (i != 2)
                 {
-                    LOG_ERROR("CallFunctionByNameWithArguments NOT FOUND!");
+                    GameProfile::SelectedGameProfile.CallFunctionByNameWithArguments =
+                        (DWORD64)MEM::GetAddressPTR(Found, 0x1, 0x5);
                 }
+                else
+                {
+                    GameProfile::SelectedGameProfile.CallFunctionByNameWithArguments = (DWORD64)Found;
+                }
+                break;
             }
         }
+
+        if (GameProfile::SelectedGameProfile.CallFunctionByNameWithArguments == 0)
+        {
+            LOG_ERROR("CallFunctionByNameWithArguments NOT FOUND!");
+        }
+
         LOG_INFO("CallFunctionByNameWithArguments: 0x{:x}",
                  (void *)GameProfile::SelectedGameProfile.CallFunctionByNameWithArguments);
 
         auto ProcessEvent = Pattern("75 0E ? ? ? 48 ? ? 48 ? ? E8 ? ? ? ? 48 8B ? 24 ? 48 8B ? 24 38 48 8B ? 24 40")
                                 .Get(0)
-                                .Get<uint8_t>();
-        ProcessEvent += 0xB;
+                                .Get<uint8_t>(0xB);
         if (ProcessEvent != nullptr)
         {
             GameProfile::SelectedGameProfile.ProcessEvent = (DWORD64)MEM::GetAddressPTR(ProcessEvent, 0x1, 0x5);
@@ -376,47 +355,35 @@ void GameProfile::CreateGameProfile()
             LOG_ERROR("ProcessEvent NOT FOUND!");
         }
 
-        GameProfile::SelectedGameProfile.CreateDefaultObject =
-            (DWORD64)Pattern("4C 8B DC 57 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 84 24 ? ? ? ? 48 "
-                             "83 B9 ? ? ? ? ? 48 8B F9 ")
-                .Get(0)
-                .Get<uint8_t>();
-        if (!GameProfile::SelectedGameProfile.CreateDefaultObject)
+        std::string CreateDefaultObjectPatterns[] = {
+            "4C 8B DC 57 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 84 24 ? ? ? ? 48 83 B9 ? ? ? ? ? 48 8B F9",
+
+            "4C 8B DC 55 53 49 8D AB ? ? ? ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 48 83 B9 ? ? "
+            "? ? ? 48 8B D9 0F 85",
+
+            "4C 8B DC 53 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 84 24 ? ? ? ? 48 83 B9",
+
+            "4C 8B DC ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? 48 ? ? ? ? ? "
+            "? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? "
+            "? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? 8B ? ? ? ? ? ? ? ? ? ? ? 8B ? ? ? "
+            "? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? "
+            "? ? ? ? ? ? ? 48"};
+
+        for (const auto PatternString : CreateDefaultObjectPatterns)
         {
-            // FallBack 1
-            GameProfile::SelectedGameProfile.CreateDefaultObject =
-                (DWORD64)Pattern("4C 8B DC 55 53 49 8D AB ? ? ? ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 "
-                                 "48 89 85 ? ? ? ? 48 83 B9 ? ? ? ? ? 48 8B D9 0F 85")
-                    .Get(0)
-                    .Get<uint8_t>();
-            if (!GameProfile::SelectedGameProfile.CreateDefaultObject)
+            auto Found = Pattern(PatternString).Get(0).Get<uint8_t>();
+            if (Found != nullptr)
             {
-                // FallBack 2
-                GameProfile::SelectedGameProfile.CreateDefaultObject =
-                    (DWORD64)Pattern(
-                        "4C 8B DC 53 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 84 24 ? ? ? ? 48 83 B9")
-                        .Get(0)
-                        .Get<uint8_t>();
-                if (!GameProfile::SelectedGameProfile.CreateDefaultObject)
-                {
-                    // Final FallBack
-                    GameProfile::SelectedGameProfile.CreateDefaultObject =
-                        (DWORD64)Pattern(
-                            "4C 8B DC ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? 48 ? ? ? ? ? "
-                            "? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? "
-                            "? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? 8B ? ? ? ? ? ? ? ? ? ? ? 8B ? ? ? "
-                            "? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? "
-                            "? ? ? ? ? ? ? 48")
-                            .Get(0)
-                            .Get<uint8_t>();
-                    if (!GameProfile::SelectedGameProfile.CreateDefaultObject)
-                    {
-                        GameProfile::SelectedGameProfile.bIsDefaultObjectArrayed = true;
-                        LOG_WARN("CreateDefualtObject NOT FOUND!, Will Use Object Array Instead!");
-                    }
-                }
+                GameProfile::SelectedGameProfile.CreateDefaultObject = (DWORD64)Found;
             }
         }
+
+        if (GameProfile::SelectedGameProfile.CreateDefaultObject == 0)
+        {
+            GameProfile::SelectedGameProfile.bIsDefaultObjectArrayed = true;
+            LOG_WARN("CreateDefualtObject NOT FOUND!, Will Use Object Array Instead!");
+        }
+
         LOG_INFO("UClass::CreateDefualtObject: 0x{:x}", (void *)GameProfile::SelectedGameProfile.CreateDefaultObject);
     }
 
@@ -461,40 +428,30 @@ void GameProfile::CreateGameProfile()
     }
     else
     {
-        auto StaticConstructObject_Internal =
-            Pattern("48 8B 84 24 ? ? 00 00 48 89 44 24 ? C7 44 24 ? 00 00 00 00 E8").Get(0).Get<uint8_t>(); // Sig 1
-        if (StaticConstructObject_Internal != nullptr)
+        std::tuple<std::string, uint8_t> StaticConstructObject_InternalPatterns[] = {
+            {"48 8B 84 24 ? ? 00 00 48 89 44 24 ? C7 44 24 ? 00 00 00 00 E8", 0x15},
+            {"48 8B C8 89 7C 24 ? E8", 0x7},
+            {"E8 ? ? ? ? 45 8B 47 70", 0x0},
+            {"89 6C 24 38 48 89 74 24 ? E8", 0x9}};
+
+        for (const auto [PatternString, Offset] : StaticConstructObject_InternalPatterns)
         {
-            StaticConstructObject_Internal += 0x15;
-        }
-        else
-        {
-            StaticConstructObject_Internal = Pattern("48 8B C8 89 7C 24 ? E8").Get(0).Get<uint8_t>();
-            if (StaticConstructObject_Internal != nullptr)
+            auto Found = Pattern(PatternString).Get(0).Get<uint8_t>(Offset);
+            if (Found != nullptr)
             {
-                StaticConstructObject_Internal += 0x7;
-            }
-            else
-            {
-                GameProfile::SelectedGameProfile.IsUsingUpdatedStaticConstruct = true;
-                StaticConstructObject_Internal = Pattern("E8 ? ? ? ? 45 8B 47 70").Get(0).Get<uint8_t>();
-                if (!StaticConstructObject_Internal)
-                {
-                    StaticConstructObject_Internal = Pattern("89 6C 24 38 48 89 74 24 ? E8").Get(0).Get<uint8_t>();
-                    if (StaticConstructObject_Internal != nullptr)
-                    {
-                        StaticConstructObject_Internal += 0x9;
-                    }
-                    else
-                    {
-                        LOG_WARN("StaticConstructObject_Internal Not Found! This will prevent Mods using the "
-                                 "ModObjectInstance from working properly.");
-                    }
-                }
+
+                GameProfile::SelectedGameProfile.StaticConstructObject_Internal =
+                    (DWORD64)MEM::GetAddressPTR(Found, 0x1, 0x5);
+                break;
             }
         }
-        GameProfile::SelectedGameProfile.StaticConstructObject_Internal =
-            (DWORD64)MEM::GetAddressPTR(StaticConstructObject_Internal, 0x1, 0x5);
+
+        if (GameProfile::SelectedGameProfile.StaticConstructObject_Internal == 0)
+        {
+            LOG_WARN("StaticConstructObject_Internal Not Found! This will prevent Mods using the "
+                     "ModObjectInstance from working properly.");
+        }
+
         LOG_INFO("StaticConstructObject_Internal 0x{:x}",
                  (void *)GameProfile::SelectedGameProfile.StaticConstructObject_Internal);
     }
