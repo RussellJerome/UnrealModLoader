@@ -1,3 +1,5 @@
+
+set(CMAKE_CXX_STANDARD 23)
 # ======== ImGui ==========
 
 add_library(ImGui STATIC 
@@ -29,6 +31,11 @@ add_subdirectory("MinHook")
 add_library(FeatherIni INTERFACE)
 target_include_directories(FeatherIni INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/FeatherIni")
 
-# ======= SpdLog =========
+# ======== Fmt ======== 
 
+add_subdirectory("fmt")
+
+# ========  SpdLog ========
+
+set(SPDLOG_FMT_EXTERNAL YES)
 add_subdirectory("spdlog")

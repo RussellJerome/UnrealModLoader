@@ -1,4 +1,5 @@
 #include "Pattern.h"
+#include <Windows.h>
 #include <intrin.h>
 
 ExecutableMeta::ExecutableMeta()

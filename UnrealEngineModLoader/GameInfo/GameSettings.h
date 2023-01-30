@@ -7,26 +7,25 @@
 namespace GameSettings
 {
 
+struct ExtendedPattern
+{
+    std::string Pattern = "";
+    uint32_t FirstOpCodes = 0;
+    uint32_t TotalByteInstruction = 0;
+};
+
 struct GInfoPatterns
 {
-    std::string GName = "";
-    uint32_t GNameFirstOpCodes = 0;
-    uint32_t GNameTotalByteInstruction = 0;
-
-    std::string GObject = "";
-    uint32_t GObjectFirstOpCodes = 0;
-    uint32_t GobjectTotalByteInstruction = 0;
-
-    std::string GWorld = "";
-    uint32_t GWorldFirstOpCodes = 0;
-    uint32_t GWorldTotalByteInstruction = 0;
+    std::optional<ExtendedPattern> GName = {};
+    std::optional<ExtendedPattern> GObject = {};
+    std::optional<ExtendedPattern> GWorld = {};
 };
 
 struct GInfoOffsets
 {
-    uint32_t GName = 0;
-    uint32_t GObject = 0;
-    uint32_t GWorld = 0;
+    std::optional<uint32_t> GName = {};
+    std::optional<uint32_t> GObject = {};
+    std::optional<uint32_t> GWorld = {};
 };
 
 struct GInfo
@@ -75,24 +74,24 @@ struct Property
 
 struct FunctionInfoPatterns
 {
-    std::string GameStateInit = "";
-    std::string BeginPlay = "";
-    std::string StaticLoadObject = "";
-    std::string SpawnActorFTrans = "";
-    std::string CallFunctionByNameWithArguments = "";
-    std::string ProcessEvent = "";
-    std::string CreateDefaultObject = "";
+    std::optional<std::string> GameStateInit = {};
+    std::optional<std::string> BeginPlay = {};
+    std::optional<std::string> StaticLoadObject = {};
+    std::optional<std::string> SpawnActorFTrans = {};
+    std::optional<std::string> CallFunctionByNameWithArguments = {};
+    std::optional<std::string> ProcessEvent = {};
+    std::optional<std::string> CreateDefaultObject = {};
 };
 
 struct FunctionInfoOffsets
 {
-    uint32_t GameStateInit = 0;
-    uint32_t BeginPlay = 0;
-    uint32_t StaticLoadObject = 0;
-    uint32_t SpawnActorFTrans = 0;
-    uint32_t CallFunctionByNameWithArguments = 0;
-    uint32_t ProcessEvent = 0;
-    uint32_t CreateDefaultObject = 0;
+    std::optional<uint32_t> GameStateInit = {};
+    std::optional<uint32_t> BeginPlay = {};
+    std::optional<uint32_t> StaticLoadObject = {};
+    std::optional<uint32_t> SpawnActorFTrans = {};
+    std::optional<uint32_t> CallFunctionByNameWithArguments = {};
+    std::optional<uint32_t> ProcessEvent = {};
+    std::optional<uint32_t> CreateDefaultObject = {};
 };
 
 struct FunctionInfo

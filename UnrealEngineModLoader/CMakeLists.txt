@@ -16,7 +16,7 @@ add_definitions(-DUNICODE -D_UNICODE -DUNREALENGINEMODLOADER_EXPORTS -D_WINDOWS)
 
 add_library(UnrealEngineModLoader SHARED ${UML_SOURCE})
 
-set_property(TARGET UnrealEngineModLoader PROPERTY CXX_STANDARD 17)
+set_property(TARGET UnrealEngineModLoader PROPERTY CXX_STANDARD 23)
 
 target_include_directories(UnrealEngineModLoader PUBLIC "./")
 

@@ -1,6 +1,5 @@
 #pragma once
 #include <Shared/UMLDefs.h>
-#include <Windows.h>
 #include <cstdint>
 #include <string>
 #include <tuple>
@@ -23,7 +22,6 @@ class ExecutableMeta
   private:
     uintptr_t m_Begin;
     uintptr_t m_End;
-    HANDLE m_Process;
 };
 
 class LOADER_API PatternMatch

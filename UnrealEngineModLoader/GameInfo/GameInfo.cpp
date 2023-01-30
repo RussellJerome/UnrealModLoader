@@ -46,18 +46,17 @@ void GameProfile::CreateGameProfile()
         {
             GameSettings::GInfoPatterns GInfoPatterns = std::get<GameSettings::GInfoPatterns>(GInfoSettings.Info);
 
-            auto GName = (DWORD64)Pattern(GInfoPatterns.GName).Get(0).Get<uint8_t>();
-            auto GNamesOffset = *reinterpret_cast<uint32_t *>(GName + GInfoPatterns.GNameFirstOpCodes);
-            GameProfile::SelectedGameProfile.GName = GName + GInfoPatterns.GNameTotalByteInstruction + GNamesOffset;
+            auto ExtendedPatternHandler = [](auto &ExtendedPattern) {
+                auto Found = (DWORD64)Pattern(ExtendedPattern.Pattern).Get(0).Get<uint8_t>();
+                auto Offset = *reinterpret_cast<uint32_t *>(Found + ExtendedPattern.FirstOpCodes);
+                return Found + ExtendedPattern.TotalByteInstruction + Offset;
+            };
 
-            auto GObject = (DWORD64)Pattern(GInfoPatterns.GObject).Get(0).Get<uint8_t>();
-            auto GObjectOffset = *reinterpret_cast<uint32_t *>(GObject + GInfoPatterns.GObjectFirstOpCodes);
+            GameProfile::SelectedGameProfile.GName = GInfoPatterns.GName.transform(ExtendedPatternHandler).value_or(0);
             GameProfile::SelectedGameProfile.GObject =
-                GObject + GInfoPatterns.GobjectTotalByteInstruction + GObjectOffset;
-
-            auto GWorld = (DWORD64)Pattern(GInfoPatterns.GWorld).Get(0).Get<uint8_t>();
-            auto GWorldOffset = *reinterpret_cast<uint32_t *>(GWorld + GInfoPatterns.GWorldFirstOpCodes);
-            GameProfile::SelectedGameProfile.GWorld = GWorld + GInfoPatterns.GWorldTotalByteInstruction + GWorldOffset;
+                GInfoPatterns.GObject.transform(ExtendedPatternHandler).value_or(0);
+            GameProfile::SelectedGameProfile.GWorld =
+                GInfoPatterns.GWorld.transform(ExtendedPatternHandler).value_or(0);
 
             LOG_INFO("GStuff Patterns Loaded!");
         }
@@ -65,14 +64,17 @@ void GameProfile::CreateGameProfile()
         {
             GameSettings::GInfoOffsets GInfoOffsets = std::get<GameSettings::GInfoOffsets>(GInfoSettings.Info);
 
-            GameProfile::SelectedGameProfile.GName = (DWORD64)GetModuleHandleW(0) + GInfoOffsets.GName;
-            GameProfile::SelectedGameProfile.GObject = (DWORD64)GetModuleHandleW(0) + GInfoOffsets.GObject;
-            GameProfile::SelectedGameProfile.GWorld = (DWORD64)GetModuleHandleW(0) + GInfoOffsets.GWorld;
+            auto OffsetHandler = [](auto &Offset) { return (DWORD64)GetModuleHandleW(0) + Offset; };
+
+            GameProfile::SelectedGameProfile.GName = GInfoOffsets.GName.transform(OffsetHandler).value_or(0);
+            GameProfile::SelectedGameProfile.GObject = GInfoOffsets.GObject.transform(OffsetHandler).value_or(0);
+            GameProfile::SelectedGameProfile.GWorld = GInfoOffsets.GWorld.transform(OffsetHandler).value_or(0);
 
             LOG_INFO("GStuff Offsets Loaded!");
         }
     }
-    else
+
+    if (GameProfile::SelectedGameProfile.GName == 0)
     {
         if (GameProfile::SelectedGameProfile.UsesFNamePool)
         {
@@ -102,7 +104,10 @@ void GameProfile::CreateGameProfile()
                 LOG_ERROR("GName Could Not Be Found!");
             }
         }
+    }
 
+    if (GameProfile::SelectedGameProfile.GObject == 0)
+    {
         auto GObjectPat = Pattern("8B 46 10 3B 46 3C 75 0F 48 8B D6 48 8D 0D ? ? ? ? E8").Get(0).Get<uint8_t>();
         if (GObjectPat != nullptr)
         {
@@ -114,7 +119,10 @@ void GameProfile::CreateGameProfile()
         {
             LOG_ERROR("GObject Could Not Be Found!");
         }
+    }
 
+    if (GameProfile::SelectedGameProfile.GWorld == 0)
+    {
         auto GWorldPat = Pattern("0F 2E ? 74 ? 48 8B 1D ? ? ? ? 48 85 DB 74").Get(0).Get<uint8_t>();
         if (GWorldPat != nullptr)
         {
@@ -194,20 +202,30 @@ void GameProfile::CreateGameProfile()
             GameSettings::FunctionInfoPatterns FunctionInfoPatterns =
                 std::get<GameSettings::FunctionInfoPatterns>(FunctionInfoSettings.Info);
 
+            auto PatternHandler = [](auto &PatternString) {
+                return (DWORD64)Pattern(PatternString).Get(0).Get<uint8_t>();
+            };
+
             GameProfile::SelectedGameProfile.GameStateInit =
-                (DWORD64)Pattern(FunctionInfoPatterns.GameStateInit).Get(0).Get<uint8_t>();
+                FunctionInfoPatterns.GameStateInit.transform(PatternHandler).value_or(0);
+
             GameProfile::SelectedGameProfile.BeginPlay =
-                (DWORD64)Pattern(FunctionInfoPatterns.BeginPlay).Get(0).Get<uint8_t>();
+                FunctionInfoPatterns.BeginPlay.transform(PatternHandler).value_or(0);
+
             GameProfile::SelectedGameProfile.StaticLoadObject =
-                (DWORD64)Pattern(FunctionInfoPatterns.StaticLoadObject).Get(0).Get<uint8_t>();
+                FunctionInfoPatterns.StaticLoadObject.transform(PatternHandler).value_or(0);
+
             GameProfile::SelectedGameProfile.SpawnActorFTrans =
-                (DWORD64)Pattern(FunctionInfoPatterns.SpawnActorFTrans).Get(0).Get<uint8_t>();
+                FunctionInfoPatterns.SpawnActorFTrans.transform(PatternHandler).value_or(0);
+
             GameProfile::SelectedGameProfile.CallFunctionByNameWithArguments =
-                (DWORD64)Pattern(FunctionInfoPatterns.CallFunctionByNameWithArguments).Get(0).Get<uint8_t>();
+                FunctionInfoPatterns.CallFunctionByNameWithArguments.transform(PatternHandler).value_or(0);
+
             GameProfile::SelectedGameProfile.ProcessEvent =
-                (DWORD64)Pattern(FunctionInfoPatterns.ProcessEvent).Get(0).Get<uint8_t>();
+                FunctionInfoPatterns.ProcessEvent.transform(PatternHandler).value_or(0);
+
             GameProfile::SelectedGameProfile.CreateDefaultObject =
-                (DWORD64)Pattern(FunctionInfoPatterns.CreateDefaultObject).Get(0).Get<uint8_t>();
+                FunctionInfoPatterns.CreateDefaultObject.transform(PatternHandler).value_or(0);
 
             LOG_INFO("Function Patterns Set!");
         }
@@ -216,33 +234,41 @@ void GameProfile::CreateGameProfile()
             GameSettings::FunctionInfoOffsets FunctionInfoOffsets =
                 std::get<GameSettings::FunctionInfoOffsets>(FunctionInfoSettings.Info);
 
+            auto OffsetHandler = [](auto &Offset) { return (DWORD64)GetModuleHandleW(0) + Offset; };
+
             GameProfile::SelectedGameProfile.GameStateInit =
-                (DWORD64)GetModuleHandleW(0) + FunctionInfoOffsets.GameStateInit;
-            GameProfile::SelectedGameProfile.BeginPlay = (DWORD64)GetModuleHandleW(0) + FunctionInfoOffsets.BeginPlay;
+                FunctionInfoOffsets.GameStateInit.transform(OffsetHandler).value_or(0);
+            GameProfile::SelectedGameProfile.BeginPlay =
+                FunctionInfoOffsets.BeginPlay.transform(OffsetHandler).value_or(0);
             GameProfile::SelectedGameProfile.StaticLoadObject =
-                (DWORD64)GetModuleHandleW(0) + FunctionInfoOffsets.StaticLoadObject;
+                FunctionInfoOffsets.StaticLoadObject.transform(OffsetHandler).value_or(0);
             GameProfile::SelectedGameProfile.SpawnActorFTrans =
-                (DWORD64)GetModuleHandleW(0) + FunctionInfoOffsets.SpawnActorFTrans;
+                FunctionInfoOffsets.SpawnActorFTrans.transform(OffsetHandler).value_or(0);
             GameProfile::SelectedGameProfile.CallFunctionByNameWithArguments =
-                (DWORD64)GetModuleHandleW(0) + FunctionInfoOffsets.CallFunctionByNameWithArguments;
+                FunctionInfoOffsets.CallFunctionByNameWithArguments.transform(OffsetHandler).value_or(0);
             GameProfile::SelectedGameProfile.ProcessEvent =
-                (DWORD64)GetModuleHandleW(0) + FunctionInfoOffsets.ProcessEvent;
+                FunctionInfoOffsets.ProcessEvent.transform(OffsetHandler).value_or(0);
             GameProfile::SelectedGameProfile.CreateDefaultObject =
-                (DWORD64)GetModuleHandleW(0) + FunctionInfoOffsets.CreateDefaultObject;
+                FunctionInfoOffsets.CreateDefaultObject.transform(OffsetHandler).value_or(0);
 
             LOG_INFO("Function Offsets Set!");
         }
     }
-    else
+
+    if (!GameProfile::SelectedGameProfile.GameStateInit)
     {
         GameProfile::SelectedGameProfile.GameStateInit =
             (DWORD64)Pattern("40 53 48 83 EC 20 48 8B 41 10 48 8B D9 48 8B 91").Get(0).Get<uint8_t>();
         LOG_INFO("GameStateInit: 0x{:x}", (void *)GameProfile::SelectedGameProfile.GameStateInit);
-        if (!GameProfile::SelectedGameProfile.GameStateInit)
-        {
-            LOG_ERROR("GameStateInit NOT FOUND!");
-        }
+    }
 
+    if (!GameProfile::SelectedGameProfile.GameStateInit)
+    {
+        LOG_ERROR("GameStateInit NOT FOUND!");
+    }
+
+    if (!GameProfile::SelectedGameProfile.BeginPlay)
+    {
         auto BeginPlay = Pattern("48 8B D9 E8 ? ? ? ? F6 83 ? ? ? ? ? 74 12 48 8B 03").Get(0).Get<uint8_t>(3);
         if (BeginPlay != nullptr)
         {
@@ -253,13 +279,16 @@ void GameProfile::CreateGameProfile()
         {
             LOG_ERROR("AActor::BeginPlay NOT FOUND!");
         }
+    }
 
-        std::tuple<std::string, uint8_t> StaticLoadObjectPatterns[] = {
-            {"89 64 24 ? 48 8B C8 E8 ? ? ? ? 41 BE ? ? ? ? EB 05 E8", 0x7},
-            {"C7 44 24 ? ? ? ? ? E8 ? ? ? ? 48 8B 8D ? ? ? ? 48 85 C9 74 05 E8 ? ? ? ? 45 33 C9 ? 89 74 24", 0x8},
-            {"89 6C 24 20 48 8B C8 E8 ? ? ? ? 48 8B 4C 24 ? 48 8B F0 48 85 C9 74 05", 0x7},
-            {"48 8B C8 89 5C 24 20 E8 ? ? ? ? 48", 0x7}};
+    std::tuple<std::string, uint8_t> StaticLoadObjectPatterns[] = {
+        {"89 64 24 ? 48 8B C8 E8 ? ? ? ? 41 BE ? ? ? ? EB 05 E8", 0x7},
+        {"C7 44 24 ? ? ? ? ? E8 ? ? ? ? 48 8B 8D ? ? ? ? 48 85 C9 74 05 E8 ? ? ? ? 45 33 C9 ? 89 74 24", 0x8},
+        {"89 6C 24 20 48 8B C8 E8 ? ? ? ? 48 8B 4C 24 ? 48 8B F0 48 85 C9 74 05", 0x7},
+        {"48 8B C8 89 5C 24 20 E8 ? ? ? ? 48", 0x7}};
 
+    if (!GameProfile::SelectedGameProfile.StaticLoadObject)
+    {
         for (const auto [PatternString, Offset] : StaticLoadObjectPatterns)
         {
             auto Found = Pattern(PatternString).Get(0).Get<uint8_t>(Offset);
@@ -269,18 +298,21 @@ void GameProfile::CreateGameProfile()
                 break;
             }
         }
+    }
 
-        if (GameProfile::SelectedGameProfile.StaticLoadObject == 0)
-        {
-            LOG_ERROR("StaticLoadObject NOT FOUND!");
-        }
+    if (GameProfile::SelectedGameProfile.StaticLoadObject == 0)
+    {
+        LOG_ERROR("StaticLoadObject NOT FOUND!");
+    }
 
-        LOG_INFO("StaticLoadObject: 0x{:x}", (void *)GameProfile::SelectedGameProfile.StaticLoadObject);
+    LOG_INFO("StaticLoadObject: 0x{:x}", (void *)GameProfile::SelectedGameProfile.StaticLoadObject);
 
-        std::tuple<std::string, uint8_t> SpawnActorFTransPatterns[] = {
-            {"4C 8B C6 48 8B C8 48 8B D3 E8 ? ? ? ? 48 8B 5C 24 ? 48 8B 74 24", 0x9},
-            {"4C 8B CE 4C 8D 44 24 ? 48 8B D7 48 8B CB E8 ? ? ? ? 48 8B 4C 24 ? 48 33 CC", 0xE}};
+    std::tuple<std::string, uint8_t> SpawnActorFTransPatterns[] = {
+        {"4C 8B C6 48 8B C8 48 8B D3 E8 ? ? ? ? 48 8B 5C 24 ? 48 8B 74 24", 0x9},
+        {"4C 8B CE 4C 8D 44 24 ? 48 8B D7 48 8B CB E8 ? ? ? ? 48 8B 4C 24 ? 48 33 CC", 0xE}};
 
+    if (!GameProfile::SelectedGameProfile.SpawnActorFTrans)
+    {
         for (const auto [PatternString, Offset] : SpawnActorFTransPatterns)
         {
             auto Found = Pattern(PatternString).Get(0).Get<uint8_t>(Offset);
@@ -290,30 +322,20 @@ void GameProfile::CreateGameProfile()
                 break;
             }
         }
+    }
 
-        if (GameProfile::SelectedGameProfile.SpawnActorFTrans == 0)
-        {
-            LOG_ERROR("SpawnActorFTrans NOT FOUND!");
-        }
+    if (GameProfile::SelectedGameProfile.SpawnActorFTrans == 0)
+    {
+        LOG_ERROR("SpawnActorFTrans NOT FOUND!");
+    }
 
-        LOG_INFO("UWorld::SpawnActor: 0x{:x}", (void *)GameProfile::SelectedGameProfile.SpawnActorFTrans);
+    LOG_INFO("UWorld::SpawnActor: 0x{:x}", (void *)GameProfile::SelectedGameProfile.SpawnActorFTrans);
 
-        std::tuple<std::string, uint8_t> CallFunctionByNameWithArgumentsPatterns[] = {
-            {"8B ? E8 ? ? ? ? ? 0A ? FF ? EB 9E ? 8B", 0x2},
-            {"49 8B D4 E8 ? ? ? ? 44 0A F8 FF C3 EB 9A", 0x3},
-            {"41 57 41 56 41 55 41 54 56 57 55 53 48 81 EC ? ? ? ? 44 0F "
-             "29 BC 24 ? ? ? ? 44 0F 29 B4 24 ? ? ? "
-             "? 44 0F 29 "
-             "AC 24 ? ? ? ? 44 0F 29 A4 24 ? ? ? ? 44 0F 29 9C 24 ? ? ? ? "
-             "44 0F 29 94 24 ? ? ? ? 44 0F 29 8C 24 "
-             "? ? ? ? 44 "
-             "0F 29 84 24 ? ? ? ? 0F 29 BC 24 ? ? ? ? 0F 29 B4 24 ? ? ? ? "
-             "48 8B 8C 24 ? ? ? ? 48 8B 94 24 ? ? ? "
-             "? 48 8B 84 "
-             "24 ? ? ? ? 4C 8B 40 18 0F 28 3D",
-             0x0}};
+    std::tuple<std::string, uint8_t> CallFunctionByNameWithArgumentsPatterns[] = {
+        {"8B ? E8 ? ? ? ? ? 0A ? FF ? EB 9E ? 8B", 0x2}, {"49 8B D4 E8 ? ? ? ? 44 0A F8 FF C3 EB 9A", 0x3}};
 
-        // todo: this is a dirty workaround
+    if (!GameProfile::SelectedGameProfile.CallFunctionByNameWithArguments)
+    {
         for (int i = 0; i < 3; i++)
         {
             const auto [PatternString, Offset] = CallFunctionByNameWithArgumentsPatterns[i];
@@ -321,27 +343,23 @@ void GameProfile::CreateGameProfile()
             auto Found = Pattern(PatternString).Get(0).Get<uint8_t>(Offset);
             if (Found != nullptr)
             {
-                if (i != 2)
-                {
-                    GameProfile::SelectedGameProfile.CallFunctionByNameWithArguments =
-                        (DWORD64)MEM::GetAddressPTR(Found, 0x1, 0x5);
-                }
-                else
-                {
-                    GameProfile::SelectedGameProfile.CallFunctionByNameWithArguments = (DWORD64)Found;
-                }
+                GameProfile::SelectedGameProfile.CallFunctionByNameWithArguments =
+                    (DWORD64)MEM::GetAddressPTR(Found, 0x1, 0x5);
                 break;
             }
         }
+    }
 
-        if (GameProfile::SelectedGameProfile.CallFunctionByNameWithArguments == 0)
-        {
-            LOG_ERROR("CallFunctionByNameWithArguments NOT FOUND!");
-        }
+    if (GameProfile::SelectedGameProfile.CallFunctionByNameWithArguments == 0)
+    {
+        LOG_ERROR("CallFunctionByNameWithArguments NOT FOUND!");
+    }
 
-        LOG_INFO("CallFunctionByNameWithArguments: 0x{:x}",
-                 (void *)GameProfile::SelectedGameProfile.CallFunctionByNameWithArguments);
+    LOG_INFO("CallFunctionByNameWithArguments: 0x{:x}",
+             (void *)GameProfile::SelectedGameProfile.CallFunctionByNameWithArguments);
 
+    if (!GameProfile::SelectedGameProfile.ProcessEvent)
+    {
         auto ProcessEvent = Pattern("75 0E ? ? ? 48 ? ? 48 ? ? E8 ? ? ? ? 48 8B ? 24 ? 48 8B ? 24 38 48 8B ? 24 40")
                                 .Get(0)
                                 .Get<uint8_t>(0xB);
@@ -354,21 +372,24 @@ void GameProfile::CreateGameProfile()
         {
             LOG_ERROR("ProcessEvent NOT FOUND!");
         }
+    }
 
-        std::string CreateDefaultObjectPatterns[] = {
-            "4C 8B DC 57 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 84 24 ? ? ? ? 48 83 B9 ? ? ? ? ? 48 8B F9",
+    std::string CreateDefaultObjectPatterns[] = {
+        "4C 8B DC 57 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 84 24 ? ? ? ? 48 83 B9 ? ? ? ? ? 48 8B F9",
 
-            "4C 8B DC 55 53 49 8D AB ? ? ? ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 48 83 B9 ? ? "
-            "? ? ? 48 8B D9 0F 85",
+        "4C 8B DC 55 53 49 8D AB ? ? ? ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 48 83 B9 ? ? "
+        "? ? ? 48 8B D9 0F 85",
 
-            "4C 8B DC 53 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 84 24 ? ? ? ? 48 83 B9",
+        "4C 8B DC 53 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 84 24 ? ? ? ? 48 83 B9",
 
-            "4C 8B DC ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? 48 ? ? ? ? ? "
-            "? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? "
-            "? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? 8B ? ? ? ? ? ? ? ? ? ? ? 8B ? ? ? "
-            "? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? "
-            "? ? ? ? ? ? ? 48"};
+        "4C 8B DC ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? 48 ? ? ? ? ? "
+        "? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? "
+        "? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? 8B ? ? ? ? ? ? ? ? ? ? ? 8B ? ? ? "
+        "? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? "
+        "? ? ? ? ? ? ? 48"};
 
+    if (!GameProfile::SelectedGameProfile.CreateDefaultObject)
+    {
         for (const auto PatternString : CreateDefaultObjectPatterns)
         {
             auto Found = Pattern(PatternString).Get(0).Get<uint8_t>();
@@ -377,15 +398,15 @@ void GameProfile::CreateGameProfile()
                 GameProfile::SelectedGameProfile.CreateDefaultObject = (DWORD64)Found;
             }
         }
-
-        if (GameProfile::SelectedGameProfile.CreateDefaultObject == 0)
-        {
-            GameProfile::SelectedGameProfile.bIsDefaultObjectArrayed = true;
-            LOG_WARN("CreateDefualtObject NOT FOUND!, Will Use Object Array Instead!");
-        }
-
-        LOG_INFO("UClass::CreateDefualtObject: 0x{:x}", (void *)GameProfile::SelectedGameProfile.CreateDefaultObject);
     }
+
+    if (GameProfile::SelectedGameProfile.CreateDefaultObject == 0)
+    {
+        GameProfile::SelectedGameProfile.bIsDefaultObjectArrayed = true;
+        LOG_WARN("CreateDefualtObject NOT FOUND!, Will Use Object Array Instead!");
+    }
+
+    LOG_INFO("UClass::CreateDefualtObject: 0x{:x}", (void *)GameProfile::SelectedGameProfile.CreateDefaultObject);
 
     if (Settings.ProcessInternalFunctionSettings.has_value())
     {

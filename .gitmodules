@@ -13,5 +13,6 @@
 [submodule "vendor/fmt"]
 	path = vendor/fmt
 	url = git@github.com:fmtlib/fmt.git
+	branch = 8.0.0
 [submodule "fmt"]
 	branch = 8.0.0
