@@ -4,15 +4,10 @@
 [submodule "vendor/MinHook"]
 	path = vendor/MinHook
 	url = https://github.com/TsudaKageyu/minhook
-[submodule "vendor/FeatherIni"]
-	path = vendor/FeatherIni
-	url = git@github.com:c-ridgway/cpp-feather-ini-parser.git
 [submodule "vendor/spdlog"]
 	path = vendor/spdlog
 	url = https://github.com/gabime/spdlog
 [submodule "vendor/fmt"]
 	path = vendor/fmt
 	url = git@github.com:fmtlib/fmt.git
-	branch = 8.0.0
-[submodule "fmt"]
 	branch = 8.0.0

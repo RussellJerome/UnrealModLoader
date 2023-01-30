@@ -25,8 +25,6 @@ target_link_libraries(UnrealEngineModLoader PUBLIC ImGui)
 
 target_link_libraries(UnrealEngineModLoader PUBLIC minhook)
 
-target_link_libraries(UnrealEngineModLoader PUBLIC FeatherIni)
-
 target_link_libraries(UnrealEngineModLoader PUBLIC d3d11 d3dcompiler)
 
 target_link_libraries(UnrealEngineModLoader PUBLIC spdlog::spdlog)

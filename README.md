@@ -16,6 +16,7 @@ All video documentation and guides can be found [here](https://www.youtube.com/p
 	* You can press f1 to open the Mod Loader gui panel.
 
 # 3rd Party Software
-  * [feather-ini-parser](https://github.com/Turbine1991/cpp-feather-ini-parser)
   * [Minhook](https://github.com/TsudaKageyu/minhook)
   * [ImGui](https://github.com/ocornut/imgui)
+  * [fmt](https://github.com/fmtlib/fmt)
+  * [spdlog](https://github.com/gabime/spdlog)
