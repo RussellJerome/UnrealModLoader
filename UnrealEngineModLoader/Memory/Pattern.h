@@ -1,4 +1,5 @@
 #pragma once
+#include <Shared/UMLDefs.h>
 #include <Windows.h>
 #include <cstdint>
 #include <string>
@@ -25,7 +26,7 @@ class ExecutableMeta
     HANDLE m_Process;
 };
 
-class PatternMatch
+class LOADER_API PatternMatch
 {
   public:
     inline PatternMatch(void *Ptr) : m_Ptr(Ptr)
@@ -45,7 +46,7 @@ class PatternMatch
     void *m_Ptr;
 };
 
-class Pattern
+class LOADER_API Pattern
 {
   public:
     Pattern(const std::string &Pattern) : Pattern(Pattern.c_str(), Pattern.size())
