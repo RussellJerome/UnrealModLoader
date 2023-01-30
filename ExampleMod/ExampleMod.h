@@ -14,7 +14,6 @@ class ExampleMod : public Mod
         ModLoaderVersion = "2.2.1";
 
         // Dont Touch The Internal Stuff
-        ModRef = this;
         CompleteModCreation();
     }
 
