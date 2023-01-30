@@ -2,7 +2,7 @@
 # todo: split into another lib
 set(UE4_SOURCE "UE4/Basic.hpp" "UE4/Basic.cpp" "UE4/CoreUObject_classes.hpp" "UE4/CoreUObject_functions.cpp" "UE4/CoreUObject_parameters.hpp" "UE4/CoreUObject_structs.hpp" "UE4/Ue4.hpp")
 
-set(SHARED_SOURCE "Shared/Hooks.h" "Shared/Hooks.cpp" "Shared/LoaderUI.h" "Shared/LoaderUI.cpp" "Shared/PakLoader.h" "Shared/PakLoader.cpp" "Shared/UMLDefs.h")
+set(SHARED_SOURCE "Shared/Hooks.h" "Shared/Hooks.cpp" "Shared/LoaderUI.h" "Shared/LoaderUI.cpp" "Shared/UMLDefs.h")
 
 set(LOG_SOURCE "Log/Log.h" "Log/Log.cpp")
 set(GAMEINFO_SOURCE "GameInfo/GameInfo.h" "GameInfo/GameInfo.cpp" "GameInfo/GameSettings.h" "GameInfo/GameSettings.cpp")

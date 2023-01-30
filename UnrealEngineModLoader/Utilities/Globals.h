@@ -28,7 +28,6 @@ class LOADER_API Global
         std::string FunctionName;
         void *FuncPtr;
     };
-    std::vector<ModInfo> ModInfoList;
     std::string GameName;
     bool bIsMenuOpen;
     std::vector<class Mod *> CoreMods;

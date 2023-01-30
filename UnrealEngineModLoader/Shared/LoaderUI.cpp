@@ -143,55 +143,6 @@ HRESULT LoaderUI::LoaderResizeBuffers(IDXGISwapChain *pSwapChain, UINT BufferCou
     }
 }
 
-void ShowLogicMods()
-{
-    if (!ImGui::CollapsingHeader("Logic Mods"))
-        return;
-
-    for (size_t i = 0; i < Global::GetGlobals()->ModInfoList.size(); i++)
-    {
-        std::string str(Global::GetGlobals()->ModInfoList[i].ModName.begin(),
-                        Global::GetGlobals()->ModInfoList[i].ModName.end());
-        std::string ModLabel = str + "##" + std::to_string(i);
-        if (ImGui::TreeNode(ModLabel.c_str()))
-        {
-            std::string Author = "Created By: " + Global::GetGlobals()->ModInfoList[i].ModAuthor;
-            ImGui::Text(Author.c_str());
-            ImGui::Separator();
-            std::string Description = "Description: " + Global::GetGlobals()->ModInfoList[i].ModDescription;
-            ImGui::Text(Description.c_str());
-            ImGui::Separator();
-            std::string Version = "Version: " + Global::GetGlobals()->ModInfoList[i].ModVersion;
-            ImGui::Text(Version.c_str());
-            ImGui::Separator();
-            if (ImGui::TreeNode("Mod Buttons"))
-            {
-                if (Global::GetGlobals()->ModInfoList[i].IsEnabled &&
-                    Global::GetGlobals()->ModInfoList[i].CurrentModActor &&
-                    Global::GetGlobals()->ModInfoList[i].ContainsButton)
-                {
-                    for (size_t bi = 0; bi < Global::GetGlobals()->ModInfoList[i].ModButtons.size(); bi++)
-                    {
-                        auto currentmodbutton = Global::GetGlobals()->ModInfoList[i].ModButtons[bi];
-                        std::string ButtonLabel = currentmodbutton + "##" + std::to_string(i + bi);
-                        if (ImGui::Button(ButtonLabel.c_str()))
-                        {
-                            std::wstring FuncNameAndArgs = L"ModMenuButtonPressed " + std::to_wstring(bi);
-                            Global::GetGlobals()->ModInfoList[i].CurrentModActor->CallFunctionByNameWithArguments(
-                                FuncNameAndArgs.c_str(), nullptr, NULL, true);
-                        }
-                    }
-                    ImGui::Separator();
-                }
-                ImGui::TreePop();
-            }
-            std::string ActiveLabel = "Enable##" + std::to_string(i);
-            ImGui::Checkbox(ActiveLabel.c_str(), &Global::GetGlobals()->ModInfoList[i].IsEnabled);
-            ImGui::TreePop();
-        }
-    }
-}
-
 void ShowCoreMods()
 {
     if (!ImGui::CollapsingHeader("Core Mods"))
@@ -268,7 +219,6 @@ void DrawImGui()
     ImGui::Begin("Unreal Mod Loader", NULL, NULL);
     ImGui::Spacing();
     ImGui::Text("Unreal Mod Loader V: %s", MODLOADER_VERSION);
-    ShowLogicMods();
     ShowCoreMods();
     ShowTools();
 
