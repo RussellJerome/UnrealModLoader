@@ -45,6 +45,4 @@ class LOADER_API Mod
 
     // Called When Mod Construct Finishes
     void CompleteModCreation();
-
-    static Mod *ModRef;
 };

@@ -2,37 +2,6 @@
 #include "Utilities/MinHook.h"
 #include "Utilities/Version.h"
 
-Mod *Mod::ModRef;
-
-namespace CallBackHandler
-{
-void CallBackBeginPlay(UE4::AActor *Actor)
-{
-    Mod::ModRef->BeginPlay(Actor);
-}
-
-void CallBackInitGameState()
-{
-    Mod::ModRef->InitGameState();
-}
-
-void CallBackDrawImGui()
-{
-    Mod::ModRef->DrawImGui();
-}
-
-void CallBackPostBeginPlay(std::wstring ModActorName, UE4::AActor *Actor)
-{
-    Mod::ModRef->PostBeginPlay(ModActorName, Actor);
-}
-
-void CallBackDX11Present(ID3D11Device *pDevice, ID3D11DeviceContext *pContext,
-                         ID3D11RenderTargetView *pRenderTargetView)
-{
-    Mod::ModRef->DX11Present(pDevice, pContext, pRenderTargetView);
-}
-} // namespace CallBackHandler
-
 void Mod::InitGameState()
 {
 }
@@ -60,21 +29,26 @@ void Mod::DrawImGui()
 void Mod::SetupHooks()
 {
     Global::GetGlobals()->eventSystem.registerEvent(
-        new Event<UE4::AActor *>("BeginPlay", &CallBackHandler::CallBackBeginPlay));
-    Global::GetGlobals()->eventSystem.registerEvent(
-        new Event<>("InitGameState", &CallBackHandler::CallBackInitGameState));
-    Global::GetGlobals()->eventSystem.registerEvent(
-        new Event<std::wstring, UE4::AActor *>("PostBeginPlay", &CallBackHandler::CallBackPostBeginPlay));
-    Global::GetGlobals()->eventSystem.registerEvent(new Event<>("DrawImGui", &CallBackHandler::CallBackDrawImGui));
+        new Event<UE4::AActor *>("BeginPlay", [&](auto *Actor) { this->BeginPlay(Actor); }));
+
+    Global::GetGlobals()->eventSystem.registerEvent(new Event<>("InitGameState", [&]() { this->InitGameState(); }));
+
+    Global::GetGlobals()->eventSystem.registerEvent(new Event<std::wstring, UE4::AActor *>(
+        "PostBeginPlay", [&](auto Name, auto *Actor) { this->PostBeginPlay(Name, Actor); }));
+
+    Global::GetGlobals()->eventSystem.registerEvent(new Event<>("DrawImGui", [&]() { this->DrawImGui(); }));
+
     Global::GetGlobals()->eventSystem.registerEvent(
         new Event<ID3D11Device *, ID3D11DeviceContext *, ID3D11RenderTargetView *>(
-            "DX11Present", &CallBackHandler::CallBackDX11Present));
+            "DX11Present", [&](auto *pDevice, auto *pContext, auto *pRenderTargetView) {
+                this->DX11Present(pDevice, pContext, pRenderTargetView);
+            }));
 }
 
 void Mod::CompleteModCreation()
 {
     IsFinishedCreating = true;
-    Global::GetGlobals()->AddToCoreMods(ModRef);
+    Global::GetGlobals()->AddToCoreMods(this);
     LOG_INFO("Core Mod Created: {}", ModName.c_str());
     if (ModLoaderVersion != MODLOADER_VERSION)
     {
