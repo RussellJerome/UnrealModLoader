@@ -336,10 +336,8 @@ void GameProfile::CreateGameProfile()
 
     if (!GameProfile::SelectedGameProfile.CallFunctionByNameWithArguments)
     {
-        for (int i = 0; i < 3; i++)
+        for (const auto [PatternString, Offset] : CallFunctionByNameWithArgumentsPatterns)
         {
-            const auto [PatternString, Offset] = CallFunctionByNameWithArgumentsPatterns[i];
-
             auto Found = Pattern(PatternString).Get(0).Get<uint8_t>(Offset);
             if (Found != nullptr)
             {
