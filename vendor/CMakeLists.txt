@@ -1,36 +1,72 @@
-
+include(ExternalProject)
+set(FETCHCONTENT_QUIET FALSE)
+include(FetchContent)
 set(CMAKE_CXX_STANDARD 23)
 # ======== ImGui ==========
 
-add_library(ImGui STATIC 
-		"imgui/imgui.cpp" 
-		"imgui/imgui_draw.cpp"
-		"imgui/imgui_internal.h"
-		"imgui/imgui_widgets.cpp"
-		"imgui/imgui_demo.cpp"
-		"imgui/imgui_tables.cpp"
+FetchContent_Declare(
+	ImGui_Download
+	
+	GIT_REPOSITORY "git@github.com:ocornut/imgui.git"
+	GIT_TAG "2efebe331547a31b34ebf4049545df241cd04e50"
+	GIT_PROGRESS TRUE
+
+	CONFIGURE_COMMAND ""
+	BUILD_COMMAND ""
+	INSTALL_COMMAND ""
+)
+FetchContent_MakeAvailable(ImGui_Download)
+
+add_library(ImGui STATIC
+		"${imgui_download_SOURCE_DIR}/imgui.cpp" 
+		"${imgui_download_SOURCE_DIR}/imgui_draw.cpp"
+		"${imgui_download_SOURCE_DIR}/imgui_internal.h"
+		"${imgui_download_SOURCE_DIR}/imgui_widgets.cpp"
+		"${imgui_download_SOURCE_DIR}/imgui_demo.cpp"
+		"${imgui_download_SOURCE_DIR}/imgui_tables.cpp"
 		
-		"imgui/backends/imgui_impl_dx11.h"
-		"imgui/backends/imgui_impl_dx11.cpp"
+		"${imgui_download_SOURCE_DIR}/backends/imgui_impl_dx11.h"
+		"${imgui_download_SOURCE_DIR}/backends/imgui_impl_dx11.cpp"
 
-		"imgui/backends/imgui_impl_win32.h"
-		"imgui/backends/imgui_impl_win32.cpp"
+		"${imgui_download_SOURCE_DIR}/backends/imgui_impl_win32.h"
+		"${imgui_download_SOURCE_DIR}/backends/imgui_impl_win32.cpp"
 
-		"imgui/misc/cpp/imgui_stdlib.h"
-		"imgui/misc/cpp/imgui_stdlib.cpp")
+		"${imgui_download_SOURCE_DIR}/misc/cpp/imgui_stdlib.h"
+		"${imgui_download_SOURCE_DIR}/misc/cpp/imgui_stdlib.cpp")
 
-target_include_directories(ImGui PUBLIC "imgui" "imgui/backends")
+target_include_directories(ImGui PUBLIC "${imgui_download_SOURCE_DIR}" "${imgui_download_SOURCE_DIR}/backends")
 
 # ======== MinHook ========
 
+FetchContent_Declare(
+	MinHook
+
+	GIT_REPOSITORY "git@github.com:TsudaKageyu/minhook.git"
+	GIT_TAG "49d03ad118cf7f6768c79a8f187e14b8f2a07f94"
+	GIT_PROGRESS TRUE
+)
 set(BUILD_SHARED_LIBS OFF)
-add_subdirectory("MinHook")
+FetchContent_MakeAvailable(MinHook)
 
 # ======== Fmt ======== 
 
-add_subdirectory("fmt")
+FetchContent_Declare(
+	fmt
+
+	GIT_REPOSITORY "git@github.com:fmtlib/fmt.git"
+	GIT_TAG "8.0.0"
+	GIT_PROGRESS TRUE
+)
+FetchContent_MakeAvailable(fmt)
 
 # ========  SpdLog ========
 
+FetchContent_Declare(
+	spdlog
+
+	GIT_REPOSITORY "git@github.com:gabime/spdlog.git"
+	GIT_TAG "927cc29444a294d76e83dfb898e797dc431ce094"
+	GIT_PROGRESS TRUE
+)
 set(SPDLOG_FMT_EXTERNAL YES)
-add_subdirectory("spdlog")
+FetchContent_MakeAvailable(spdlog)
