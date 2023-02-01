@@ -8,5 +8,6 @@ project ("UnrealModLoader")
 # Include sub-projects.
 add_subdirectory ("vendor")
 add_subdirectory ("UnrealEngineModLoader")
+add_subdirectory ("xinput1_3")
 add_subdirectory ("ExampleMod")
 # add_subdirectory ("SetSeedMod")

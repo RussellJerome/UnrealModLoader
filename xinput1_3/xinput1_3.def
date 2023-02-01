@@ -1,0 +1,10 @@
+LIBRARY xinput1_3
+EXPORTS
+	DllMain=fDllMain @1
+	XInputEnable=fXInputEnable @2
+	XInputGetBatteryInformation=fXInputGetBatteryInformation @3
+	XInputGetCapabilities=fXInputGetCapabilities @4
+	XInputGetDSoundAudioDeviceGuids=fXInputGetDSoundAudioDeviceGuids @5
+	XInputGetKeystroke=fXInputGetKeystroke @6
+	XInputGetState=fXInputGetState @7
+	XInputSetState=fXInputSetState @8
