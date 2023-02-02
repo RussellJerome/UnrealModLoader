@@ -70,7 +70,7 @@ class UObject
         }
     }
 
-    template <typename T> static std::vector<T *> GetAllObjectsOfType(UClass *Class, bool filterDefualts)
+    template <typename T> static std::vector<T *> GetAllObjectsOfType(UClass *Class, bool filterDefaults)
     {
         if (IsChunkedArray())
         {
@@ -87,7 +87,7 @@ class UObject
 
                 if (object->IsA(Class))
                 {
-                    if (filterDefualts)
+                    if (filterDefaults)
                     {
                         if (object->GetName().find("Default__") != std::string::npos)
                         {
@@ -113,7 +113,7 @@ class UObject
 
                 if (object->IsA(Class))
                 {
-                    if (filterDefualts)
+                    if (filterDefaults)
                     {
                         if (object->GetName().find("Default__") != std::string::npos)
                         {

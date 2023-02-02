@@ -406,10 +406,10 @@ void GameProfile::CreateGameProfile(GameSettings::GameSettings Settings)
     if (GameProfile::SelectedGameProfile.CreateDefaultObject == 0)
     {
         GameProfile::SelectedGameProfile.bIsDefaultObjectArrayed = true;
-        LOG_WARN("CreateDefualtObject NOT FOUND!, Will Use Object Array Instead!");
+        LOG_WARN("CreateDefaultObject NOT FOUND!, Will Use Object Array Instead!");
     }
 
-    LOG_INFO("UClass::CreateDefualtObject: 0x{:x}", (void *)GameProfile::SelectedGameProfile.CreateDefaultObject);
+    LOG_INFO("UClass::CreateDefaultObject: 0x{:x}", (void *)GameProfile::SelectedGameProfile.CreateDefaultObject);
 
     if (Settings.ProcessInternalFunctionSettings.has_value())
     {
