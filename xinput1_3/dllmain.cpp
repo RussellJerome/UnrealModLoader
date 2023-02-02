@@ -1,4 +1,5 @@
 #include <Windows.h>
+#include <string>
 
 #pragma region Proxy
 struct xinput1_3_dll
@@ -78,13 +79,19 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 {
     switch (ul_reason_for_call)
     {
-    case DLL_PROCESS_ATTACH:
-        xinput1_3.dll = LoadLibrary(L"\\System32\\xinput1_3.dll");
+    case DLL_PROCESS_ATTACH: {
+
+        wchar_t SystemDir[MAX_PATH];
+        GetSystemDirectoryW(SystemDir, MAX_PATH);
+        std::wstring OriginalDll = std::wstring(SystemDir) + L"\\xinput1_3.dll";
+
+        xinput1_3.dll = LoadLibraryW(OriginalDll.c_str());
         setupFunctions();
 
         LoadLibrary(L"UnrealEngineModLoader.dll");
 
         break;
+    }
     case DLL_PROCESS_DETACH:
         FreeLibrary(xinput1_3.dll);
         break;
