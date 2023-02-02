@@ -29,4 +29,4 @@ target_link_libraries(UnrealEngineModLoader PUBLIC d3d11 d3dcompiler)
 
 target_link_libraries(UnrealEngineModLoader PUBLIC spdlog::spdlog)
 
-target_link_libraries(UnrealEngineModLoader PRIVATE nlohmann_json::nlohmann_json)
+target_link_libraries(UnrealEngineModLoader PUBLIC nlohmann_json::nlohmann_json)

@@ -1,4 +1,5 @@
 #pragma once
+#include "GameSettings.h"
 #include "Memory/mem.h"
 #include <Windows.h>
 #include <string>
@@ -87,5 +88,5 @@ class LOADER_API GameProfile
     Offsets defs;
 
     static GameProfile SelectedGameProfile;
-    static void CreateGameProfile();
+    static void CreateGameProfile(GameSettings::GameSettings Settings);
 };

@@ -9,7 +9,7 @@ namespace GameSettings
 {
 
 #define OPTIONAL_GET(Json, Type, Name, Dest)                                                                           \
-    if (Json.contains(Name))                                                                                           \
+    if (Json.contains(Name) && !Json.at(Name).is_null())                                                               \
     {                                                                                                                  \
         Type Variable = {};                                                                                            \
         j.at(Name).get_to(Variable);                                                                                   \

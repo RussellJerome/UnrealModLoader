@@ -1,9 +1,20 @@
 #include "GameInfo/GameInfo.h"
+#include "GameInfo/GameSettings.h"
 #include "Utilities/MinHook.h"
+#include <filesystem>
+#include <fstream>
+#include <nlohmann/json.hpp>
 
 DWORD WINAPI MainThread(LPVOID lParam)
 {
-    GameProfile::CreateGameProfile();
+    auto ConfigPath = std::filesystem::temp_directory_path() / "unrealmodding" / "cpp_loader" / "config.json";
+    auto InputStream = std::ifstream(ConfigPath);
+    auto Json = nlohmann::json::parse(InputStream);
+    
+    auto Settings = Json.get<GameSettings::GameSettings>();
+
+    GameProfile::CreateGameProfile(Settings);
+
     return 0;
 }
 

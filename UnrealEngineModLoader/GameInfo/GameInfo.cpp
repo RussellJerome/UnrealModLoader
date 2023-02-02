@@ -13,9 +13,8 @@
 
 GameProfile GameProfile::SelectedGameProfile;
 
-void GameProfile::CreateGameProfile()
+void GameProfile::CreateGameProfile(GameSettings::GameSettings Settings)
 {
-    GameSettings::GameSettings Settings = GameSettings::GameSettings::GetBakedSettings();
     // debug
     if (true)
     {
