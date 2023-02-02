@@ -1,4 +1,5 @@
 #pragma once
+#include <Log/Log.h>
 #include <Shared/UMLDefs.h>
 #include <cstdint>
 #include <string>
@@ -83,6 +84,11 @@ class LOADER_API Pattern
         m_Len = j;
     }
 
+    inline bool HasMatches() const
+    {
+        return !m_Matches.empty();
+    }
+
     inline PatternMatch &Get(int Index)
     {
         if (!m_Matched)
@@ -99,7 +105,7 @@ class LOADER_API Pattern
         return m_Matches[Index];
     }
 
-    void Find(int MaxMatches);
+    void Find(int MaxMatches = INT_MAX);
 
   private:
     bool ConsiderMatch(const uint8_t *Start);

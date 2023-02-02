@@ -1,12 +1,18 @@
 #include "GameInfo/GameInfo.h"
 #include "Utilities/MinHook.h"
 
+DWORD WINAPI MainThread(LPVOID lParam)
+{
+    GameProfile::CreateGameProfile();
+    return 0;
+}
+
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
 {
     switch (ul_reason_for_call)
     {
     case DLL_PROCESS_ATTACH:
-        GameProfile::CreateGameProfile();
+        CreateThread(NULL, NULL, MainThread, NULL, NULL, NULL);
         break;
     case DLL_THREAD_ATTACH:
         break;

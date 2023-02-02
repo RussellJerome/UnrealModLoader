@@ -6,7 +6,7 @@ set(SHARED_SOURCE "Shared/Hooks.h" "Shared/Hooks.cpp" "Shared/LoaderUI.h" "Share
 
 set(LOG_SOURCE "Log/Log.h" "Log/Log.cpp")
 set(GAMEINFO_SOURCE "GameInfo/GameInfo.h" "GameInfo/GameInfo.cpp" "GameInfo/GameSettings.h" "GameInfo/GameSettings.cpp")
-set(MEMORY_SOURCE "Memory/CoreModLoader.h" "Memory/CoreModLoader.cpp" "Memory/mem.h" "Memory/mem.cpp" "Memory/Pattern.h" "Memory/Pattern.cpp")
+set(MEMORY_SOURCE "Memory/CoreModLoader.h" "Memory/CoreModLoader.cpp" "Memory/mem.h" "Memory/mem.cpp" "Memory/Pattern.h" "Memory/Pattern.cpp" "Memory/PatternScanner.h" "Memory/PatternScanner.h")
 set(MOD_SOURCE "Mod/Mod.h" "Mod/Mod.cpp")
 set(UTILITIES_SOURCE "Utilities/Dumper.h" "Utilities/Dumper.cpp" "Utilities/EngineDefFinder.h" "Utilities/EngineDefFinder.cpp" "Utilities/Globals.h" "Utilities/Globals.cpp" "Utilities/MinHook.h" "Utilities/Version.h")
 
@@ -28,3 +28,5 @@ target_link_libraries(UnrealEngineModLoader PUBLIC minhook)
 target_link_libraries(UnrealEngineModLoader PUBLIC d3d11 d3dcompiler)
 
 target_link_libraries(UnrealEngineModLoader PUBLIC spdlog::spdlog)
+
+target_link_libraries(UnrealEngineModLoader PRIVATE nlohmann_json::nlohmann_json)

@@ -2,6 +2,7 @@
 #include "GameSettings.h"
 #include "Log/Log.h"
 #include "Memory/Pattern.h"
+#include "Memory/PatternScanner.h"
 #include "Utilities/Version.h"
 #include <Shared/Hooks.h>
 #include <UE4/Ue4.hpp>
@@ -46,7 +47,7 @@ void GameProfile::CreateGameProfile()
             GameSettings::GInfoPatterns GInfoPatterns = std::get<GameSettings::GInfoPatterns>(GInfoSettings.Info);
 
             auto ExtendedPatternHandler = [](auto &ExtendedPattern) {
-                auto Found = (DWORD64)Pattern(ExtendedPattern.Pattern).Get(0).Get<uint8_t>();
+                auto Found = (DWORD64)PatternScanner::Scan(ExtendedPattern.Pattern).Get(0).Get<uint8_t>();
                 auto Offset = *reinterpret_cast<uint32_t *>(Found + ExtendedPattern.FirstOpCodes);
                 return Found + ExtendedPattern.TotalByteInstruction + Offset;
             };
@@ -77,7 +78,7 @@ void GameProfile::CreateGameProfile()
     {
         if (GameProfile::SelectedGameProfile.UsesFNamePool)
         {
-            auto FPoolPat = Pattern("74 09 48 8D 15 ? ? ? ? EB 16").Get(0).Get<uint8_t>();
+            auto FPoolPat = PatternScanner::Scan("74 09 48 8D 15 ? ? ? ? EB 16").Get(0).Get<uint8_t>();
             if (FPoolPat != nullptr)
             {
                 auto FPoolPatoffset = *reinterpret_cast<uint32_t *>(FPoolPat + 5);
@@ -91,7 +92,8 @@ void GameProfile::CreateGameProfile()
         }
         else
         {
-            auto GNamePat = Pattern("E8 ? ? ? ? 48 8B C3 48 89 1D ? ? ? ? 48 8B 5C 24").Get(0).Get<uint8_t>();
+            auto GNamePat =
+                PatternScanner::Scan("E8 ? ? ? ? 48 8B C3 48 89 1D ? ? ? ? 48 8B 5C 24").Get(0).Get<uint8_t>();
             if (GNamePat != nullptr)
             {
                 auto GNamesAddress = *reinterpret_cast<uint32_t *>(GNamePat + 11);
@@ -107,7 +109,8 @@ void GameProfile::CreateGameProfile()
 
     if (GameProfile::SelectedGameProfile.GObject == 0)
     {
-        auto GObjectPat = Pattern("8B 46 10 3B 46 3C 75 0F 48 8B D6 48 8D 0D ? ? ? ? E8").Get(0).Get<uint8_t>();
+        auto GObjectPat =
+            PatternScanner::Scan("8B 46 10 3B 46 3C 75 0F 48 8B D6 48 8D 0D ? ? ? ? E8").Get(0).Get<uint8_t>();
         if (GObjectPat != nullptr)
         {
             auto GObjectOffset = *reinterpret_cast<uint32_t *>(GObjectPat + 14);
@@ -122,7 +125,7 @@ void GameProfile::CreateGameProfile()
 
     if (GameProfile::SelectedGameProfile.GWorld == 0)
     {
-        auto GWorldPat = Pattern("0F 2E ? 74 ? 48 8B 1D ? ? ? ? 48 85 DB 74").Get(0).Get<uint8_t>();
+        auto GWorldPat = PatternScanner::Scan("0F 2E ? 74 ? 48 8B 1D ? ? ? ? 48 85 DB 74").Get(0).Get<uint8_t>();
         if (GWorldPat != nullptr)
         {
             auto GWorldAddress = *reinterpret_cast<uint32_t *>(GWorldPat + 8);
@@ -202,7 +205,7 @@ void GameProfile::CreateGameProfile()
                 std::get<GameSettings::FunctionInfoPatterns>(FunctionInfoSettings.Info);
 
             auto PatternHandler = [](auto &PatternString) {
-                return (DWORD64)Pattern(PatternString).Get(0).Get<uint8_t>();
+                return (DWORD64)PatternScanner::Scan(PatternString).Get(0).Get<uint8_t>();
             };
 
             GameProfile::SelectedGameProfile.GameStateInit =
@@ -257,7 +260,7 @@ void GameProfile::CreateGameProfile()
     if (!GameProfile::SelectedGameProfile.GameStateInit)
     {
         GameProfile::SelectedGameProfile.GameStateInit =
-            (DWORD64)Pattern("40 53 48 83 EC 20 48 8B 41 10 48 8B D9 48 8B 91").Get(0).Get<uint8_t>();
+            (DWORD64)PatternScanner::Scan("40 53 48 83 EC 20 48 8B 41 10 48 8B D9 48 8B 91").Get(0).Get<uint8_t>();
         LOG_INFO("GameStateInit: 0x{:x}", (void *)GameProfile::SelectedGameProfile.GameStateInit);
     }
 
@@ -268,7 +271,8 @@ void GameProfile::CreateGameProfile()
 
     if (!GameProfile::SelectedGameProfile.BeginPlay)
     {
-        auto BeginPlay = Pattern("48 8B D9 E8 ? ? ? ? F6 83 ? ? ? ? ? 74 12 48 8B 03").Get(0).Get<uint8_t>(3);
+        auto BeginPlay =
+            PatternScanner::Scan("48 8B D9 E8 ? ? ? ? F6 83 ? ? ? ? ? 74 12 48 8B 03").Get(0).Get<uint8_t>(3);
         if (BeginPlay != nullptr)
         {
             GameProfile::SelectedGameProfile.BeginPlay = (DWORD64)MEM::GetAddressPTR(BeginPlay, 0x1, 0x5);
@@ -280,22 +284,23 @@ void GameProfile::CreateGameProfile()
         }
     }
 
-    std::tuple<std::string, uint8_t> StaticLoadObjectPatterns[] = {
-        {"89 64 24 ? 48 8B C8 E8 ? ? ? ? 41 BE ? ? ? ? EB 05 E8", 0x7},
-        {"C7 44 24 ? ? ? ? ? E8 ? ? ? ? 48 8B 8D ? ? ? ? 48 85 C9 74 05 E8 ? ? ? ? 45 33 C9 ? 89 74 24", 0x8},
-        {"89 6C 24 20 48 8B C8 E8 ? ? ? ? 48 8B 4C 24 ? 48 8B F0 48 85 C9 74 05", 0x7},
-        {"48 8B C8 89 5C 24 20 E8 ? ? ? ? 48", 0x7}};
+    std::string StaticLoadObjectPatterns[] = {
+        "89 64 24 ? 48 8B C8 E8 ? ? ? ? 41 BE ? ? ? ? EB 05 E8",
+        "C7 44 24 ? ? ? ? ? E8 ? ? ? ? 48 8B 8D ? ? ? ? 48 85 C9 74 05 E8 ? ? ? ? 45 33 C9 ? 89 74 24",
+        "89 6C 24 20 48 8B C8 E8 ? ? ? ? 48 8B 4C 24 ? 48 8B F0 48 85 C9 74 05", "48 8B C8 89 5C 24 20 E8 ? ? ? ? 48"};
+
+    uint8_t StaticLoadObjectOffsets[] = {0x7, 0x8, 0x7, 0x7};
 
     if (!GameProfile::SelectedGameProfile.StaticLoadObject)
     {
-        for (const auto [PatternString, Offset] : StaticLoadObjectPatterns)
+        auto OnFound = [&StaticLoadObjectOffsets](size_t Index, Pattern &Found) {
+            return Found.Get(0).Get<uint8_t>(StaticLoadObjectOffsets[Index]);
+        };
+
+        auto Found = PatternScanner::Scan<uint8_t *>(std::span{StaticLoadObjectPatterns}, OnFound);
+        if (Found != nullptr)
         {
-            auto Found = Pattern(PatternString).Get(0).Get<uint8_t>(Offset);
-            if (Found != nullptr)
-            {
-                GameProfile::SelectedGameProfile.StaticLoadObject = (DWORD64)MEM::GetAddressPTR(Found, 0x1, 0x5);
-                break;
-            }
+            GameProfile::SelectedGameProfile.StaticLoadObject = (DWORD64)MEM::GetAddressPTR(Found, 0x1, 0x5);
         }
     }
 
@@ -306,20 +311,22 @@ void GameProfile::CreateGameProfile()
 
     LOG_INFO("StaticLoadObject: 0x{:x}", (void *)GameProfile::SelectedGameProfile.StaticLoadObject);
 
-    std::tuple<std::string, uint8_t> SpawnActorFTransPatterns[] = {
-        {"4C 8B C6 48 8B C8 48 8B D3 E8 ? ? ? ? 48 8B 5C 24 ? 48 8B 74 24", 0x9},
-        {"4C 8B CE 4C 8D 44 24 ? 48 8B D7 48 8B CB E8 ? ? ? ? 48 8B 4C 24 ? 48 33 CC", 0xE}};
+    std::string SpawnActorFTransPatterns[] = {
+        "4C 8B C6 48 8B C8 48 8B D3 E8 ? ? ? ? 48 8B 5C 24 ? 48 8B 74 24",
+        "4C 8B CE 4C 8D 44 24 ? 48 8B D7 48 8B CB E8 ? ? ? ? 48 8B 4C 24 ? 48 33 CC"};
+
+    uint8_t SpawnActorFTransOffsets[] = {0x9, 0xE};
 
     if (!GameProfile::SelectedGameProfile.SpawnActorFTrans)
     {
-        for (const auto [PatternString, Offset] : SpawnActorFTransPatterns)
+        auto OnFound = [&SpawnActorFTransOffsets](size_t Index, Pattern &Found) {
+            return Found.Get(0).Get<uint8_t>(SpawnActorFTransOffsets[Index]);
+        };
+
+        auto Found = PatternScanner::Scan<uint8_t *>(std::span{SpawnActorFTransPatterns}, OnFound);
+        if (Found != nullptr)
         {
-            auto Found = Pattern(PatternString).Get(0).Get<uint8_t>(Offset);
-            if (Found != nullptr)
-            {
-                GameProfile::SelectedGameProfile.SpawnActorFTrans = (DWORD64)MEM::GetAddressPTR(Found, 0x1, 0x5);
-                break;
-            }
+            GameProfile::SelectedGameProfile.SpawnActorFTrans = (DWORD64)MEM::GetAddressPTR(Found, 0x1, 0x5);
         }
     }
 
@@ -337,7 +344,7 @@ void GameProfile::CreateGameProfile()
     {
         for (const auto [PatternString, Offset] : CallFunctionByNameWithArgumentsPatterns)
         {
-            auto Found = Pattern(PatternString).Get(0).Get<uint8_t>(Offset);
+            auto Found = PatternScanner::Scan(PatternString).Get(0).Get<uint8_t>(Offset);
             if (Found != nullptr)
             {
                 GameProfile::SelectedGameProfile.CallFunctionByNameWithArguments =
@@ -357,9 +364,10 @@ void GameProfile::CreateGameProfile()
 
     if (!GameProfile::SelectedGameProfile.ProcessEvent)
     {
-        auto ProcessEvent = Pattern("75 0E ? ? ? 48 ? ? 48 ? ? E8 ? ? ? ? 48 8B ? 24 ? 48 8B ? 24 38 48 8B ? 24 40")
-                                .Get(0)
-                                .Get<uint8_t>(0xB);
+        auto ProcessEvent =
+            PatternScanner::Scan("75 0E ? ? ? 48 ? ? 48 ? ? E8 ? ? ? ? 48 8B ? 24 ? 48 8B ? 24 38 48 8B ? 24 40")
+                .Get(0)
+                .Get<uint8_t>(0xB);
         if (ProcessEvent != nullptr)
         {
             GameProfile::SelectedGameProfile.ProcessEvent = (DWORD64)MEM::GetAddressPTR(ProcessEvent, 0x1, 0x5);
@@ -387,13 +395,12 @@ void GameProfile::CreateGameProfile()
 
     if (!GameProfile::SelectedGameProfile.CreateDefaultObject)
     {
-        for (const auto PatternString : CreateDefaultObjectPatterns)
+        auto Found =
+            PatternScanner::Scan<uint8_t *>(std::span{CreateDefaultObjectPatterns},
+                                            [](size_t _, Pattern &Found) { return Found.Get(0).Get<uint8_t>(); });
+        if (Found != nullptr)
         {
-            auto Found = Pattern(PatternString).Get(0).Get<uint8_t>();
-            if (Found != nullptr)
-            {
-                GameProfile::SelectedGameProfile.CreateDefaultObject = (DWORD64)Found;
-            }
+            GameProfile::SelectedGameProfile.CreateDefaultObject = (DWORD64)Found;
         }
     }
 
@@ -411,14 +418,15 @@ void GameProfile::CreateGameProfile()
             *Settings.ProcessInternalFunctionSettings;
 
         GameProfile::SelectedGameProfile.ProcessInternals =
-            (DWORD64)Pattern(ProcessInternalFunctionSettings.ProcessInternal).Get(0).Get<uint8_t>();
+            (DWORD64)PatternScanner::Scan(ProcessInternalFunctionSettings.ProcessInternal).Get(0).Get<uint8_t>();
         LOG_INFO("ProcessInternalFunction: 0x{:x}", (void *)GameProfile::SelectedGameProfile.ProcessInternals);
     }
     else
     {
         if (GameProfile::SelectedGameProfile.UsesFNamePool || GameProfile::SelectedGameProfile.IsUsing4_22)
         {
-            DWORD64 ProcessAddy = (DWORD64)Pattern("41 F6 C7 02 74 ? 4C 8B C7 48 8B ? ? 8B ? E8").Get(0).Get<uint8_t>();
+            DWORD64 ProcessAddy =
+                (DWORD64)PatternScanner::Scan("41 F6 C7 02 74 ? 4C 8B C7 48 8B ? ? 8B ? E8").Get(0).Get<uint8_t>();
             if (ProcessAddy)
             {
                 auto ProcessAddyOffset = *reinterpret_cast<uint32_t *>(ProcessAddy + 16);
@@ -446,23 +454,19 @@ void GameProfile::CreateGameProfile()
     }
     else
     {
-        std::tuple<std::string, uint8_t> StaticConstructObject_InternalPatterns[] = {
-            {"48 8B 84 24 ? ? 00 00 48 89 44 24 ? C7 44 24 ? 00 00 00 00 E8", 0x15},
-            {"48 8B C8 89 7C 24 ? E8", 0x7},
-            {"E8 ? ? ? ? 45 8B 47 70", 0x0},
-            {"89 6C 24 38 48 89 74 24 ? E8", 0x9}};
+        std::string StaticConstructObject_InternalPatterns[] = {
+            "48 8B 84 24 ? ? 00 00 48 89 44 24 ? C7 44 24 ? 00 00 00 00 E8", "48 8B C8 89 7C 24 ? E8",
+            "E8 ? ? ? ? 45 8B 47 70", "89 6C 24 38 48 89 74 24 ? E8"};
 
-        for (const auto [PatternString, Offset] : StaticConstructObject_InternalPatterns)
-        {
-            auto Found = Pattern(PatternString).Get(0).Get<uint8_t>(Offset);
-            if (Found != nullptr)
-            {
+        uint8_t StaticConstructObject_InternalOffsets[] = {0x15, 0x7, 0x0, 0x9};
 
-                GameProfile::SelectedGameProfile.StaticConstructObject_Internal =
-                    (DWORD64)MEM::GetAddressPTR(Found, 0x1, 0x5);
-                break;
-            }
-        }
+        auto OnFound = [&StaticConstructObject_InternalOffsets](size_t Index, Pattern &Found) {
+            return Found.Get(0).Get<uint8_t>(StaticConstructObject_InternalOffsets[Index]);
+        };
+
+        auto Found = PatternScanner::Scan<uint8_t *>(std::span{StaticConstructObject_InternalPatterns}, OnFound);
+
+        GameProfile::SelectedGameProfile.StaticConstructObject_Internal = (DWORD64)MEM::GetAddressPTR(Found, 0x1, 0x5);
 
         if (GameProfile::SelectedGameProfile.StaticConstructObject_Internal == 0)
         {
