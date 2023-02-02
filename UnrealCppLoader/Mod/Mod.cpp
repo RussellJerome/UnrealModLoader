@@ -6,10 +6,6 @@ void Mod::InitGameState()
 {
 }
 
-void Mod::OnModMenuButtonPressed()
-{
-}
-
 void Mod::BeginPlay(UE4::AActor *Actor)
 {
 }
@@ -18,6 +14,7 @@ void Mod::PostBeginPlay(std::wstring ModActorName, UE4::AActor *Actor)
 {
 }
 
+#ifdef ENABLE_GUI
 void Mod::DX11Present(ID3D11Device *pDevice, ID3D11DeviceContext *pContext, ID3D11RenderTargetView *pRenderTargetView)
 {
 }
@@ -25,6 +22,7 @@ void Mod::DX11Present(ID3D11Device *pDevice, ID3D11DeviceContext *pContext, ID3D
 void Mod::DrawImGui()
 {
 }
+#endif
 
 void Mod::SetupHooks()
 {
@@ -36,6 +34,7 @@ void Mod::SetupHooks()
     Global::GetGlobals()->eventSystem.registerEvent(new Event<std::wstring, UE4::AActor *>(
         "PostBeginPlay", [&](auto Name, auto *Actor) { this->PostBeginPlay(Name, Actor); }));
 
+#ifdef ENABLE_GUI
     Global::GetGlobals()->eventSystem.registerEvent(new Event<>("DrawImGui", [&]() { this->DrawImGui(); }));
 
     Global::GetGlobals()->eventSystem.registerEvent(
@@ -43,6 +42,7 @@ void Mod::SetupHooks()
             "DX11Present", [&](auto *pDevice, auto *pContext, auto *pRenderTargetView) {
                 this->DX11Present(pDevice, pContext, pRenderTargetView);
             }));
+#endif
 }
 
 void Mod::CompleteModCreation()

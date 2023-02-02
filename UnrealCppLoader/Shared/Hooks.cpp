@@ -1,5 +1,9 @@
 #include "Hooks.h"
+
+#ifdef ENABLE_GUI
 #include "LoaderUI.h"
+#endif
+
 #include "Memory/mem.h"
 #include "UE4/Ue4.hpp"
 #include <GameInfo/GameInfo.h>
@@ -138,11 +142,15 @@ DWORD __stdcall InitHooks(LPVOID)
                  &HookedFunctions::origInitGameState, "AGameModeBase::InitGameState");
     MinHook::Add(GameProfile::SelectedGameProfile.BeginPlay, &HookedFunctions::hookBeginPlay,
                  &HookedFunctions::origBeginPlay, "AActor::BeginPlay");
+
+#ifdef ENABLE_GUI
     LoaderUI::GetUI()->CreateUILogicThread();
     if (!GameProfile::SelectedGameProfile.bDelayGUISpawn)
     {
         LoaderUI::HookDX();
     }
+#endif
+
     return NULL;
 }
 

@@ -16,14 +16,14 @@ GameProfile GameProfile::SelectedGameProfile;
 void GameProfile::CreateGameProfile(GameSettings::GameSettings Settings)
 {
     // debug
-    if (true)
-    {
+    #ifdef _DEBUG
         ShowWindow(GetConsoleWindow(), SW_SHOW);
         FreeConsole();
         AllocConsole();
-        LOG_INFO("Created by ~Russell.J Release V {}", MODLOADER_VERSION);
-        LOG_INFO("Heavily modified by AstroTechies");
-    }
+    #endif
+
+    LOG_INFO("Created by ~Russell.J Release V {}", MODLOADER_VERSION);
+    LOG_INFO("Heavily modified by AstroTechies");
     LOG_INFO("Loading baked profile");
 
     GameProfile::SelectedGameProfile.IsUsingFChunkedFixedUObjectArray = Settings.IsUsingFChunkedFixedUObjectArray;

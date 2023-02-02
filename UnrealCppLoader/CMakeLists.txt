@@ -2,7 +2,12 @@
 # todo: split into another lib
 set(UE4_SOURCE "UE4/Basic.hpp" "UE4/Basic.cpp" "UE4/CoreUObject_classes.hpp" "UE4/CoreUObject_functions.cpp" "UE4/CoreUObject_parameters.hpp" "UE4/CoreUObject_structs.hpp" "UE4/Ue4.hpp")
 
-set(SHARED_SOURCE "Shared/Hooks.h" "Shared/Hooks.cpp" "Shared/LoaderUI.h" "Shared/LoaderUI.cpp" "Shared/UCPPLDefs.h")
+set(SHARED_SOURCE "Shared/Hooks.h" "Shared/Hooks.cpp" "Shared/UCPPLDefs.h")
+
+if (ENABLE_GUI)
+	set(SHARED_SOURCE ${SHARED_SOURCE} "Shared/LoaderUI.h" "Shared/LoaderUI.cpp")
+	add_definitions(-DENABLE_GUI)
+endif()
 
 set(LOG_SOURCE "Log/Log.h" "Log/Log.cpp")
 set(GAMEINFO_SOURCE "GameInfo/GameInfo.h" "GameInfo/GameInfo.cpp" "GameInfo/GameSettings.h")
@@ -20,8 +25,10 @@ set_property(TARGET UnrealCppLoader PROPERTY CXX_STANDARD 23)
 
 target_include_directories(UnrealCppLoader PUBLIC "./")
 
-target_include_directories(UnrealCppLoader PUBLIC ${ImGui_INCLUDE_DIRECTORIES})
-target_link_libraries(UnrealCppLoader PUBLIC ImGui)
+if(ENABLE_GUI)
+	target_include_directories(UnrealCppLoader PUBLIC ${ImGui_INCLUDE_DIRECTORIES})
+	target_link_libraries(UnrealCppLoader PUBLIC ImGui)
+endif()
 
 target_link_libraries(UnrealCppLoader PUBLIC minhook)
 

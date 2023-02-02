@@ -165,17 +165,6 @@ void ShowCoreMods()
             std::string Version = "Version: " + Global::GetGlobals()->CoreMods[i]->ModVersion;
             ImGui::Text(Version.c_str());
             ImGui::Separator();
-
-            if (Global::GetGlobals()->CoreMods[i]->UseMenuButton &&
-                Global::GetGlobals()->CoreMods[i]->IsFinishedCreating)
-            {
-                std::string ButtonLabel = str + " Button" + "##cm" + std::to_string(i);
-                if (ImGui::Button(ButtonLabel.c_str()))
-                {
-                    Global::GetGlobals()->CoreMods[i]->OnModMenuButtonPressed();
-                }
-            }
-
             ImGui::TreePop();
         }
     }

@@ -4,6 +4,8 @@ include(FetchContent)
 set(CMAKE_CXX_STANDARD 23)
 # ======== ImGui ==========
 
+if(ENABLE_GUI)
+
 FetchContent_Declare(
 	ImGui_Download
 	
@@ -36,6 +38,8 @@ add_library(ImGui STATIC
 		"${imgui_download_SOURCE_DIR}/misc/cpp/imgui_stdlib.cpp")
 
 target_include_directories(ImGui PUBLIC "${imgui_download_SOURCE_DIR}" "${imgui_download_SOURCE_DIR}/backends")
+
+endif()
 
 # ======== MinHook ========
 
