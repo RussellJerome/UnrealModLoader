@@ -274,8 +274,6 @@ struct GameSettings
     std::optional<FunctionInfo> FunctionInfoSettings = {};
     std::optional<ProcessInternalFunction> ProcessInternalFunctionSettings = {};
     std::optional<StaticConstructObject_InternalInfo> StaticConstructObject_InternalInfoSettings = {};
-
-    static GameSettings GetBakedSettings();
 };
 
 static void from_json(const nlohmann::json &j, GameSettings &Settings)

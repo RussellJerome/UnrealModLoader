@@ -5,7 +5,7 @@ set(UE4_SOURCE "UE4/Basic.hpp" "UE4/Basic.cpp" "UE4/CoreUObject_classes.hpp" "UE
 set(SHARED_SOURCE "Shared/Hooks.h" "Shared/Hooks.cpp" "Shared/LoaderUI.h" "Shared/LoaderUI.cpp" "Shared/UMLDefs.h")
 
 set(LOG_SOURCE "Log/Log.h" "Log/Log.cpp")
-set(GAMEINFO_SOURCE "GameInfo/GameInfo.h" "GameInfo/GameInfo.cpp" "GameInfo/GameSettings.h" "GameInfo/GameSettings.cpp")
+set(GAMEINFO_SOURCE "GameInfo/GameInfo.h" "GameInfo/GameInfo.cpp" "GameInfo/GameSettings.h")
 set(MEMORY_SOURCE "Memory/CoreModLoader.h" "Memory/CoreModLoader.cpp" "Memory/mem.h" "Memory/mem.cpp" "Memory/Pattern.h" "Memory/Pattern.cpp" "Memory/PatternScanner.h" "Memory/PatternScanner.h")
 set(MOD_SOURCE "Mod/Mod.h" "Mod/Mod.cpp")
 set(UTILITIES_SOURCE "Utilities/Dumper.h" "Utilities/Dumper.cpp" "Utilities/EngineDefFinder.h" "Utilities/EngineDefFinder.cpp" "Utilities/Globals.h" "Utilities/Globals.cpp" "Utilities/MinHook.h" "Utilities/Version.h")
