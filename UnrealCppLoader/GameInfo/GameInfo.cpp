@@ -15,12 +15,12 @@ GameProfile GameProfile::SelectedGameProfile;
 
 void GameProfile::CreateGameProfile(GameSettings::GameSettings Settings)
 {
-    // debug
-    #ifdef _DEBUG
-        ShowWindow(GetConsoleWindow(), SW_SHOW);
-        FreeConsole();
-        AllocConsole();
-    #endif
+// debug
+#ifndef NDEBUG
+    ShowWindow(GetConsoleWindow(), SW_SHOW);
+    FreeConsole();
+    AllocConsole();
+#endif
 
     LOG_INFO("Created by ~Russell.J Release V {}", MODLOADER_VERSION);
     LOG_INFO("Heavily modified by AstroTechies");
