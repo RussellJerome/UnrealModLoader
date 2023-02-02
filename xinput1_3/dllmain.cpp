@@ -88,7 +88,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
         xinput1_3.dll = LoadLibraryW(OriginalDll.c_str());
         setupFunctions();
 
-        LoadLibrary(L"UnrealEngineModLoader.dll");
+        LoadLibrary(L"UnrealCppLoader.dll");
 
         break;
     }

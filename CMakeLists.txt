@@ -3,11 +3,11 @@
 #
 cmake_minimum_required (VERSION 3.8)
 
-project ("UnrealModLoader")
+project ("UnrealCppLoader")
 
 # Include sub-projects.
 add_subdirectory ("vendor")
-add_subdirectory ("UnrealEngineModLoader")
+add_subdirectory ("UnrealCppLoader")
 add_subdirectory ("xinput1_3")
 add_subdirectory ("ExampleMod")
 # add_subdirectory ("SetSeedMod")

@@ -22,6 +22,7 @@ void GameProfile::CreateGameProfile(GameSettings::GameSettings Settings)
         FreeConsole();
         AllocConsole();
         LOG_INFO("Created by ~Russell.J Release V {}", MODLOADER_VERSION);
+        LOG_INFO("Heavily modified by AstroTechies");
     }
     LOG_INFO("Loading baked profile");
 

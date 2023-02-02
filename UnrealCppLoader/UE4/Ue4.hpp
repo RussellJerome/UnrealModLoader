@@ -29,7 +29,7 @@ static void InitSDK()
     GWorldObjects = (DWORD64)(GameProfile::SelectedGameProfile.GWorld);
     UWorld::GWorld = (UWorld **)GWorldObjects;
 
-#ifdef UNREALENGINEMODLOADER_EXPORTS // Stops dumb errors from the ExampleMod shit
+#ifdef UNREALCPPLOADER_EXPORTS // Stops dumb errors from the ExampleMod shit
     if (GameProfile::SelectedGameProfile.IsUObjectMissing)
     {
         LOG_WARN("UObject Not Defined. Scanning for def.");

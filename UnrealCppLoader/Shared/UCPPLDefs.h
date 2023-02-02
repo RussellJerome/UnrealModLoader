@@ -3,7 +3,7 @@
 // Easy To Manage, keeping it in one place.
 #define MODLOADER_VERSION "2.2.1"
 
-#ifdef UNREALENGINEMODLOADER_EXPORTS
+#ifdef UNREALCPPLOADER_EXPORTS
 #define LOADER_API __declspec(dllexport)
 #else
 #define LOADER_API __declspec(dllimport)

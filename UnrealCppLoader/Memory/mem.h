@@ -1,5 +1,5 @@
 #pragma once
-#include <Shared/UMLDefs.h>
+#include <Shared/UCPPLDefs.h>
 #include <cinttypes>
 #include <cstdio>
 #include <windows.h>

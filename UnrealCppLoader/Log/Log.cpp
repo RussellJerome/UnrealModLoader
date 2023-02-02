@@ -10,7 +10,7 @@ void Log::Init()
     ConsoleSink->set_level(spdlog::level::trace);
     ConsoleSink->set_pattern("[%^%l%$] %v");
 
-    auto FileSink = std::make_shared<spdlog::sinks::basic_file_sink_mt>("UML-Log.txt", true);
+    auto FileSink = std::make_shared<spdlog::sinks::basic_file_sink_mt>("UCPPL-Log.txt", true);
     ConsoleSink->set_level(spdlog::level::trace);
     ConsoleSink->set_pattern("[%^%l%$] %v");
 
