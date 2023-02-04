@@ -4,7 +4,6 @@
 #include "Utilities/Dumper.h"
 #include "Utilities/Globals.h"
 #include "Utilities/MinHook.h"
-#include "Utilities/Version.h"
 
 LoaderUI *LoaderUI::UI;
 

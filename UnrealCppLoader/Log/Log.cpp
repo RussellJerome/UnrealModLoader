@@ -3,9 +3,12 @@
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/sinks/wincolor_sink.h>
+#include <Windows.h>
 
 void Log::Init()
 {
+    AllocConsole();
+
     auto ConsoleSink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
     ConsoleSink->set_level(spdlog::level::trace);
     ConsoleSink->set_pattern("[%^%l%$] %v");

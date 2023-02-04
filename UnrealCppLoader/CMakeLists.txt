@@ -13,11 +13,13 @@ set(LOG_SOURCE "Log/Log.h" "Log/Log.cpp")
 set(GAMEINFO_SOURCE "GameInfo/GameInfo.h" "GameInfo/GameInfo.cpp" "GameInfo/GameSettings.h")
 set(MEMORY_SOURCE "Memory/CoreModLoader.h" "Memory/CoreModLoader.cpp" "Memory/mem.h" "Memory/mem.cpp" "Memory/Pattern.h" "Memory/Pattern.cpp" "Memory/PatternScanner.h" "Memory/PatternScanner.h")
 set(MOD_SOURCE "Mod/Mod.h" "Mod/Mod.cpp")
-set(UTILITIES_SOURCE "Utilities/Dumper.h" "Utilities/Dumper.cpp" "Utilities/EngineDefFinder.h" "Utilities/EngineDefFinder.cpp" "Utilities/Globals.h" "Utilities/Globals.cpp" "Utilities/MinHook.h" "Utilities/Version.h")
+set(UTILITIES_SOURCE "Utilities/Dumper.h" "Utilities/Dumper.cpp" "Utilities/EngineDefFinder.h" "Utilities/EngineDefFinder.cpp" "Utilities/Globals.h" "Utilities/Globals.cpp" "Utilities/MinHook.h")
 
 set(UCPPL_SOURCE "dllmain.cpp" ${GAMEINFO_SOURCE} ${SHARED_SOURCE} ${MEMORY_SOURCE} ${MOD_SOURCE} ${UTILITIES_SOURCE} ${UE4_SOURCE} ${LOG_SOURCE})
 
 add_definitions(-DUNICODE -D_UNICODE -DUNREALCPPLOADER_EXPORTS -D_WINDOWS)
+add_compile_definitions(UNREALCPPLOADER_VERSION="${UNREALCPPLOADER_VERSION}")
+add_compile_definitions(MODLOADER_VERSION="${UNREALCPPLOADER_VERSION}")
 
 add_library(UnrealCppLoader SHARED ${UCPPL_SOURCE})
 

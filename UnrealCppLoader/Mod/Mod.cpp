@@ -1,6 +1,5 @@
 #include "Mod.h"
 #include "Utilities/MinHook.h"
-#include "Utilities/Version.h"
 
 void Mod::InitGameState()
 {

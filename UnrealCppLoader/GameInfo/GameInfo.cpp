@@ -3,7 +3,6 @@
 #include "Log/Log.h"
 #include "Memory/Pattern.h"
 #include "Memory/PatternScanner.h"
-#include "Utilities/Version.h"
 #include <Shared/Hooks.h>
 #include <UE4/Ue4.hpp>
 #include <filesystem>
@@ -15,14 +14,7 @@ GameProfile GameProfile::SelectedGameProfile;
 
 void GameProfile::CreateGameProfile(GameSettings::GameSettings Settings)
 {
-// debug
-#ifndef NDEBUG
-    ShowWindow(GetConsoleWindow(), SW_SHOW);
-    FreeConsole();
-    AllocConsole();
-#endif
-
-    LOG_INFO("Created by ~Russell.J Release V {}", MODLOADER_VERSION);
+    LOG_INFO("Created by ~Russell.J Release V{}", MODLOADER_VERSION);
     LOG_INFO("Heavily modified by AstroTechies");
     LOG_INFO("Loading baked profile");
 
