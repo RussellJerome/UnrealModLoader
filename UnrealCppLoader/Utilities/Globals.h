@@ -23,10 +23,12 @@ struct ModInfo
 class LOADER_API Global
 {
   public:
+    typedef void (*BpFunction)(UE4::UObject *, UE4::FFrame *, void *, PVOID (*)(UE4::UObject *, UE4::FFrame *, void *));
+
     struct BPFunctionWrapper
     {
         std::string FunctionName;
-        void *FuncPtr;
+        BpFunction FuncPtr;
     };
     std::string GameName;
     bool bIsMenuOpen;
@@ -36,7 +38,7 @@ class LOADER_API Global
 
     static Global *GetGlobals();
 
-    void AddBPFunctionWrapper(std::string FunctionName, void *FuncPtr)
+    void AddBPFunctionWrapper(std::string FunctionName, BpFunction FuncPtr)
     {
         BPFunctionWrapper FunctionWrap;
         FunctionWrap.FunctionName = FunctionName;

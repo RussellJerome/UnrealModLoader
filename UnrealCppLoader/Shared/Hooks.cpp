@@ -34,12 +34,11 @@ PVOID hookProcessFunction(UE4::UObject *obj, UE4::FFrame *Frame, void *const Res
     PVOID ret = nullptr;
     if (!GameStateClassInitNotRan)
     {
-        for (size_t i = 0; i < Global::GetGlobals()->GetBPFunctionWrappers().size(); i++)
+        for (const auto &Wrapper : Global::GetGlobals()->GetBPFunctionWrappers())
         {
-            if (Frame->Node->GetName() == Global::GetGlobals()->GetBPFunctionWrappers()[i].FunctionName)
+            if (Frame->Node->GetName() == Wrapper.FunctionName)
             {
-                reinterpret_cast<void (*)(UE4::UObject *, UE4::FFrame *, void *)>(
-                    Global::GetGlobals()->GetBPFunctionWrappers()[i].FuncPtr)(obj, Frame, (void *)Result);
+                Wrapper.FuncPtr(obj, Frame, Result, origProcessFunction);
                 return nullptr;
             }
         }
