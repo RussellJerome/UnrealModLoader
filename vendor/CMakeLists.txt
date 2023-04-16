@@ -9,7 +9,7 @@ if(ENABLE_GUI)
 FetchContent_Declare(
 	ImGui_Download
 	
-	GIT_REPOSITORY "git@github.com:ocornut/imgui.git"
+	GIT_REPOSITORY "https://github.com/ocornut/imgui.git"
 	GIT_TAG "2efebe331547a31b34ebf4049545df241cd04e50"
 	GIT_PROGRESS TRUE
 	GIT_SHALLOW FALSE
@@ -46,7 +46,7 @@ endif()
 FetchContent_Declare(
 	MinHook
 
-	GIT_REPOSITORY "git@github.com:TsudaKageyu/minhook.git"
+	GIT_REPOSITORY "https://github.com/TsudaKageyu/minhook.git"
 	GIT_TAG "49d03ad118cf7f6768c79a8f187e14b8f2a07f94"
 	GIT_PROGRESS TRUE
 	GIT_SHALLOW FALSE
@@ -59,7 +59,7 @@ FetchContent_MakeAvailable(MinHook)
 FetchContent_Declare(
 	fmt
 
-	GIT_REPOSITORY "git@github.com:fmtlib/fmt.git"
+	GIT_REPOSITORY "https://github.com/fmtlib/fmt.git"
 	GIT_TAG "8.0.0"
 	GIT_PROGRESS TRUE
 	GIT_SHALLOW FALSE
@@ -71,7 +71,7 @@ FetchContent_MakeAvailable(fmt)
 FetchContent_Declare(
 	spdlog
 
-	GIT_REPOSITORY "git@github.com:gabime/spdlog.git"
+	GIT_REPOSITORY "https://github.com/gabime/spdlog.git"
 	GIT_TAG "927cc29444a294d76e83dfb898e797dc431ce094"
 	GIT_PROGRESS TRUE
 	GIT_SHALLOW FALSE
@@ -84,7 +84,7 @@ FetchContent_MakeAvailable(spdlog)
 FetchContent_Declare(
 	nlohmann_json
 
-	GIT_REPOSITORY "git@github.com:nlohmann/json.git"
+	GIT_REPOSITORY "https://github.com/nlohmann/json.git"
 	GIT_TAG "b2306145e1789368e6f261680e8dc007e91cc986"
 	GIT_PROGRESS TRUE
 	GIT_SHALLOW FALSE

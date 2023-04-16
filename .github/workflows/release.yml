@@ -1,0 +1,78 @@
+name: Release
+
+permissions:
+  contents: write
+
+on:
+  push:
+    tags:
+      - v[0-9]+.*
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.create-gh-release.outputs.computed-prefix }}${{ steps.create-gh-release.outputs.version }}
+    steps:
+      - uses: actions/checkout@v3
+      - id: create-gh-release
+        uses: taiki-e/create-gh-release-action@v1
+        with:
+          draft: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+  upload-artifacts:
+    needs: create-release
+    strategy:
+      matrix:
+        config: [debug, release]
+        gui: [gui, nogui]
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      # Setup the build machine with the most recent versions of CMake and Ninja. Both are cached if not already: on subsequent runs both will be quickly restored from GitHub cache service.
+      - uses: lukka/get-cmake@latest
+
+      - uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Build artifacts
+        uses: lukka/run-cmake@v10
+        with:
+          configurePreset: windows-${{ matrix.config }}-${{ matrix.gui }}
+          buildPreset: windows-${{ matrix.config }}-${{ matrix.gui }}
+
+      - name: Upload dlls
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: out/build/windows-${{ matrix.config }}-${{ matrix.gui }}/UnrealCppLoader/UnrealCppLoader.dll
+          asset_name: UnrealCppLoader-${{ matrix.config }}-${{ matrix.gui }}.dll
+          tag: ${{ needs.create-release.outputs.tag }}
+
+      - name: Upload pdbs
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: out/build/windows-${{ matrix.config }}-${{ matrix.gui }}/UnrealCppLoader/UnrealCppLoader.pdb
+          asset_name: UnrealCppLoader-${{ matrix.config }}-${{ matrix.gui }}.pdb
+          tag: ${{ needs.create-release.outputs.tag }}
+
+      - name: Upload xinput1_3
+        if: matrix.config == 'release' && matrix.gui == 'nogui'
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: out/build/windows-${{ matrix.config }}-${{ matrix.gui }}/xinput1_3/xinput1_3.dll
+          asset_name: xinput1_3.dll
+          tag: ${{ needs.create-release.outputs.tag }}
+
+  publish-release:
+    needs: [create-release, upload-artifacts]
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: mark release as non-draft
+        run: |
+          gh release edit ${{ needs.create-release.outputs.tag }} --draft=false

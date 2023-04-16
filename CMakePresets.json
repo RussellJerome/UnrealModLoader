@@ -1,0 +1,96 @@
+{
+  "version": 4,
+  "configurePresets": [
+    {
+      "name": "windows-base",
+      "description": "Target Windows with the Visual Studio development environment.",
+      "hidden": true,
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/out/build/${presetName}",
+      "installDir": "${sourceDir}/out/install/${presetName}",
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "cl.exe",
+        "CMAKE_CXX_COMPILER": "cl.exe"
+      }
+    },
+    {
+      "name": "x64-debug",
+      "displayName": "x64 Debug",
+      "description": "Target Windows (64-bit) (Debug)",
+      "hidden": true,
+      "inherits": "windows-base",
+      "architecture": {
+        "value": "x64",
+        "strategy": "external"
+      },
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "x64-release",
+      "displayName": "x64 Release",
+      "description": "Target Windows (64-bit) (RelWithDebInfo)",
+      "hidden": true,
+      "inherits": "x64-debug",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+      }
+    },
+
+    {
+      "name": "windows-debug-nogui",
+      "displayName": "Windows x64 Debug Nogui",
+      "inherits": "x64-debug",
+      "cacheVariables": {
+        "ENABLE_GUI": "OFF"
+      }
+    },
+    {
+      "name": "windows-debug-gui",
+      "displayName": "Windows x64 Debug Gui",
+      "inherits": "x64-debug",
+      "cacheVariables": {
+        "ENABLE_GUI": "ON"
+      }
+    },
+    {
+      "name": "windows-release-nogui",
+      "displayName": "Windows x64 Release Nogui",
+      "inherits": "x64-release",
+      "cacheVariables": {
+        "ENABLE_GUI": "OFF"
+      }
+    },
+    {
+      "name": "windows-release-gui",
+      "displayName": "Windows x64 Release Gui",
+      "inherits": "x64-release",
+      "cacheVariables": {
+        "ENABLE_GUI": "ON"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "windows-debug-nogui",
+      "displayName": "Windows x64 Debug Nogui",
+      "configurePreset": "windows-debug-nogui"
+    },
+    {
+      "name": "windows-debug-gui",
+      "displayName": "Windows x64 Debug Gui",
+      "configurePreset": "windows-debug-gui"
+    },
+    {
+      "name": "windows-release-nogui",
+      "displayName": "Windows x64 Release Nogui",
+      "configurePreset": "windows-release-nogui"
+    },
+    {
+      "name": "windows-release-gui",
+      "displayName": "Windows x64 Release Gui",
+      "configurePreset": "windows-release-gui"
+    }
+  ]
+}
