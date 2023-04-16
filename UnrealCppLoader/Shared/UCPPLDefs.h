@@ -1,5 +1,8 @@
 #pragma once
 
+#define UNREALCPPLOADER_VERSION "0.1.13"
+#define MODLOADER_VERSION UNREALCPPLOADER_VERSION
+
 #ifdef UNREALCPPLOADER_EXPORTS
 #define LOADER_API __declspec(dllexport)
 #else

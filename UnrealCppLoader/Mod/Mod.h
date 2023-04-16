@@ -44,6 +44,8 @@ class LOADER_API Mod
     virtual void DrawImGui();
 #endif
 
-    // Called When Mod Construct Finishes
-    void CompleteModCreation();
+  protected:
+    // Call to initialize the mod
+    Mod(std::string &&ModName, std::string &&ModVersion, std::string &&ModDescription, std::string &&ModAuthors,
+        std::string &&ModLoaderVersion);
 };

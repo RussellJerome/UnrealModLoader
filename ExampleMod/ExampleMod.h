@@ -5,16 +5,8 @@ class ExampleMod : public Mod
 {
   public:
     // Basic Mod Info
-    ExampleMod()
+    ExampleMod() : Mod("ExampleMod", "1.0.0", "HAHAHAHA MOD GO BURR", "RussellJ", MODLOADER_VERSION)
     {
-        ModName = "ExampleMod"; // Mod Name -- If Using BP ModActor, Should Be The Same Name As Your Pak
-        ModVersion = "1.0.0";   // Mod Version
-        ModDescription = "HAHAHAHA MOD GO BURR"; // Mod Description
-        ModAuthors = "RussellJ";                 // Mod Author
-        ModLoaderVersion = "2.2.1";
-
-        // Dont Touch The Internal Stuff
-        CompleteModCreation();
     }
 
     // Called When Internal Mod Setup is finished

@@ -44,8 +44,15 @@ void Mod::SetupHooks()
 #endif
 }
 
-void Mod::CompleteModCreation()
+Mod::Mod(std::string &&ModName, std::string &&ModVersion, std::string &&ModDescription, std::string &&ModAuthors,
+         std::string &&ModLoaderVersion)
 {
+    this->ModName = ModName;
+    this->ModVersion = ModVersion;
+    this->ModDescription = ModDescription;
+    this->ModAuthors = ModAuthors;
+    this->ModLoaderVersion = ModLoaderVersion;
+
     IsFinishedCreating = true;
     Global::GetGlobals()->AddToCoreMods(this);
     LOG_INFO("Core Mod Created: {}", ModName.c_str());
